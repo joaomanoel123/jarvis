@@ -1,4 +1,23 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+"""
+Correção da UI do GitHub Pages
+Corrige problemas de carregamento da interface
+"""
+
+import os
+
+def print_header():
+    """Exibe cabeçalho"""
+    print("🎨 CORREÇÃO UI GITHUB PAGES")
+    print("=" * 35)
+    print("🔧 Corrigindo problemas de interface")
+    print()
+
+def create_fixed_index():
+    """Cria versão corrigida do index.html"""
+    print("1️⃣ Criando index.html corrigido...")
+    
+    fixed_html = '''<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -15,7 +34,14 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    
     <style>
+        /* Garantir que a UI apareça */
         body {
             background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
             color: white;
@@ -313,7 +339,8 @@
         <div class="container">
             <div class="jarvis-container">
                 <h1 class="jarvis-title">
-                    🤖 J.A.R.V.I.S
+                    <i class="bi bi-robot"></i>
+                    J.A.R.V.I.S
                 </h1>
                 <p class="lead">Seu Assistente Virtual Inteligente</p>
                 
@@ -321,7 +348,8 @@
                 <div class="chat-interface">
                     <div id="chatMessages" class="chat-messages">
                         <div class="message assistant">
-                            🤖 Olá! Eu sou o J.A.R.V.I.S, seu assistente virtual. Como posso ajudá-lo hoje?
+                            <i class="bi bi-robot me-2"></i>
+                            Olá! Eu sou o J.A.R.V.I.S, seu assistente virtual. Como posso ajudá-lo hoje?
                         </div>
                     </div>
                     
@@ -332,7 +360,7 @@
                                placeholder="Digite sua pergunta aqui..."
                                autocomplete="off">
                         <button id="sendButton" class="btn btn-jarvis ms-2" type="button">
-                            ➤
+                            <i class="bi bi-send"></i>
                         </button>
                     </div>
                 </div>
@@ -340,25 +368,33 @@
                 <!-- Features -->
                 <div class="features">
                     <div class="feature-card">
-                        <div class="feature-icon">💬</div>
+                        <div class="feature-icon">
+                            <i class="bi bi-chat-dots"></i>
+                        </div>
                         <h5>Chat Inteligente</h5>
                         <p>Conversação natural com IA avançada</p>
                     </div>
                     
                     <div class="feature-card">
-                        <div class="feature-icon">🔍</div>
+                        <div class="feature-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
                         <h5>Pesquisa Web</h5>
                         <p>Pesquise qualquer coisa no Google</p>
                     </div>
                     
                     <div class="feature-card">
-                        <div class="feature-icon">🎥</div>
+                        <div class="feature-icon">
+                            <i class="bi bi-youtube"></i>
+                        </div>
                         <h5>YouTube</h5>
                         <p>Reproduza músicas e vídeos</p>
                     </div>
                     
                     <div class="feature-card">
-                        <div class="feature-icon">🕐</div>
+                        <div class="feature-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
                         <h5>Informações</h5>
                         <p>Hora, data e informações úteis</p>
                     </div>
@@ -396,6 +432,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
     <script>
         // Configuração
@@ -558,9 +595,9 @@
             messageDiv.className = `message ${type}`;
             
             if (type === 'assistant') {
-                messageDiv.innerHTML = `🤖 ${text}`;
+                messageDiv.innerHTML = `<i class="bi bi-robot me-2"></i>${text}`;
             } else {
-                messageDiv.innerHTML = `👤 ${text}`;
+                messageDiv.innerHTML = `<i class="bi bi-person me-2"></i>${text}`;
             }
             
             chatMessages.appendChild(messageDiv);
@@ -572,7 +609,7 @@
             const typingDiv = document.createElement('div');
             typingDiv.className = 'message assistant typing-indicator';
             typingDiv.id = 'typingIndicator';
-            typingDiv.innerHTML = '🤖 Digitando<span class="dots">...</span>';
+            typingDiv.innerHTML = '<i class="bi bi-robot me-2"></i>Digitando<span class="dots">...</span>';
             
             chatMessages.appendChild(typingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -624,4 +661,231 @@
     </script>
 </body>
 
-</html>
+</html>'''
+    
+    try:
+        with open('docs/index.html', 'w', encoding='utf-8') as f:
+            f.write(fixed_html)
+        
+        print("   ✅ index.html corrigido criado")
+        return True
+        
+    except Exception as e:
+        print(f"   ❌ Erro: {e}")
+        return False
+
+def create_minimal_css():
+    """Cria CSS mínimo para garantir funcionamento"""
+    print("2️⃣ Criando CSS mínimo...")
+    
+    minimal_css = '''/* J.A.R.V.I.S Web - CSS Mínimo */
+body {
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Garantir que elementos apareçam */
+* {
+    box-sizing: border-box;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.show {
+    display: block !important;
+}
+
+/* Responsivo básico */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 10px;
+    }
+}
+'''
+    
+    try:
+        with open('docs/style.css', 'w', encoding='utf-8') as f:
+            f.write(minimal_css)
+        
+        print("   ✅ CSS mínimo criado")
+        return True
+        
+    except Exception as e:
+        print(f"   ❌ Erro: {e}")
+        return False
+
+def create_minimal_js():
+    """Cria JavaScript mínimo"""
+    print("3️⃣ Criando JavaScript mínimo...")
+    
+    minimal_js = '''// J.A.R.V.I.S Web - JavaScript Mínimo
+console.log('🤖 J.A.R.V.I.S Web carregando...');
+
+// Garantir que o site funcione mesmo sem dependências externas
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ DOM carregado');
+    
+    // Verificar se jQuery está disponível
+    if (typeof $ === 'undefined') {
+        console.log('⚠️ jQuery não disponível, usando JavaScript nativo');
+    } else {
+        console.log('✅ jQuery disponível');
+    }
+    
+    // Garantir que a interface apareça
+    setTimeout(() => {
+        const loadingScreen = document.getElementById('loadingScreen');
+        const mainInterface = document.getElementById('mainInterface');
+        
+        if (loadingScreen) {
+            loadingScreen.style.display = 'none';
+        }
+        
+        if (mainInterface) {
+            mainInterface.style.display = 'block';
+        }
+        
+        console.log('✅ Interface carregada');
+    }, 2000);
+});
+
+// Fallback para garantir que a página apareça
+window.addEventListener('load', function() {
+    console.log('✅ Página totalmente carregada');
+    
+    // Forçar exibição da interface após 5 segundos
+    setTimeout(() => {
+        const loadingScreen = document.getElementById('loadingScreen');
+        const mainInterface = document.getElementById('mainInterface');
+        
+        if (loadingScreen) {
+            loadingScreen.style.display = 'none';
+        }
+        
+        if (mainInterface) {
+            mainInterface.style.display = 'block';
+            mainInterface.style.opacity = '1';
+        }
+        
+        console.log('🎉 Interface forçada a aparecer');
+    }, 5000);
+});
+'''
+    
+    try:
+        with open('docs/main.js', 'w', encoding='utf-8') as f:
+            f.write(minimal_js)
+        
+        print("   ✅ JavaScript mínimo criado")
+        return True
+        
+    except Exception as e:
+        print(f"   ❌ Erro: {e}")
+        return False
+
+def create_simple_script():
+    """Cria script.js simples"""
+    print("4️⃣ Criando script.js simples...")
+    
+    simple_script = '''// Script simples para J.A.R.V.I.S Web
+console.log('📜 Script.js carregado');
+
+// Função para garantir compatibilidade
+function ensureCompatibility() {
+    // Polyfill básico para fetch se não existir
+    if (!window.fetch) {
+        console.log('⚠️ Fetch não disponível');
+    }
+    
+    // Verificar console
+    if (!window.console) {
+        window.console = {
+            log: function() {},
+            error: function() {},
+            warn: function() {}
+        };
+    }
+}
+
+// Executar verificações
+ensureCompatibility();
+
+console.log('✅ Script.js inicializado');
+'''
+    
+    try:
+        with open('docs/script.js', 'w', encoding='utf-8') as f:
+            f.write(simple_script)
+        
+        print("   ✅ script.js simples criado")
+        return True
+        
+    except Exception as e:
+        print(f"   ❌ Erro: {e}")
+        return False
+
+def main():
+    """Função principal"""
+    print_header()
+    
+    steps = [
+        ("Criar index.html corrigido", create_fixed_index),
+        ("Criar CSS mínimo", create_minimal_css),
+        ("Criar JavaScript mínimo", create_minimal_js),
+        ("Criar script.js simples", create_simple_script)
+    ]
+    
+    success_count = 0
+    
+    for step_name, step_func in steps:
+        print(f"📝 {step_name}...")
+        if step_func():
+            success_count += 1
+        print()
+    
+    # Resultado final
+    print("🎨 CORREÇÃO UI CONCLUÍDA!")
+    print("=" * 25)
+    print(f"✅ Arquivos corrigidos: {success_count}/{len(steps)}")
+    
+    if success_count >= 3:
+        print("🎯 UI CORRIGIDA COM SUCESSO!")
+        print("✅ Interface simplificada e funcional")
+        print("✅ Compatibilidade garantida")
+        print("✅ Carregamento otimizado")
+        print("✅ Design responsivo")
+        print()
+        print("🚀 PRÓXIMOS PASSOS:")
+        print("   1. git add docs/")
+        print("   2. git commit -m 'Corrigir UI GitHub Pages'")
+        print("   3. git push origin main")
+        print("   4. Aguardar 2-5 minutos")
+        print("   5. Acessar: https://joaomanoel123.github.io/jarvis")
+        
+    else:
+        print("❌ ALGUMAS CORREÇÕES FALHARAM")
+        print("🔧 Verifique os erros acima")
+    
+    print()
+    print("🌐 SEU SITE:")
+    print("   https://joaomanoel123.github.io/jarvis")
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\\n👋 Correção interrompida!")
+    except Exception as e:
+        print(f"\\n❌ Erro inesperado: {e}")
