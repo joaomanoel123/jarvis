@@ -4,7 +4,7 @@ $(document).ready(function () {
     const isGitHubPages = true;
     
     // Configuração da API (você pode adicionar sua chave aqui)
-    const GOOGLE_API_KEY = 'AIzaSyDs5DEbpEMM3OGwAOafCfYfPdZMf-wn7hE'; // Substitua pela sua chave
+    const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY_HERE'; // Configure sua chave aqui
     
     console.log('🌐 J.A.R.V.I.S Web Version carregado!');
 

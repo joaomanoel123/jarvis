@@ -1,6 +1,7 @@
 {
-  "api_key": "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",
-  "access_key": "cj5Hf3KgzSxVuFC7xrNeWMkxtWVUvrnXC1eh9m7IyDlJIMsqP9xayA==",
+  "api_key": "YOUR_GROQ_API_KEY_HERE",
+  "access_key": "YOUR_PORCUPINE_ACCESS_KEY_HERE",
+  "google_api_key": "YOUR_GOOGLE_API_KEY_HERE",
   "session_id": "",
   "token": ""
 }
