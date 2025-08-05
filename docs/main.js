@@ -3,7 +3,7 @@ $(document).ready(function () {
     // Configuração para GitHub Pages (sem Eel)
     const isGitHubPages = true;
     
-    // Configuração da API (você pode adicionar sua chave aqui)
+    // Configuração da API (sua chave configurada)
     const GOOGLE_API_KEY = 'AIzaSyB-bKu1M569hi9fizOMEOXeGTcUyJfFTUA'; // Chave configurada
     
     console.log('🌐 J.A.R.V.I.S Web Version carregado!');
