@@ -1,0 +1,24 @@
+# Prevent submodule issues
+* text=auto
+*.py text
+*.js text
+*.html text
+*.css text
+*.md text
+*.yml text
+*.yaml text
+*.json text
+
+# Binary files
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.so binary
+
+# No submodules
+.gitmodules export-ignore
