@@ -15,7 +15,7 @@
     <meta name="pragma" content="no-cache">
     
     <!-- Force Refresh -->
-    <meta name="version" content="2025-08-05-v2">
+    <meta name="version" content="2025-08-05-v3-mobile">
 
     <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" type="image/x-icon">
 
@@ -32,9 +32,17 @@
     <!-- Texllate -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
-    <link rel="stylesheet" href="style.css?v=2025080519">
+    <link rel="stylesheet" href="style.css?v=2025080521">
+    <!-- Melhorias visuais Iron Man/J.A.R.V.I.S -->
+    <link rel="stylesheet" href="iron_man_visual_styles.css?v=2025011520">
+    <!-- Melhorias Google-like -->
+    <link rel="stylesheet" href="google_enhanced_web_styles.css?v=2025011521">
 
-    <!-- Force rebuild: 2025-08-05 16:14:47 -->
+    <!-- Mobile Optimizations -->
+    <link rel="stylesheet" href="mobile_optimizations.css?v=2025080520">
+    
+    <!-- Enhanced Version: 2025-01-15 22:00:00 -->
+    <!-- Funcionalidades: Voz funcional, comandos avançados, apps web, mobile optimized -->
 </head>
 
 <body>
@@ -220,7 +228,7 @@
                                 <input type="text" class="input-field" name="chatbox" id="chatbox"
                                     placeholder="Digite sua pergunta aqui...">
                                 <button id="SendBtn" class="glow-on-hover" hidden><i class="bi bi-send"></i></button>
-                                <button id="MicBtn" class="glow-on-hover" disabled title="Microfone não disponível na web"><i class="bi bi-mic-mute"></i></button>
+                                <button id="MicBtn" class="glow-on-hover" title="Clique para falar"><i class="bi bi-mic"></i></button>
                                 <button id="ChatBtn" class="glow-on-hover" data-bs-toggle="offcanvas"
                                     data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"><i
                                         class="bi bi-chat-dots"></i></button>
@@ -282,18 +290,28 @@
                 <div class="modal-body">
                     <h6>🌟 Funcionalidades:</h6>
                     <ul>
-                        <li>💬 <strong>Chat Inteligente</strong> - Conversação natural com IA</li>
-                        <li>🔍 <strong>Pesquisa</strong> - "pesquisar receitas de bolo"</li>
-                        <li>🎥 <strong>YouTube</strong> - "reproduzir música no YouTube"</li>
-                        <li>📱 <strong>WhatsApp</strong> - "enviar mensagem para [nome]"</li>
-                        <li>🌐 <strong>Interface Web</strong> - Acesso via navegador</li>
+                        <li>💬 <strong>Chat Inteligente</strong> - Conversação natural com IA Gemini</li>
+                        <li>🎤 <strong>Reconhecimento de Voz</strong> - Comandos por voz funcional (Chrome/Edge)</li>
+                        <li>🔍 <strong>Pesquisa Avançada</strong> - "pesquisar [termo]" no Google</li>
+                        <li>🎥 <strong>YouTube Inteligente</strong> - "reproduzir [música/vídeo]"</li>
+                        <li>📱 <strong>WhatsApp Web</strong> - "enviar mensagem [texto]"</li>
+                        <li>🌐 <strong>Redes Sociais</strong> - "abrir [facebook/instagram/twitter]"</li>
+                        <li>📧 <strong>Produtividade</strong> - "abrir [gmail/calendar/drive]"</li>
+                        <li>📰 <strong>Informações</strong> - "tempo", "notícias", "que horas são"</li>
+                        <li>🎮 <strong>Entretenimento</strong> - "abrir [netflix/spotify/twitch]"</li>
+                        <li>📊 <strong>Estatísticas</strong> - Monitoramento em tempo real</li>
                     </ul>
                     
                     <h6>🎮 Como usar:</h6>
                     <ul>
-                        <li>Digite sua pergunta na caixa de texto</li>
-                        <li>Pressione Enter ou clique no botão enviar</li>
-                        <li>Aguarde a resposta do assistente</li>
+                        <li>🎤 <strong>Por voz:</strong> Clique no microfone ou pressione Ctrl+Space</li>
+                        <li>⌨️ <strong>Por texto:</strong> Digite na caixa de texto</li>
+                        <li>📤 Pressione Enter ou clique no botão enviar</li>
+                        <li>🤖 Aguarde a resposta do assistente</li>
+                        <li>🔇 Pressione Esc para parar a escuta</li>
+                        <li>🆘 Pressione F1 para ajuda rápida</li>
+                        <li>📊 Pressione F2 para estatísticas</li>
+                        <li>🎤 Pressione F3 para testar microfone</li>
                     </ul>
                     
                     <h6>💡 Exemplos de comandos:</h6>
@@ -301,12 +319,26 @@
                         <li>"Olá, como você está?"</li>
                         <li>"Pesquisar receitas de bolo"</li>
                         <li>"Reproduzir música relaxante no YouTube"</li>
+                        <li>"Abrir WhatsApp"</li>
+                        <li>"Enviar mensagem olá como vai"</li>
+                        <li>"Abrir Instagram"</li>
+                        <li>"Abrir Gmail"</li>
                         <li>"Que horas são?"</li>
                         <li>"Como está o tempo?"</li>
+                        <li>"Abrir Netflix"</li>
+                        <li>"Estatísticas"</li>
                     </ul>
                     
                     <div class="alert alert-info">
-                        <strong>📝 Nota:</strong> Esta é a versão web do J.A.R.V.I.S. Algumas funcionalidades como reconhecimento de voz e controle de dispositivos estão disponíveis apenas na versão desktop.
+                        <strong>📝 Nota:</strong> Esta versão web Enhanced inclui reconhecimento de voz funcional, comandos avançados e integração com aplicativos web. Para controle de dispositivos físicos, use a versão desktop.
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <strong>🆕 Novidades Enhanced:</strong> Reconhecimento de voz funcional, comandos inteligentes, integração com redes sociais, WhatsApp Web, produtividade e entretenimento!
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <strong>⚡ Atalhos:</strong> Ctrl+Space (microfone), F1 (ajuda), F2 (stats), F3 (teste mic), Esc (parar)
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -330,15 +362,29 @@
     <!-- Particle js -->
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
     <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
-    <script src="script.js?v=2025080519"></script>
-
+    <script src="script.js?v=2025080521"></script>
     <!-- Siri wave -->
     <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
 
     <!-- Texllate js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/textillate/0.4.0/jquery.textillate.min.js"></script>
 
-    <script src="main.js?v=2025080519"></script>
+    <!-- Configurações do J.A.R.V.I.S -->
+    <script src="jarvis-config.js?v=2025011522"></script>
+    <!-- Sistema de reconhecimento de voz web -->
+    <script src="speech-recognition-web.js?v=2025011522"></script>
+    <!-- Sistema de comandos avançados -->
+    <script src="advanced-commands.js?v=2025011522"></script>
+    <!-- Sistema principal melhorado -->
+    <script src="main-enhanced.js?v=2025011522"></script>
+    
+    <!-- Melhorias visuais Iron Man/J.A.R.V.I.S -->
+    <script src="iron_man_audio_visualizer.js?v=2025011520"></script>
+    <!-- Sistema de áudio Google-like -->
+    <script src="google_audio_web.js?v=2025011521"></script>
+    
+    <!-- Mobile Enhancements -->
+    <script src="mobile_enhancements.js?v=2025080520"></script>
 
 </body>
 
