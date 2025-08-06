@@ -25,9 +25,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: false
+          submodules: 'false'
           fetch-depth: 1
           clean: true
+          lfs: false
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
