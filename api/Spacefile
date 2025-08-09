@@ -9,4 +9,4 @@ app:
 runtime:
   env:
     - name: CORS_ORIGINS
-      default: "*"
+      default: "https://joaomanoel123.github.io,https://joaomanoel123.github.io/jarvis"
