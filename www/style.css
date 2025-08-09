@@ -1,7 +1,7 @@
 
 body{
     background-color: black;
-    overflow-y: hidden;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -175,11 +175,19 @@ body{
   
   /* Input Filed End*/
 
+  
   /* Chat Box Start */
 
 .chat-canvas{
   background-color: #191919
 }
+
+#siri-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 
 .receiver_message{
   padding: 8px;
@@ -213,6 +221,7 @@ body{
   justify-content: center;
   align-items: center;
   animation: change-view 2s ease-in infinite;
+  max-width: 90vw;
 }
 
 @keyframes change-view {
@@ -224,16 +233,26 @@ body{
 
   70%,
   100% {
-    transform: rotate(-80deg) skew(30deg) translateX(calc(45px * var(--i))) translateY(calc(-35px * var(--i)));
+    transform: rotate(-80deg) skew(30deg) translateX(calc(25px * var(--i))) translateY(calc(-20px * var(--i)));
   }
+}
+
+@media (max-width: 576px) {
+  .square { width: 280px; height: 280px; }
+  .svg-frame { width: 320px; height: 320px; }
+  #TextInput { margin: 10px; padding: 6px 8px; }
+  .glow-on-hover { width: 40px; height: 40px; }
+  .siri-message { font-size: 20px !important; }
 }
 
 svg {
   position: absolute;
   transition: 0.5s;
   transform-origin: center;
-  width: 450px;
-  height: 450px;
+  width: 90vw;
+  max-width: 450px;
+  height: auto;
+  aspect-ratio: 1 / 1;
   fill: none;
   animation: change-view 5s ease-in-out infinite alternate;
   filter: drop-shadow(0 0 12px #00aaff);

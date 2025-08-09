@@ -1,0 +1,12 @@
+v: 0
+app:
+  name: jarvis-api
+  type: "micro"
+  engine: "python3.11"
+  src: "."
+  commands:
+    - "pip install -r requirements.txt"
+runtime:
+  env:
+    - name: CORS_ORIGINS
+      default: "*"

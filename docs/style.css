@@ -1,10 +1,11 @@
-body {
+
+body{
     background-color: black;
-    overflow-y: hidden;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
-.square {
+.square{
     position: relative;
     width: 400px;
     height: 400px;
@@ -13,7 +14,7 @@ body {
     align-items: center;
 }
 
-.square span:nth-child(1) {
+.square span:nth-child(1){
     position: absolute;
     top: 0;
     left: 0;
@@ -26,7 +27,7 @@ body {
     animation: animate1 6s linear infinite;
 }
 
-.square span:nth-child(2) {
+.square span:nth-child(2){
     position: absolute;
     top: 0;
     left: 0;
@@ -39,7 +40,7 @@ body {
     animation: animate2 4s linear infinite;
 }
 
-.square span:nth-child(3) {
+.square span:nth-child(3){
     position: absolute;
     top: 0;
     left: 0;
@@ -53,54 +54,55 @@ body {
 }
 
 @keyframes animate1 {
-    0% {
+    0%{
         transform: rotate(0deg);
     }
-    100% {
+    100%{
         transform: rotate(360deg);
     }
 }
-
 @keyframes animate2 {
-    0% {
+    0%{
         transform: rotate(0deg);
     }
-    100% {
+    100%{
         transform: rotate(360deg);
     }
 }
-
 @keyframes animate3 {
-    0% {
+    0%{
         transform: rotate(0deg);
     }
-    100% {
+    100%{
         transform: rotate(360deg);
     }
 }
 
-/* Input Field Start*/
+
+/* Input Filed Start*/
+
 #TextInput {
     background-color: #181818a8;
     border-color: blue;
     box-shadow: 0 0 20px rgb(25, 0, 255),
-        inset 0 0 0px rgb(25, 0, 255);
+      inset 0 0 0px rgb(25, 0, 255);
     border-radius: 8px;
     color: white;
     padding: 3px 0px 3px 20px;
     margin: 0px 20%;
-}
-
-.input-field {
+  }
+  
+  .input-field {
     background-color: transparent;
     border: none;
     width: 95%;
     outline: none;
     color: white;
     font-family: cursive;
-}
-
-.glow-on-hover {
+  }
+  
+  
+  .glow-on-hover {
     width: 35px;
     height: 35px;
     border: none;
@@ -113,9 +115,9 @@ body {
     border-radius: 10px;
     padding: 0px;
     margin-left: 10px;
-}
-
-.glow-on-hover:before {
+  }
+  
+  .glow-on-hover:before {
     content: '';
     background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
     position: absolute;
@@ -130,21 +132,21 @@ body {
     opacity: 0;
     transition: opacity .3s ease-in-out;
     border-radius: 10px;
-}
-
-.glow-on-hover:active {
+  }
+  
+  .glow-on-hover:active {
     color: #181818a8
-}
-
-.glow-on-hover:active:after {
+  }
+  
+  .glow-on-hover:active:after {
     background: transparent;
-}
-
-.glow-on-hover:hover:before {
+  }
+  
+  .glow-on-hover:hover:before {
     opacity: 1;
-}
-
-.glow-on-hover:after {
+  }
+  
+  .glow-on-hover:after {
     z-index: -1;
     content: '';
     position: absolute;
@@ -154,96 +156,106 @@ body {
     left: 0;
     top: 0;
     border-radius: 10px;
-}
-
-.glow-on-hover:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.glow-on-hover:disabled:hover:before {
-    opacity: 0;
-}
-
-@keyframes glowing {
+  }
+  
+  @keyframes glowing {
     0% {
-        background-position: 0 0;
+      background-position: 0 0;
     }
-
+  
     50% {
-        background-position: 400% 0;
+      background-position: 400% 0;
     }
-
+  
     100% {
-        background-position: 0 0;
+      background-position: 0 0;
     }
+  }
+  
+  
+  /* Input Filed End*/
+
+  
+  /* Chat Box Start */
+
+.chat-canvas{
+  background-color: #191919
 }
 
-/* Input Field End*/
-
-/* Chat Box Start */
-.chat-canvas {
-    background-color: #191919
+#siri-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.receiver_message {
-    padding: 8px;
-    border: 2px solid cyan;
-    border-radius: 0px 15px 15px 20px;
-    width: auto;
-    color: white;
-    background-color: #0dcaf014;
+
+.receiver_message{
+  padding: 8px;
+  border: 2px solid cyan;
+  border-radius: 0px 15px 15px 20px;
+  width: auto;
+  color: white;
+  background-color: #0dcaf014;
 }
 
-.sender_message {
-    padding: 8px;
-    border: 1px solid #0045ff;
-    border-radius: 15px 15px 0px 20px;
-    width: auto;
-    color: white;
-    background-color: #0045ff;
+.sender_message{
+  padding: 8px;
+  border: 1px solid #0045ff;
+  border-radius: 15px 15px 0px 20px;
+  width: auto;
+  color: white;
+  background-color: #0045ff;
 }
-
-.width-size {
-    max-width: 80%;
-    width: auto;
+.width-size{
+  max-width: 80%;
+  width: auto;
 }
-
-/* Chat Box End*/
+/* Chat Box Start End*/
 
 .svg-frame {
-    position: relative;
-    width: 455px;
-    height: 455px;
-    transform-style: preserve-3d;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    animation: change-view 2s ease-in infinite;
+  position: relative;
+  width: 455px;
+  height: 455px;
+  transform-style: preserve-3d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: change-view 2s ease-in infinite;
+  max-width: 90vw;
 }
 
 @keyframes change-view {
 
-    0%,
-    50% {
-        transform: rotate(-0deg) skew(00deg) translateX(calc(0 * var(--i))) translateY(calc(-0px * var(--i)));
-    }
+  0%,
+  50% {
+    transform: rotate(-0deg) skew(00deg) translateX(calc(0 * var(--i))) translateY(calc(-0px * var(--i)));
+  }
 
-    70%,
-    100% {
-        transform: rotate(-80deg) skew(30deg) translateX(calc(45px * var(--i))) translateY(calc(-35px * var(--i)));
-    }
+  70%,
+  100% {
+    transform: rotate(-80deg) skew(30deg) translateX(calc(25px * var(--i))) translateY(calc(-20px * var(--i)));
+  }
+}
+
+@media (max-width: 576px) {
+  .square { width: 280px; height: 280px; }
+  .svg-frame { width: 320px; height: 320px; }
+  #TextInput { margin: 10px; padding: 6px 8px; }
+  .glow-on-hover { width: 40px; height: 40px; }
+  .siri-message { font-size: 20px !important; }
 }
 
 svg {
-    position: absolute;
-    transition: 0.5s;
-    transform-origin: center;
-    width: 450px;
-    height: 450px;
-    fill: none;
-    animation: change-view 5s ease-in-out infinite alternate;
-    filter: drop-shadow(0 0 12px #00aaff);
+  position: absolute;
+  transition: 0.5s;
+  transform-origin: center;
+  width: 90vw;
+  max-width: 450px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  fill: none;
+  animation: change-view 5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 12px #00aaff);
 }
 
 #big-centro,
@@ -255,107 +267,35 @@ svg {
 #center-lines,
 #squares,
 #top-dots {
-    transform-origin: center;
-    animation: rotate 4s ease-in-out infinite alternate;
+  transform-origin: center;
+  animation: rotate 4s ease-in-out infinite alternate;
 }
 
 #big-centro {
-    animation-delay: -1.5s;
+  animation-delay: -1.5s;
 }
 
 #outter1 {
-    animation-delay: -1.2s;
+  animation-delay: -1.2s;
 }
 
 #center {
-    animation-delay: -2.2s;
+  animation-delay: -2.2s;
 }
 
 #bottom-dots,
 #top-dots {
-    animation-duration: 7s;
+  animation-duration: 7s;
 }
 
 #center-lines,
 #outter-center {
-    animation-duration: 6s;
-    animation-delay: -3s;
+  animation-duration: 6s;
+  animation-delay: -3s;
 }
 
 @keyframes rotate {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .svg-frame {
-        width: 300px;
-        height: 300px;
-    }
-    
-    svg {
-        width: 300px;
-        height: 300px;
-    }
-    
-    .square {
-        width: 250px;
-        height: 250px;
-    }
-    
-    #TextInput {
-        margin: 0px 10%;
-    }
-}
-
-/* Loading Animation */
-.loading {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255,255,255,.3);
-    border-radius: 50%;
-    border-top-color: #fff;
-    animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Status Messages */
-.status-message {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 10px 20px;
-    border-radius: 5px;
-    color: white;
-    z-index: 1000;
-    animation: slideIn 0.3s ease-out;
-}
-
-.status-success {
-    background-color: #28a745;
-}
-
-.status-error {
-    background-color: #dc3545;
-}
-
-.status-info {
-    background-color: #17a2b8;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+  to {
+    transform: rotate(360deg);
+  }
 }
