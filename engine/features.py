@@ -529,14 +529,14 @@ def _try_gemini_rest_api(user_input: str, api_key: str, model_name: str, max_ret
 def _fallback_response(user_input: str):
     """Resposta de fallback quando Gemini não está disponível"""
     fallback_responses = {
-        "oi": "Olá! Como posso ajudar você hoje?",
-        "olá": "Oi! Em que posso ser útil?",
-        "como você está": "Estou funcionando bem, obrigado por perguntar!",
-        "que horas são": f"Agora são {time.strftime('%H:%M')}",
-        "que dia é hoje": f"Hoje é {time.strftime('%d/%m/%Y')}",
-        "obrigado": "De nada! Sempre à disposição.",
-        "tchau": "Até logo! Foi um prazer ajudar.",
-        "ajuda": "Posso ajudar com pesquisas, abrir aplicativos, reproduzir música e muito mais!"
+        "oi": "Olá, João Manoel! Como posso ajudar você hoje?",
+        "olá": "Oi, Sr. João Manoel! Em que posso ser útil?",
+        "como você está": "Estou funcionando perfeitamente, João Manoel. Obrigado por perguntar!",
+        "que horas são": f"São {time.strftime('%H:%M')}, Sr. João Manoel.",
+        "que dia é hoje": f"Hoje é {time.strftime('%d/%m/%Y')}, João Manoel.",
+        "obrigado": "De nada, João Manoel! Sempre à disposição.",
+        "tchau": "Até logo, Sr. João Manoel! Foi um prazer ajudar.",
+        "ajuda": "Posso ajudar com pesquisas, abrir aplicativos, reproduzir música e muito mais, João Manoel!"
     }
     
     # Procurar resposta simples
@@ -631,26 +631,50 @@ def makeCall(name: str, mobileNo: str):
 
 
 def openWhatsApp():
-    """Função específica para abrir o WhatsApp com fallback garantido"""
+    """Função específica para abrir o WhatsApp com fallback garantido - Configurado para João Manoel"""
     try:
-        speak("Abrindo WhatsApp")
-        print("📱 Abrindo WhatsApp...")
+        speak("Abrindo WhatsApp para João Manoel")
+        print("📱 Abrindo WhatsApp para João Manoel...")
+        print("🔍 Iniciando diagnóstico detalhado...")
 
         system = platform.system()
         print(f"🔍 Sistema detectado: {system}")
+        print(f"🔍 Versão do sistema: {platform.version()}")
 
         app_opened = False
 
         if system == "Windows":
-            try:
-                result = subprocess.run(["WhatsApp"], capture_output=True, timeout=3)
-                if result.returncode == 0:
-                    print("✅ WhatsApp Desktop aberto")
+            print("🔍 Tentando abrir WhatsApp no Windows...")
+            
+            # Lista de caminhos possíveis do WhatsApp
+            whatsapp_paths = [
+                "WhatsApp",
+                "C:\\Users\\%USERNAME%\\AppData\\Local\\WhatsApp\\WhatsApp.exe",
+                "C:\\Program Files\\WhatsApp\\WhatsApp.exe",
+                "C:\\Program Files (x86)\\WhatsApp\\WhatsApp.exe"
+            ]
+            
+            for path in whatsapp_paths:
+                try:
+                    print(f"📂 Tentando caminho: {path}")
+                    result = subprocess.run([path], capture_output=True, timeout=3)
+                    if result.returncode == 0:
+                        print(f"✅ WhatsApp Desktop encontrado em: {path}")
+                        app_opened = True
+                        break
+                    else:
+                        print(f"❌ Falhou com código: {result.returncode}")
+                except FileNotFoundError:
+                    print(f"⚠️ Arquivo não encontrado: {path}")
+                except subprocess.TimeoutExpired:
+                    print(f"✅ WhatsApp iniciado (timeout esperado): {path}")
                     app_opened = True
-                else:
-                    print("⚠️ WhatsApp Desktop não encontrado no Windows")
-            except Exception as e:
-                print(f"⚠️ Erro ao tentar abrir WhatsApp Desktop: {e}")
+                    break
+                except Exception as e:
+                    print(f"❌ Erro com {path}: {e}")
+            
+            if not app_opened:
+                print("⚠️ Nenhum WhatsApp Desktop encontrado no Windows")
 
         elif system == "Darwin":  # macOS
             try:
@@ -664,6 +688,7 @@ def openWhatsApp():
                 print(f"⚠️ Erro ao tentar abrir WhatsApp macOS: {e}")
 
         else:  # Linux
+            print("🔍 Tentando abrir WhatsApp no Linux...")
             whatsapp_commands = [
                 "whatsapp-for-linux",
                 "whatsdesk", 
@@ -671,8 +696,10 @@ def openWhatsApp():
                 "snap run whatsapp-for-linux",
                 "flatpak run com.github.eneshecan.WhatsAppForLinux"
             ]
+            
             for cmd in whatsapp_commands:
                 try:
+                    print(f"📂 Tentando comando: {cmd}")
                     result = subprocess.run(cmd.split(), capture_output=True, timeout=2)
                     print(f"✅ WhatsApp aberto com: {cmd}")
                     app_opened = True
@@ -682,18 +709,28 @@ def openWhatsApp():
                     app_opened = True
                     break
                 except FileNotFoundError:
+                    print(f"⚠️ Comando não encontrado: {cmd}")
                     continue
                 except Exception as e:
-                    print(f"⚠️ Erro com {cmd}: {e}")
+                    print(f"❌ Erro com {cmd}: {e}")
+            
+            if not app_opened:
+                print("⚠️ Nenhum WhatsApp encontrado no Linux")
 
         # Fallback garantido → WhatsApp Web
         if not app_opened:
-            print("🌐 Nenhum aplicativo encontrado, abrindo WhatsApp Web...")
-            webbrowser.open("https://web.whatsapp.com")
-            speak("WhatsApp Web aberto no navegador")
+            print("🌐 Nenhum aplicativo encontrado, abrindo WhatsApp Web para João Manoel...")
+            print("🔍 Tentando abrir https://web.whatsapp.com...")
+            try:
+                webbrowser.open("https://web.whatsapp.com")
+                print("✅ WhatsApp Web aberto com sucesso")
+                speak("WhatsApp Web aberto no navegador para João Manoel")
+            except Exception as e:
+                print(f"❌ Erro ao abrir WhatsApp Web: {e}")
+                speak("Erro ao abrir WhatsApp Web. Verifique se há um navegador instalado.")
         else:
             time.sleep(2)
-            speak("WhatsApp aberto com sucesso")
+            speak("WhatsApp aberto com sucesso para João Manoel")
 
     except Exception as e:
         print(f"❌ Erro crítico ao abrir WhatsApp: {e}")

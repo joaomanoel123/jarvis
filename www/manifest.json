@@ -1,0 +1,37 @@
+{
+  "name": "J.A.R.V.I.S - Assistente Virtual",
+  "short_name": "JARVIS",
+  "description": "Assistente virtual inteligente criado por João Manoel",
+  "start_url": "/jarvis/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00AAFF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/img/logo.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "assets/img/logo.ico",
+      "sizes": "96x96",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "assets/img/logo.ico",
+      "sizes": "192x192",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "assets/img/logo.ico",
+      "sizes": "512x512",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["productivity", "utilities", "entertainment"],
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "scope": "/jarvis/",
+  "prefer_related_applications": false
+}

@@ -54,9 +54,9 @@ def start():
             flag = recoganize.AuthenticateFace(camera_type, camera_index)
             if flag == 1:
                 eel.hideFaceAuth()
-                speak("Face Authentication Successful")
+                speak("Autenticação facial bem-sucedida")
                 eel.hideFaceAuthSuccess()
-                speak("Hello, Welcome Sir, How can i Help You")
+                speak("Olá, bem-vindo João Manoel! Como posso ajudá-lo hoje?")
                 eel.hideStart()
                 playAssistantSound()
             else:
@@ -66,7 +66,7 @@ def start():
             speak("Pulando autenticação facial")
             eel.hideLoader()
             eel.hideStart()
-            speak("Hello, Welcome Sir, How can i Help You")
+            speak("Olá, bem-vindo João Manoel! Como posso ajudá-lo hoje?")
             playAssistantSound()
     
     # Definir porta (suporta variável de ambiente PORT)
