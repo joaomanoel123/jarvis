@@ -1,6 +1,9 @@
 $(document).ready(function () {
 
     eel.init()()
+    
+    // Inicializar sequência de loading
+    initializeJarvis();
 
     // Verificar se textillate está disponível antes de usar
     if (typeof $.fn.textillate === 'function') {
@@ -222,31 +225,7 @@ $(document).ready(function () {
         testApiConnection();
     });
     
-    // Função para testar conexão com a API
-    function testApiConnection() {
-        const apiUrl = localStorage.getItem('FRONT_API_URL') || DEFAULT_API_URL;
-        updateWishMessage("🔄 Testando conexão...");
-        
-        fetch(apiUrl.replace(/\/$/, '') + '/health')
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'ok') {
-                updateWishMessage(`✅ API conectada! Ambiente: ${data.environment}`);
-                if (!data.api_configured) {
-                    updateWishMessage("⚠️ API conectada, mas Google API Key não configurada no servidor.");
-                }
-            } else {
-                updateWishMessage("❌ API não está funcionando corretamente.");
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao testar API:', error);
-            updateWishMessage(`❌ Erro de conexão: ${error.message}`);
-        });
-    }
-    
-    // Testar conexão na inicialização
-    setTimeout(testApiConnection, 2000);
+
     
 
     // enter press event handler on chat box
@@ -257,8 +236,119 @@ $(document).ready(function () {
             PlayAssistant(message)
         }
     });
-
-
-
+    
+    // Função de inicialização do Jarvis
+    function initializeJarvis() {
+        console.log('🤖 Iniciando sequência de inicialização do Jarvis...');
+        
+        // Estado inicial: mostrar apenas o loader
+        showOnlyElement('#Loader');
+        updateWishMessage('🔄 Initializing systems...');
+        
+        // Permitir pular animação com clique ou tecla
+        let skipInitialization = false;
+        
+        function skipToMain() {
+            if (!skipInitialization) {
+                skipInitialization = true;
+                console.log('⏩ Pulando animação de inicialização');
+                goToMainScreen();
+            }
+        }
+        
+        // Event listeners para pular
+        $(document).one('click', skipToMain);
+        $(document).one('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+                skipToMain();
+            }
+        });
+        
+        // Sequência de inicialização
+        setTimeout(() => {
+            if (skipInitialization) return;
+            
+            // Fase 1: Face Authentication
+            showOnlyElement('#FaceAuth');
+            updateWishMessage('🔍 Scanning biometric data...');
+            
+            setTimeout(() => {
+                if (skipInitialization) return;
+                
+                // Fase 2: Authentication Success
+                showOnlyElement('#FaceAuthSuccess');
+                updateWishMessage('✅ Authentication successful!');
+                
+                setTimeout(() => {
+                    if (skipInitialization) return;
+                    
+                    // Fase 3: Hello Greeting
+                    showOnlyElement('#HelloGreet');
+                    updateWishMessage('👋 Hello! I am J.A.R.V.I.S');
+                    
+                    setTimeout(() => {
+                        if (skipInitialization) return;
+                        
+                        // Testar API durante a inicialização
+                        updateWishMessage('🔌 Connecting to neural network...');
+                        testApiConnection();
+                        
+                        setTimeout(() => {
+                            if (skipInitialization) return;
+                            goToMainScreen();
+                        }, 2000);
+                        
+                    }, 2000);
+                }, 2000);
+            }, 2000);
+        }, 3000);
+        
+        // Função para mostrar apenas um elemento da tela de loading
+        function showOnlyElement(selector) {
+            $('#Loader, #FaceAuth, #FaceAuthSuccess, #HelloGreet').attr('hidden', true);
+            $(selector).attr('hidden', false);
+        }
+        
+        // Função para ir para a tela principal
+        function goToMainScreen() {
+            console.log('✅ Inicialização completa! Indo para tela principal...');
+            
+            // Remover event listeners de pular
+            $(document).off('click keydown');
+            
+            // Esconder tela de loading e mostrar tela principal
+            $('#Start').attr('hidden', true);
+            $('#Oval').attr('hidden', false);
+            
+            // Mensagem de boas-vindas
+            updateWishMessage('🎆 Welcome! How can I assist you today?');
+            
+            // Focar no input de texto
+            setTimeout(() => {
+                $('#chatbox').focus();
+            }, 500);
+        }
+    }
+    
+    // Função melhorada para testar conexão com a API
+    function testApiConnection() {
+        const apiUrl = localStorage.getItem('FRONT_API_URL') || DEFAULT_API_URL;
+        
+        fetch(apiUrl.replace(/\/$/, '') + '/health')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                console.log('✅ API conectada com sucesso!');
+                if (!data.api_configured) {
+                    console.warn('⚠️ Google API Key não configurada no servidor');
+                }
+            } else {
+                console.warn('⚠️ API não está funcionando corretamente');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erro de conexão com API:', error);
+        });
+    }
 
 });
