@@ -171,10 +171,25 @@ $(document).ready(function () {
                     }
                 } else if (data && data.error) {
                     // Tratar erros específicos da API
+                    console.log('❌ Erro da API:', data);
+                    
+                    let errorMessage = data.reply || 'Erro desconhecido';
+                    
                     if (data.error === 'missing_api_key') {
-                        updateWishMessage("⚠️ Chave da API do Google não configurada no servidor. Entre em contato com o administrador.");
-                    } else {
-                        updateWishMessage(`❌ Erro da API: ${data.reply || 'Erro desconhecido'}`);
+                        errorMessage = "⚠️ Chave da API do Google não configurada no servidor. Entre em contato com o administrador.";
+                    } else if (data.error === 'network_error') {
+                        errorMessage = "🌐 Erro de conexão com a API do Google. Verifique a internet do servidor.";
+                    } else if (data.error === 'format_error') {
+                        errorMessage = "📝 Erro no formato da resposta da API do Google.";
+                    } else if (data.error === 'internal_error') {
+                        errorMessage = `🔧 Erro interno: ${data.error_type || 'Desconhecido'}. Detalhes: ${data.details || 'N/A'}`;
+                    }
+                    
+                    updateWishMessage(errorMessage);
+                    
+                    // Log detalhado para debug
+                    if (data.details) {
+                        console.log('🔍 Detalhes do erro:', data.details);
                     }
                 } else {
                     updateWishMessage("🤖 Resposta inválida da API. Tente novamente.");
@@ -428,14 +443,16 @@ $(document).ready(function () {
             console.log('📝 Dados do health check:', data);
             
             if (data.status === 'ok') {
-                const message = `✅ API conectada! (${responseTime}ms)\nAmbiente: ${data.environment}\nAPI configurada: ${data.api_configured ? 'Sim' : 'Não'}`;
+                const provider = data.api_provider || 'none';
+                const providerEmoji = provider === 'groq' ? '⚡' : provider === 'google' ? '🤖' : '❌';
+                const message = `✅ API conectada! (${responseTime}ms)\nProvedor: ${providerEmoji} ${provider.toUpperCase()}\nAmbiente: ${data.environment}\nAPI configurada: ${data.api_configured ? 'Sim' : 'Não'}`;
                 updateWishMessage(message);
-                console.log('✅ API conectada com sucesso!');
+                console.log(`✅ API conectada com sucesso! Provedor: ${provider}`);
                 
                 if (!data.api_configured) {
-                    console.warn('⚠️ Google API Key não configurada no servidor');
+                    console.warn('⚠️ Nenhuma API Key configurada no servidor');
                     setTimeout(() => {
-                        updateWishMessage('⚠️ Google API Key não configurada no servidor. Configure no Render Dashboard.');
+                        updateWishMessage('⚠️ Nenhuma API Key configurada. Configure GROQ_API_KEY ou GOOGLE_API_KEY no Render Dashboard.');
                     }, 3000);
                 }
             } else {

@@ -1,4 +1,4 @@
 Cache buster for GitHub Pages deployment
-Generated at: 2025-08-10 15:25:00
-Build ID: jarvis-v1.0.4-message-processing-debug
-Fix: Enhanced message processing with detailed error handling and debug tools
+Generated at: 2025-08-10 15:45:00
+Build ID: jarvis-v1.1.0-groq-api-integration
+Feature: Groq API integration with Google Gemini fallback - ultra-fast responses
