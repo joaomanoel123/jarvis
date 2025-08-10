@@ -25,6 +25,8 @@
   }
 
   const eel = {
+    // Identify that this is the browser stub (useful for static-mode fallbacks)
+    isStub: true,
     // Called as eel.init()()
     init: () => wrapReturn(undefined),
     // App-specific calls used in JS

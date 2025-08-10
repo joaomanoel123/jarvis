@@ -1,4 +1,5 @@
 import os
+import platform
 import shlex
 import sqlite3
 import struct
@@ -17,8 +18,12 @@ import pvporcupine  # type: ignore
 import requests
 import json
 from typing import Dict
+from dotenv import load_dotenv
 
 from engine.helper import extract_yt_term, remove_words  # type: ignore
+
+# Carregar variáveis de ambiente
+load_dotenv()
 
 # Importar configuração segura
 try:
@@ -47,19 +52,25 @@ def playAssistantSound():
 def openCommand(query: str):
     query = query.replace(ASSISTANT_NAME, "")
     query = query.replace("open", "")
+    query = query.replace("abrir", "")
+    query = query.replace("abra", "")
     query = query.lower()
 
     app_name = query.strip()
 
-    if app_name != "":
+    # Verificar se é WhatsApp especificamente
+    if "whatsapp" in app_name or "whats" in app_name:
+        openWhatsApp()
+        return
 
+    if app_name != "":
         try:
             cursor.execute(
                 'SELECT path FROM sys_command WHERE name IN (?)', (app_name,))
             results = cursor.fetchall()
 
             if len(results) != 0:
-                speak("Abrindo " + query)
+                speak("Abrindo " + app_name)
                 subprocess.Popen([results[0][0]])
 
             elif len(results) == 0:
@@ -68,17 +79,25 @@ def openCommand(query: str):
                 results = cursor.fetchall()
 
                 if len(results) != 0:
-                    speak("Abrindo " + query)
+                    speak("Abrindo " + app_name)
                     webbrowser.open(results[0][0])
 
                 else:
-                    speak("Abrindo " + query)
+                    speak("Abrindo " + app_name)
                     try:
-                        os.system('start ' + query)
+                        # Tentar abrir aplicativo genérico
+                        if platform.system() == "Windows":
+                            os.system(f'start {app_name}')
+                        elif platform.system() == "Darwin":  # macOS
+                            os.system(f'open -a "{app_name}"')
+                        else:  # Linux
+                            os.system(f'{app_name} &')
                     except:
                         speak("Não encontrado")
         except Exception as e:
             speak(f"Algo deu errado: {e}")
+    else:
+        speak("Por favor, me diga qual aplicativo você quer abrir")
 
 def PlayYoutube(query: str):
     """Reproduz vídeo no YouTube com opção de autenticação facial"""
@@ -142,23 +161,46 @@ def searchGoogle(query: str):
         speak("Por favor, me diga o que você quer pesquisar no Google")
 
 def hotword():
+    """
+    Função de detecção de hotword usando Porcupine
+    Requer chave válida do Picovoice
+    """
     porcupine = None
     paud = None
     audio_stream = None
+    
     try:
-        # Ler a access_key do cookies.json com depuração
-        print("Tentando abrir cookies.json...")
-        with open("engine/cookies.json", "r") as f:
-            cookies = json.load(f)
-        access_key = cookies.get("access_key")
-        print(f"Access Key lida: {access_key}")  # Depuração
-        if not access_key:
-            raise ValueError("Chave de acesso (access_key) não encontrada em cookies.json")
-
+        # Ler a access_key do .env ou cookies.json
+        access_key = os.getenv('PORCUPINE_ACCESS_KEY')
+        
+        if not access_key or access_key == 'your_porcupine_access_key_here':
+            # Fallback para cookies.json
+            try:
+                print("🔍 Tentando ler access_key do cookies.json...")
+                with open("engine/cookies.json", "r") as f:
+                    cookies = json.load(f)
+                access_key = cookies.get("access_key")
+            except FileNotFoundError:
+                print("⚠️ Arquivo cookies.json não encontrado")
+        
+        # Verificar se a chave está configurada
+        if not access_key or access_key == 'YOUR_PORCUPINE_ACCESS_KEY_HERE' or access_key == '':
+            print("⚠️ Chave Porcupine não configurada. Hotword detection desabilitado.")
+            print("💡 Para ativar o hotword:")
+            print("   1. Acesse: https://picovoice.ai/")
+            print("   2. Crie uma conta gratuita")
+            print("   3. Obtenha sua Access Key")
+            print("   4. Configure no arquivo .env: PORCUPINE_ACCESS_KEY=sua_chave")
+            print("   5. Ou configure no cookies.json")
+            return
+        
+        print(f"🔑 Access Key: {access_key[:10]}...")
+        
         # Inicializar o Porcupine com a access_key
-        print("Inicializando Porcupine...")
+        print("🎙️ Inicializando Porcupine...")
         porcupine = pvporcupine.create(access_key=access_key, keywords=["jarvis", "alexa"])
-        print("Porcupine inicializado com sucesso!")
+        print("✅ Porcupine inicializado com sucesso!")
+        print("🎧 Hotword detection ativo - diga 'Jarvis' ou 'Alexa'")
 
         # Configurar PyAudio
         paud = pyaudio.PyAudio()
@@ -177,16 +219,39 @@ def hotword():
             keyword_index = porcupine.process(keyword)
 
             if keyword_index >= 0:
-                print("hotword detected")
-
+                print("🎙️ Hotword detectado!")
                 
+                # Ativar Jarvis
                 pyautogui.keyDown("win")
                 pyautogui.press("j")
                 time.sleep(2)
                 pyautogui.keyUp("win")
 
     except Exception as e:
-        print(f"Error in hotword detection: {e}")
+        error_msg = str(e)
+        print(f"❌ Error in hotword detection: {error_msg}")
+        
+        # Mensagens de erro mais informativas
+        if "AccessKey is invalid" in error_msg or "Failed to parse AccessKey" in error_msg:
+            print("⚠️ CHAVE PORCUPINE INVÁLIDA")
+            print("💡 SOLUÇÃO:")
+            print("   1. Acesse: https://picovoice.ai/")
+            print("   2. Faça login ou crie uma conta gratuita")
+            print("   3. Vá para 'Console' > 'AccessKey'")
+            print("   4. Copie sua chave válida")
+            print("   5. Configure no .env: PORCUPINE_ACCESS_KEY=sua_chave_aqui")
+            print("")
+            print("🚫 Por enquanto, o hotword está desabilitado")
+            print("✅ Você ainda pode usar o Jarvis pela interface web")
+        elif "Picovoice Error" in error_msg:
+            print("⚠️ ERRO DO PICOVOICE")
+            print("💡 Possíveis causas:")
+            print("   - Chave expirada ou inválida")
+            print("   - Limite de uso excedido")
+            print("   - Problema de conectividade")
+        else:
+            print(f"⚠️ Erro desconhecido: {error_msg}")
+            
     finally:
         if porcupine is not None:
             porcupine.delete()
@@ -274,59 +339,129 @@ def whatsApp(mobile_no: str, message: str, flag: str, name: str):
     pyautogui.hotkey('enter')
     speak(jarvis_message)
 
-# chat bot com Google Gemini 2.5-flash
-def chatBotGemini(query: str):
-    user_input = query.strip()
-    try:
-        # Tentar usar a biblioteca oficial do Google primeiro
-        try:
-            import google.generativeai as genai
-            
-            with open("engine/cookies.json", "r") as f:
-                cookies = json.load(f)
-            google_api_key = cookies.get("google_api_key")
-            if not google_api_key:
-                raise ValueError("Chave API do Google não encontrada em cookies.json")
-            
-            # Configurar a API do Google
-            genai.configure(api_key=google_api_key)
-            
-            # Usar o modelo Gemini 1.5-flash (mais estável)
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            
-            # Gerar resposta
-            response = model.generate_content(
-                user_input,
-                generation_config=genai.types.GenerationConfig(
-                    temperature=0.7,
-                    top_k=40,
-                    top_p=0.95,
-                    max_output_tokens=1024,
-                )
-            )
-            
-            if response.text:
-                response_text = response.text.strip()
-                print(f"🤖 Gemini 2.5-flash: {response_text}")
-                speak(response_text)
-                eel.receiverText(response_text)  # type: ignore
-                return response_text
-            else:
-                raise Exception("Resposta vazia do Gemini")
-                
-        except ImportError:
-            # Fallback para API REST se a biblioteca não estiver disponível
-            print("⚠️ Biblioteca google-generativeai não encontrada, usando API REST...")
-            
-            with open("engine/cookies.json", "r") as f:
-                cookies = json.load(f)
-            google_api_key = cookies.get("google_api_key")
-            if not google_api_key:
-                raise ValueError("Chave API do Google não encontrada em cookies.json")
+# chat bot com Google Gemini com sistema de retry robusto
 
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={google_api_key}"
+def chatBotGemini(query: str):
+    """Chatbot Gemini com sistema de retry otimizado"""
+    user_input = query.strip()
+
+    google_api_key = _get_google_api_key()
+    if not google_api_key:
+        speak("Chave da API do Google Gemini não configurada")
+        return "❌ API Key ausente"
+
+    models_to_try = [
+        'gemini-1.5-flash',
+        'gemini-1.0-pro'
+    ]
+
+    for model_name in models_to_try:
+        print(f"🤖 Tentando modelo: {model_name}")
+
+        result = _try_gemini_library(user_input, google_api_key, model_name, max_retries=1)
+        if result:
+            return result
+
+        result = _try_gemini_rest_api(user_input, google_api_key, model_name, max_retries=1)
+        if result:
+            return result
+
+    print("⚠️ Gemini indisponível, usando fallback")
+    return _fallback_response(user_input)
+
+
+def _get_google_api_key():
+    """Obter chave API do Google de múltiplas fontes"""
+    # Tentar .env primeiro
+    api_key = os.getenv('GOOGLE_API_KEY')
+    
+    if not api_key or api_key == 'your_google_api_key_here':
+        # Fallback para cookies.json
+        try:
+            with open("engine/cookies.json", "r") as f:
+                cookies = json.load(f)
+            api_key = cookies.get("google_api_key")
+        except FileNotFoundError:
+            pass
+    
+    if api_key and api_key != 'YOUR_GOOGLE_API_KEY_HERE':
+        return api_key
+    
+    return None
+
+def _try_gemini_library(user_input: str, api_key: str, model_name: str, max_retries: int = 3):
+    """Tentar usar biblioteca oficial do Google Gemini"""
+    try:
+        import google.generativeai as genai
+        
+        # Configurar a API do Google
+        genai.configure(api_key=api_key)
+        
+        for attempt in range(max_retries):
+            try:
+                print(f"  📡 Tentativa {attempt + 1}/{max_retries} com biblioteca oficial...")
+                
+                # Usar o modelo especificado
+                model = genai.GenerativeModel(model_name)
+                
+                # Gerar resposta com timeout
+                response = model.generate_content(
+                    user_input,
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.7,
+                        top_k=40,
+                        top_p=0.95,
+                        max_output_tokens=1024,
+                    )
+                )
+                
+                if response.text:
+                    response_text = response.text.strip()
+                    print(f"✅ {model_name} (biblioteca): Sucesso!")
+                    speak(response_text)
+                    try:
+                        eel.receiverText(response_text)
+                    except:
+                        pass
+                    return response_text
+                else:
+                    print(f"  ⚠️ Resposta vazia do {model_name}")
+                    
+            except Exception as e:
+                error_str = str(e)
+                print(f"  ❌ Erro na tentativa {attempt + 1}: {error_str}")
+                
+                # Se for erro 503 (overloaded), aguardar mais tempo
+                if "503" in error_str or "overloaded" in error_str.lower():
+                    wait_time = (attempt + 1) * 5  # 5, 10, 15 segundos
+                    print(f"  ⏳ Modelo sobrecarregado, aguardando {wait_time}s...")
+                    time.sleep(wait_time)
+                elif "429" in error_str or "quota" in error_str.lower():
+                    print(f"  ⏳ Limite de quota, aguardando {(attempt + 1) * 10}s...")
+                    time.sleep((attempt + 1) * 10)
+                else:
+                    # Para outros erros, aguardar menos tempo
+                    time.sleep(2)
+                    
+                if attempt == max_retries - 1:
+                    print(f"  ❌ {model_name} (biblioteca) falhou após {max_retries} tentativas")
+                    
+    except ImportError:
+        print("  ⚠️ Biblioteca google-generativeai não disponível")
+    except Exception as e:
+        print(f"  ❌ Erro na configuração da biblioteca: {e}")
+    
+    return None
+
+def _try_gemini_rest_api(user_input: str, api_key: str, model_name: str, max_retries: int = 3):
+    """Tentar usar API REST do Gemini"""
+    for attempt in range(max_retries):
+        try:
+            print(f"  🌐 Tentativa {attempt + 1}/{max_retries} com API REST...")
+            
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
             headers = {"Content-Type": "application/json"}
-            data: Dict[str, object] = {
+            data = {
                 "contents": [{
                     "parts": [{
                         "text": user_input
@@ -339,35 +474,92 @@ def chatBotGemini(query: str):
                     "maxOutputTokens": 1024
                 }
             }
-            response = requests.post(url, json=data, headers=headers, timeout=15)
-
+            
+            # Timeout progressivo
+            timeout = 10 + (attempt * 5)  # 10, 15, 20 segundos
+            response = requests.post(url, json=data, headers=headers, timeout=timeout)
+            
             if response.status_code == 200:
                 response_data = response.json()
                 if "candidates" in response_data and len(response_data["candidates"]) > 0:
                     response_text = response_data["candidates"][0]["content"]["parts"][0]["text"]
-                    print(f"🤖 Gemini 2.5-flash (REST): {response_text}")
+                    print(f"✅ {model_name} (REST): Sucesso!")
                     speak(response_text)
-                    eel.receiverText(response_text)  # type: ignore
+                    try:
+                        eel.receiverText(response_text)
+                    except:
+                        pass
                     return response_text
                 else:
-                    raise Exception("Resposta vazia do Gemini")
+                    print(f"  ⚠️ Resposta vazia do {model_name}")
             else:
-                raise Exception(f"Erro na API do Gemini: {response.status_code} - {response.text}")
+                error_msg = f"HTTP {response.status_code}: {response.text}"
+                print(f"  ❌ Erro na tentativa {attempt + 1}: {error_msg}")
                 
-    except FileNotFoundError:
-        error_msg = "❌ Erro: cookies.json não encontrado. Crie o arquivo com uma chave API do Google."
-        speak(error_msg)
-        return error_msg
-    except Exception as e:
-        error_msg = f"❌ Erro ao chamar o Gemini: {str(e)}"
-        print(error_msg)
-        speak(error_msg)
-        # Fallback para o chatbot original em caso de erro
-        try:
-            print("🔄 Tentando usar chatbot Groq como fallback...")
-            return chatBot(query)
-        except:
-            return error_msg
+                # Tratamento específico por código de erro
+                if response.status_code == 503:  # Service Unavailable
+                    wait_time = (attempt + 1) * 8  # 8, 16, 24 segundos
+                    print(f"  ⏳ Serviço sobrecarregado (503), aguardando {wait_time}s...")
+                    time.sleep(wait_time)
+                elif response.status_code == 429:  # Too Many Requests
+                    wait_time = (attempt + 1) * 15  # 15, 30, 45 segundos
+                    print(f"  ⏳ Muitas requisições (429), aguardando {wait_time}s...")
+                    time.sleep(wait_time)
+                elif response.status_code == 500:  # Internal Server Error
+                    wait_time = (attempt + 1) * 5  # 5, 10, 15 segundos
+                    print(f"  ⏳ Erro interno (500), aguardando {wait_time}s...")
+                    time.sleep(wait_time)
+                else:
+                    # Para outros erros, aguardar menos
+                    time.sleep(3)
+                    
+        except requests.exceptions.Timeout:
+            print(f"  ⏰ Timeout na tentativa {attempt + 1}")
+            time.sleep(5)
+        except requests.exceptions.ConnectionError:
+            print(f"  🌐 Erro de conexão na tentativa {attempt + 1}")
+            time.sleep(5)
+        except Exception as e:
+            print(f"  ❌ Erro inesperado na tentativa {attempt + 1}: {e}")
+            time.sleep(3)
+    
+    print(f"  ❌ {model_name} (REST) falhou após {max_retries} tentativas")
+    return None
+
+def _fallback_response(user_input: str):
+    """Resposta de fallback quando Gemini não está disponível"""
+    fallback_responses = {
+        "oi": "Olá! Como posso ajudar você hoje?",
+        "olá": "Oi! Em que posso ser útil?",
+        "como você está": "Estou funcionando bem, obrigado por perguntar!",
+        "que horas são": f"Agora são {time.strftime('%H:%M')}",
+        "que dia é hoje": f"Hoje é {time.strftime('%d/%m/%Y')}",
+        "obrigado": "De nada! Sempre à disposição.",
+        "tchau": "Até logo! Foi um prazer ajudar.",
+        "ajuda": "Posso ajudar com pesquisas, abrir aplicativos, reproduzir música e muito mais!"
+    }
+    
+    # Procurar resposta simples
+    user_lower = user_input.lower()
+    for key, response in fallback_responses.items():
+        if key in user_lower:
+            print(f"💬 Resposta local: {response}")
+            speak(response)
+            try:
+                eel.receiverText(response)
+            except:
+                pass
+            return response
+    
+    # Resposta padrão
+    default_msg = "Desculpe, o serviço de IA está temporariamente indisponível. Tente novamente em alguns minutos ou use comandos específicos como 'abrir navegador' ou 'pesquisar no Google'."
+    print(f"⚠️ Fallback: {default_msg}")
+    speak("Desculpe, o serviço de inteligência artificial está temporariamente indisponível. Tente novamente em alguns minutos.")
+    try:
+        eel.receiverText(default_msg)
+    except:
+        pass
+    return default_msg
 
 def chatBot(query: str):
     try:
@@ -375,10 +567,17 @@ def chatBot(query: str):
         if SECURE_CONFIG_AVAILABLE:
             api_key = get_google_api_key()
         else:
-            # Fallback para cookies.json
-            with open("engine/cookies.json", "r") as f:
-                config = json.load(f)
-            api_key = config.get("google_api_key")
+            # Ler do .env primeiro
+            api_key = os.getenv('GOOGLE_API_KEY')
+            
+            if not api_key or api_key == 'your_google_api_key_here':
+                # Fallback para cookies.json
+                try:
+                    with open("engine/cookies.json", "r") as f:
+                        config = json.load(f)
+                    api_key = config.get("google_api_key")
+                except FileNotFoundError:
+                    pass
         
         if not api_key or "YOUR_" in api_key:
             speak("Chave da API não configurada. Configure no arquivo .env")
@@ -429,6 +628,139 @@ def makeCall(name: str, mobileNo: str):
     speak("Ligando para " + name)
     command = 'adb shell am start -a android.intent.action.CALL -d tel:' + mobileNo
     os.system(command)
+
+
+def openWhatsApp():
+    """Função específica para abrir o WhatsApp com fallback garantido"""
+    try:
+        speak("Abrindo WhatsApp")
+        print("📱 Abrindo WhatsApp...")
+
+        system = platform.system()
+        print(f"🔍 Sistema detectado: {system}")
+
+        app_opened = False
+
+        if system == "Windows":
+            try:
+                result = subprocess.run(["WhatsApp"], capture_output=True, timeout=3)
+                if result.returncode == 0:
+                    print("✅ WhatsApp Desktop aberto")
+                    app_opened = True
+                else:
+                    print("⚠️ WhatsApp Desktop não encontrado no Windows")
+            except Exception as e:
+                print(f"⚠️ Erro ao tentar abrir WhatsApp Desktop: {e}")
+
+        elif system == "Darwin":  # macOS
+            try:
+                result = os.system('open -a "WhatsApp" 2>/dev/null')
+                if result == 0:
+                    print("✅ WhatsApp aberto no macOS")
+                    app_opened = True
+                else:
+                    print("⚠️ WhatsApp não encontrado no macOS")
+            except Exception as e:
+                print(f"⚠️ Erro ao tentar abrir WhatsApp macOS: {e}")
+
+        else:  # Linux
+            whatsapp_commands = [
+                "whatsapp-for-linux",
+                "whatsdesk", 
+                "whatsapp",
+                "snap run whatsapp-for-linux",
+                "flatpak run com.github.eneshecan.WhatsAppForLinux"
+            ]
+            for cmd in whatsapp_commands:
+                try:
+                    result = subprocess.run(cmd.split(), capture_output=True, timeout=2)
+                    print(f"✅ WhatsApp aberto com: {cmd}")
+                    app_opened = True
+                    break
+                except subprocess.TimeoutExpired:
+                    print(f"✅ {cmd} iniciado (timeout esperado)")
+                    app_opened = True
+                    break
+                except FileNotFoundError:
+                    continue
+                except Exception as e:
+                    print(f"⚠️ Erro com {cmd}: {e}")
+
+        # Fallback garantido → WhatsApp Web
+        if not app_opened:
+            print("🌐 Nenhum aplicativo encontrado, abrindo WhatsApp Web...")
+            webbrowser.open("https://web.whatsapp.com")
+            speak("WhatsApp Web aberto no navegador")
+        else:
+            time.sleep(2)
+            speak("WhatsApp aberto com sucesso")
+
+    except Exception as e:
+        print(f"❌ Erro crítico ao abrir WhatsApp: {e}")
+        webbrowser.open("https://web.whatsapp.com")
+        speak("Abrindo WhatsApp Web como alternativa")
+
+
+def _open_whatsapp_web():
+    """Função auxiliar para abrir WhatsApp Web com múltiplas tentativas"""
+    try:
+        print("🌐 Abrindo WhatsApp Web...")
+        
+        # Tentar diferentes navegadores
+        browsers = [
+            'google-chrome',
+            'chromium-browser', 
+            'firefox',
+            'firefox-esr',
+            'opera',
+            'brave-browser'
+        ]
+        
+        web_opened = False
+        
+        # Primeiro tentar com webbrowser padrão
+        try:
+            webbrowser.open("https://web.whatsapp.com")
+            print("✅ WhatsApp Web aberto com navegador padrão")
+            web_opened = True
+        except Exception as e:
+            print(f"⚠️ Erro com navegador padrão: {e}")
+        
+        # Se o padrão falhou, tentar navegadores específicos
+        if not web_opened:
+            for browser in browsers:
+                try:
+                    print(f"🔍 Tentando abrir com {browser}...")
+                    subprocess.run([browser, "https://web.whatsapp.com"], 
+                                 capture_output=True, timeout=3)
+                    print(f"✅ WhatsApp Web aberto com {browser}")
+                    web_opened = True
+                    break
+                except (FileNotFoundError, subprocess.TimeoutExpired):
+                    # Timeout é normal para navegadores
+                    print(f"✅ {browser} iniciado (timeout esperado)")
+                    web_opened = True
+                    break
+                except Exception as e:
+                    print(f"⚠️ {browser} não funcionou: {e}")
+                    continue
+        
+        if web_opened:
+            speak("WhatsApp Web aberto no navegador")
+            speak("WhatsApp aberto com sucesso")
+        else:
+            print("❌ Não foi possível abrir nenhum navegador")
+            speak("Não foi possível abrir o WhatsApp. Verifique se há um navegador instalado.")
+            
+    except Exception as e:
+        print(f"❌ Erro crítico no WhatsApp Web: {e}")
+        speak("Erro ao abrir WhatsApp Web. Tente abrir manualmente.")
+
+def testWhatsAppWeb():
+    """Função para testar apenas o WhatsApp Web"""
+    print("🧪 TESTE: Abrindo apenas WhatsApp Web")
+    speak("Testando WhatsApp Web")
+    _open_whatsapp_web()
 
 def sendMessage(message: str, mobileNo: str, name: str):
     from engine.helper import replace_spaces_with_percent_s, goback, keyEvent, tapEvents, adbInput  # type: ignore

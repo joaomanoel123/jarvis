@@ -2,17 +2,21 @@ $(document).ready(function () {
 
     eel.init()()
 
-    $('.text').textillate({
-        loop: true,
-        sync: true,
-        in: {
-            effect: "bounceIn",
-        },
-        out: {
-            effect: "bounceOut",
-        },
-
-    });
+    // Verificar se textillate está disponível antes de usar
+    if (typeof $.fn.textillate === 'function') {
+        $('.text').textillate({
+            loop: true,
+            sync: true,
+            in: {
+                effect: "bounceIn",
+            },
+            out: {
+                effect: "bounceOut",
+            },
+        });
+    } else {
+        console.warn('Textillate não carregou, animações de texto desabilitadas');
+    }
 
     // Siri configuration
     var container = document.getElementById("siri-container");
@@ -31,19 +35,20 @@ $(document).ready(function () {
       });
 
     // Siri message animation
-    $('.siri-message').textillate({
-        loop: true,
-        sync: true,
-        in: {
-            effect: "fadeInUp",
+    if (typeof $.fn.textillate === 'function') {
+        $('.siri-message').textillate({
+            loop: true,
             sync: true,
-        },
-        out: {
-            effect: "fadeOutUp",
-            sync: true,
-        },
-
-    });
+            in: {
+                effect: "fadeInUp",
+                sync: true,
+            },
+            out: {
+                effect: "fadeOutUp",
+                sync: true,
+            },
+        });
+    }
 
     // mic button click event
 

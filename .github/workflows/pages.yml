@@ -3,7 +3,6 @@ name: Deploy J.A.R.V.I.S to GitHub Pages
 on:
   push:
     branches: [ main ]
-    paths: [ 'docs/**' ]
   workflow_dispatch:
 
 permissions:
@@ -25,13 +24,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: 'false'
-          fetch-depth: 1
-          clean: true
-          lfs: false
+          fetch-depth: 0
       
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

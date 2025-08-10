@@ -358,15 +358,20 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
 
-    <!-- Removed duplicate/legacy jQuery and unused scripts for GitHub Pages -->
+    <!-- Scripts optimized for GitHub Pages -->
 
     <!-- Siri wave -->
     <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
 
-    <!-- Texllate js -->
-    <script src="assets/vendore/texllate/jquery.fittext.js"></script>
-    <script src="assets/vendore/texllate/jquery.lettering.js"></script>
-    <script src="https://jschr.github.io/textillate/jquery.textillate.js"></script>
+    <!-- Texllate js - Using CDN with fallback -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FitText.js/1.2.0/jquery.fittext.min.js"></script>
+    <script>window.jQuery.fn.fitText || document.write('<script src="assets/vendore/texllate/jquery.fittext.js"><\/script>')</script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lettering.js/0.7.0/jquery.lettering.min.js"></script>
+    <script>window.jQuery.fn.lettering || document.write('<script src="assets/vendore/texllate/jquery.lettering.js"><\/script>')</script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/textillate/0.4.0/jquery.textillate.min.js"></script>
+    <script>window.jQuery.fn.textillate || document.write('<script>console.warn("Textillate CDN failed, animations may not work");<\/script>')</script>
 
     <!-- lottie files -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
