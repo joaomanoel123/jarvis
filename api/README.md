@@ -1,27 +1,111 @@
-Jarvis API – Deta Space
+# 🤖 Jarvis API
 
-Como rodar localmente
-- python -m venv .venv && source .venv/bin/activate
-- pip install -r requirements.txt
-- uvicorn main:app --reload --host 0.0.0.0 --port 8000
+API backend para o assistente virtual Jarvis integrado com Google Gemini.
 
-Endpoints
-- GET /health -> { status: "ok" }
-- POST /command -> body { message: "texto" } -> { reply: "..." }
+## 🏗️ Arquitetura
+- **Framework**: FastAPI
+- **IA**: Google Gemini Pro
+- **Deploy**: Render
+- **Frontend**: GitHub Pages
 
-Deploy gratuito (Render.com)
-1) Crie uma conta em https://render.com e conecte ao GitHub.
-2) Clique em New + e escolha Web Service.
-3) Escolha o repositório: jarvis e a pasta api (Root Directory = api) — se usar render.yaml, basta usar o botão "New + Blueprint".
-4) Runtime: Python
-5) Build Command: pip install -r requirements.txt
-6) Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
-7) Plano: Free
-8) Env Vars: CORS_ORIGINS = https://joaomanoel123.github.io,https://joaomanoel123.github.io/jarvis
+## 🚀 Deploy no Render
 
-Blueprint (opcional)
-- Já incluí render.yaml na raiz do repo. Você pode criar por Blueprint:
-  - Dashboard Render > New + > Blueprint > conecte o repo > Deploy.
+### **Configuração Automática**
+O projeto está configurado com `render.yaml` para deploy automático.
 
-CORS
-- Configure a env CORS_ORIGINS com os domínios do seu front (ex: https://joaomanoel123.github.io)
+### **Variáveis de Ambiente Necessárias**
+```
+GOOGLE_API_KEY = sua_chave_google_gemini
+CORS_ORIGINS = https://joaomanoel123.github.io,https://joaomanoel123.github.io/jarvis
+ENVIRONMENT = production
+```
+
+### **URLs de Produção**
+- **API**: https://jarvis-tdgt.onrender.com
+- **Docs**: https://jarvis-tdgt.onrender.com/docs
+- **Health**: https://jarvis-tdgt.onrender.com/health
+
+## 🔧 Desenvolvimento Local
+
+1. **Instalar dependências**:
+```bash
+pip install -r requirements.txt
+```
+
+2. **Configurar variáveis**:
+```bash
+export GOOGLE_API_KEY="sua_chave_aqui"
+export CORS_ORIGINS="http://localhost:3000,https://joaomanoel123.github.io"
+```
+
+3. **Executar API**:
+```bash
+uvicorn main:app --reload
+```
+
+## 📡 Endpoints
+
+### `GET /`
+Informações da API
+
+### `GET /health`
+Status da API e configurações
+```json
+{
+  "status": "ok",
+  "environment": "production",
+  "api_configured": true
+}
+```
+
+### `POST /command`
+Enviar comando para o assistente
+```json
+{
+  "message": "Olá, como você está?"
+}
+```
+
+Resposta:
+```json
+{
+  "reply": "Olá! Eu sou JARVIS, estou funcionando perfeitamente..."
+}
+```
+
+## 🔐 Segurança
+
+- ✅ CORS configurado para GitHub Pages
+- ✅ API Key protegida em variáveis de ambiente
+- ✅ Validação de entrada
+- ✅ Tratamento de erros
+
+## 🧪 Testes
+
+```bash
+# Testar health
+curl https://jarvis-tdgt.onrender.com/health
+
+# Testar comando
+curl -X POST https://jarvis-tdgt.onrender.com/command \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Olá JARVIS"}'
+```
+
+## 📊 Monitoramento
+
+- **Logs**: Render Dashboard
+- **Métricas**: Render Dashboard  
+- **Uptime**: Status page do Render
+
+## ⚠️ Limitações do Free Tier
+
+- **Cold Start**: ~30 segundos após inatividade
+- **Timeout**: 30 segundos por request
+- **Memória**: 512MB
+- **Horas**: 750h/mês
+
+---
+
+**Status**: ✅ Configurado para produção  
+**Última atualização**: 2025-08-10

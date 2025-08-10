@@ -72,36 +72,66 @@ $(document).ready(function () {
     }
     document.addEventListener('keyup', doc_keyUp, false);
 
-    // to play assisatnt 
+    // Configuração da API do Render
+    const DEFAULT_API_URL = 'https://jarvis-tdgt.onrender.com';
+    
+    // Função para enviar mensagem para o assistente
     function PlayAssistant(message) {
-
         if (message != "") {
-
             $("#Oval").attr("hidden", true);
             $("#SiriWave").attr("hidden", false);
-            // Envia para backend Deta (se configurado via ENV_FRONT_API_URL)
-            const apiUrl = window.FRONT_API_URL || localStorage.getItem('FRONT_API_URL');
-            if (apiUrl) {
-                fetch(apiUrl.replace(/\/$/, '') + '/command', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
-                }).then(r => r.json()).then(data => {
-                    if (data && data.reply) {
-                        if (window.eel && window.eel.exposed_functions && window.eel.exposed_functions.receiverText) {
-                            window.eel.exposed_functions.receiverText(data.reply);
-                        }
+            
+            // Mostrar indicador de carregamento
+            updateWishMessage("🤖 Processando...");
+            
+            // URL da API (Render por padrão, ou configurada pelo usuário)
+            const apiUrl = localStorage.getItem('FRONT_API_URL') || DEFAULT_API_URL;
+            
+            fetch(apiUrl.replace(/\/$/, '') + '/command', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.reply) {
+                    updateWishMessage(data.reply);
+                    // Se há função eel disponível, usa também
+                    if (window.eel && window.eel.exposed_functions && window.eel.exposed_functions.receiverText) {
+                        window.eel.exposed_functions.receiverText(data.reply);
                     }
-                }).catch(console.error);
-            } else {
-                eel.allCommands(message);
-            }
-            $("#chatbox").val("")
-            $("#MicBtn").attr('hidden', false);
-            $("#SendBtn").attr('hidden', true);
-
+                } else {
+                    updateWishMessage("🤖 Resposta inválida da API.");
+                }
+            })
+            .catch(error => {
+                console.error('Erro na API:', error);
+                updateWishMessage(`❌ Erro: ${error.message}. Verifique a configuração da API.`);
+            })
+            .finally(() => {
+                // Limpar input e resetar botões
+                $("#chatbox").val("");
+                $("#MicBtn").attr('hidden', false);
+                $("#SendBtn").attr('hidden', true);
+                
+                // Voltar para a tela principal após 3 segundos
+                setTimeout(() => {
+                    $("#SiriWave").attr("hidden", true);
+                    $("#Oval").attr("hidden", false);
+                    updateWishMessage("Ask me anything");
+                }, 3000);
+            });
         }
-
+    }
+    
+    // Função para atualizar a mensagem
+    function updateWishMessage(text) {
+        $("#WishMessage").text(text);
     }
 
     // toogle fucntion to hide and display mic and send button 
@@ -134,18 +164,47 @@ $(document).ready(function () {
 
     // settings button: configure backend URL
     $("#SettingsBtn").click(function () {
-        const current = localStorage.getItem('FRONT_API_URL') || '';
-        const input = prompt('URL do backend (Deta Space). Deixe vazio para desativar.', current);
+        const current = localStorage.getItem('FRONT_API_URL') || DEFAULT_API_URL;
+        const input = prompt(`URL da API do Jarvis:\n\nPadrão: ${DEFAULT_API_URL}\nAtual: ${current}\n\nDigite a nova URL ou deixe vazio para usar o padrão:`, current);
         if (input === null) return; // cancel
         const trimmed = (input || '').trim();
-        if (trimmed === '') {
+        if (trimmed === '' || trimmed === DEFAULT_API_URL) {
             localStorage.removeItem('FRONT_API_URL');
-            alert('Backend remoto desativado.');
+            alert(`✅ Usando API padrão: ${DEFAULT_API_URL}`);
         } else {
             localStorage.setItem('FRONT_API_URL', trimmed);
-            alert('Backend configurado: ' + trimmed);
+            alert(`✅ API configurada: ${trimmed}`);
         }
+        
+        // Testar a conexão
+        testApiConnection();
     });
+    
+    // Função para testar conexão com a API
+    function testApiConnection() {
+        const apiUrl = localStorage.getItem('FRONT_API_URL') || DEFAULT_API_URL;
+        updateWishMessage("🔄 Testando conexão...");
+        
+        fetch(apiUrl.replace(/\/$/, '') + '/health')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                updateWishMessage(`✅ API conectada! Ambiente: ${data.environment}`);
+                if (!data.api_configured) {
+                    updateWishMessage("⚠️ API conectada, mas Google API Key não configurada no servidor.");
+                }
+            } else {
+                updateWishMessage("❌ API não está funcionando corretamente.");
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao testar API:', error);
+            updateWishMessage(`❌ Erro de conexão: ${error.message}`);
+        });
+    }
+    
+    // Testar conexão na inicialização
+    setTimeout(testApiConnection, 2000);
     
 
     // enter press event handler on chat box
