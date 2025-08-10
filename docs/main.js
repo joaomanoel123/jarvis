@@ -113,6 +113,8 @@ $(document).ready(function () {
     // Função para enviar mensagem para o assistente
     function PlayAssistant(message) {
         if (message != "") {
+            console.log('💬 Enviando mensagem:', message);
+            
             $("#Oval").attr("hidden", true);
             $("#SiriWave").attr("hidden", false);
             
@@ -122,36 +124,73 @@ $(document).ready(function () {
             }
             
             // Mostrar indicador de carregamento
-            updateWishMessage("🤖 Processando...");
+            updateWishMessage("🤖 Processando sua mensagem...");
             
             // URL da API (Render por padrão, ou configurada pelo usuário)
             const apiUrl = localStorage.getItem('FRONT_API_URL') || DEFAULT_API_URL;
+            console.log('🔗 Usando API:', apiUrl);
+            
+            // Timeout mais longo para cold start do Render
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 segundos
             
             fetch(apiUrl.replace(/\/$/, '') + '/command', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message })
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ message }),
+                signal: controller.signal
             })
             .then(response => {
+                clearTimeout(timeoutId);
+                console.log('📡 Resposta da API:', response.status, response.statusText);
+                
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    if (response.status === 503) {
+                        throw new Error('Servidor temporáriamente indisponível (cold start). Tente novamente em alguns segundos.');
+                    } else if (response.status === 500) {
+                        throw new Error('Erro interno do servidor. Verifique se a chave API está configurada.');
+                    } else {
+                        throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+                    }
                 }
                 return response.json();
             })
             .then(data => {
+                console.log('📝 Dados recebidos:', data);
+                
                 if (data && data.reply) {
                     updateWishMessage(data.reply);
+                    console.log('✅ Resposta processada com sucesso');
+                    
                     // Se há função eel disponível, usa também
                     if (window.eel && window.eel.exposed_functions && window.eel.exposed_functions.receiverText) {
                         window.eel.exposed_functions.receiverText(data.reply);
                     }
+                } else if (data && data.error) {
+                    // Tratar erros específicos da API
+                    if (data.error === 'missing_api_key') {
+                        updateWishMessage("⚠️ Chave da API do Google não configurada no servidor. Entre em contato com o administrador.");
+                    } else {
+                        updateWishMessage(`❌ Erro da API: ${data.reply || 'Erro desconhecido'}`);
+                    }
                 } else {
-                    updateWishMessage("🤖 Resposta inválida da API.");
+                    updateWishMessage("🤖 Resposta inválida da API. Tente novamente.");
                 }
             })
             .catch(error => {
-                console.error('Erro na API:', error);
-                updateWishMessage(`❌ Erro: ${error.message}. Verifique a configuração da API.`);
+                clearTimeout(timeoutId);
+                console.error('❌ Erro na API:', error);
+                
+                if (error.name === 'AbortError') {
+                    updateWishMessage("⏱️ Timeout: A API demorou muito para responder. O servidor pode estar iniciando (cold start). Tente novamente em 30 segundos.");
+                } else if (error.message.includes('Failed to fetch')) {
+                    updateWishMessage("🚫 Erro de conexão: Verifique sua internet ou se a API está disponível.");
+                } else {
+                    updateWishMessage(`❌ ${error.message}`);
+                }
             })
             .finally(() => {
                 // Parar SiriWave se disponível
@@ -164,12 +203,12 @@ $(document).ready(function () {
                 $("#MicBtn").attr('hidden', false);
                 $("#SendBtn").attr('hidden', true);
                 
-                // Voltar para a tela principal após 3 segundos
+                // Voltar para a tela principal após 5 segundos (mais tempo para ler a resposta)
                 setTimeout(() => {
                     $("#SiriWave").attr("hidden", true);
                     $("#Oval").attr("hidden", false);
                     updateWishMessage("Ask me anything");
-                }, 3000);
+                }, 5000);
             });
         }
     }
@@ -209,6 +248,35 @@ $(document).ready(function () {
 
     // settings button: configure backend URL
     $("#SettingsBtn").click(function () {
+        const options = [
+            '🔧 Configurar URL da API',
+            '🧪 Testar conexão',
+            '💬 Teste rápido de mensagem',
+            '📊 Ver logs do console',
+            '❌ Cancelar'
+        ];
+        
+        const choice = prompt(`Configurações do Jarvis:\n\n${options.map((opt, i) => `${i + 1}. ${opt}`).join('\n')}\n\nEscolha uma opção (1-${options.length}):`);
+        
+        switch(choice) {
+            case '1':
+                configureApiUrl();
+                break;
+            case '2':
+                testApiConnection();
+                break;
+            case '3':
+                PlayAssistant('Olá, você está funcionando?');
+                break;
+            case '4':
+                alert('📊 Verifique o console do navegador (F12) para ver os logs detalhados.');
+                break;
+            default:
+                return;
+        }
+    });
+    
+    function configureApiUrl() {
         const current = localStorage.getItem('FRONT_API_URL') || DEFAULT_API_URL;
         const input = prompt(`URL da API do Jarvis:\n\nPadrão: ${DEFAULT_API_URL}\nAtual: ${current}\n\nDigite a nova URL ou deixe vazio para usar o padrão:`, current);
         if (input === null) return; // cancel
@@ -223,7 +291,7 @@ $(document).ready(function () {
         
         // Testar a conexão
         testApiConnection();
-    });
+    }
     
 
     
@@ -291,7 +359,9 @@ $(document).ready(function () {
                         
                         // Testar API durante a inicialização
                         updateWishMessage('🔌 Connecting to neural network...');
-                        testApiConnection();
+                        setTimeout(() => {
+                            testApiConnection();
+                        }, 500);
                         
                         setTimeout(() => {
                             if (skipInitialization) return;
@@ -333,21 +403,60 @@ $(document).ready(function () {
     // Função melhorada para testar conexão com a API
     function testApiConnection() {
         const apiUrl = localStorage.getItem('FRONT_API_URL') || DEFAULT_API_URL;
+        console.log('🔌 Testando conexão com:', apiUrl);
         
-        fetch(apiUrl.replace(/\/$/, '') + '/health')
-        .then(response => response.json())
+        updateWishMessage('🔄 Testando conexão com a API...');
+        
+        const startTime = Date.now();
+        
+        fetch(apiUrl.replace(/\/$/, '') + '/health', {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            cache: 'no-cache'
+        })
+        .then(response => {
+            const responseTime = Date.now() - startTime;
+            console.log(`📡 Resposta em ${responseTime}ms:`, response.status, response.statusText);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            const responseTime = Date.now() - startTime;
+            console.log('📝 Dados do health check:', data);
+            
             if (data.status === 'ok') {
+                const message = `✅ API conectada! (${responseTime}ms)\nAmbiente: ${data.environment}\nAPI configurada: ${data.api_configured ? 'Sim' : 'Não'}`;
+                updateWishMessage(message);
                 console.log('✅ API conectada com sucesso!');
+                
                 if (!data.api_configured) {
                     console.warn('⚠️ Google API Key não configurada no servidor');
+                    setTimeout(() => {
+                        updateWishMessage('⚠️ Google API Key não configurada no servidor. Configure no Render Dashboard.');
+                    }, 3000);
                 }
             } else {
-                console.warn('⚠️ API não está funcionando corretamente');
+                updateWishMessage('⚠️ API respondeu mas status não é OK');
+                console.warn('⚠️ API não está funcionando corretamente:', data);
             }
         })
         .catch(error => {
+            const responseTime = Date.now() - startTime;
             console.error('❌ Erro de conexão com API:', error);
+            
+            let errorMessage = '❌ Erro de conexão';
+            if (error.message.includes('Failed to fetch')) {
+                errorMessage = '🚫 Erro de rede: Verifique sua conexão ou se a API está online';
+            } else if (error.message.includes('503')) {
+                errorMessage = '🔄 Servidor iniciando (cold start). Aguarde 30 segundos e tente novamente';
+            } else {
+                errorMessage = `❌ ${error.message}`;
+            }
+            
+            updateWishMessage(`${errorMessage} (${responseTime}ms)`);
         });
     }
 
