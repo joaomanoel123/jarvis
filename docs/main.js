@@ -115,6 +115,11 @@ $(document).ready(function () {
         if (message != "") {
             console.log('💬 Enviando mensagem:', message);
             
+            // Verificar comandos locais primeiro (GitHub Pages)
+            if (handleLocalCommands(message)) {
+                return;
+            }
+            
             $("#Oval").attr("hidden", true);
             $("#SiriWave").attr("hidden", false);
             
@@ -231,6 +236,56 @@ $(document).ready(function () {
     // Função para atualizar a mensagem
     function updateWishMessage(text) {
         $("#WishMessage").text(text);
+    }
+    
+    // Função para lidar com comandos locais no GitHub Pages
+    function handleLocalCommands(message) {
+        const msg = message.toLowerCase();
+        
+        // Comandos do WhatsApp
+        if (msg.includes('whatsapp') || msg.includes('abrir whatsapp') || msg.includes('abra whatsapp')) {
+            console.log('🎯 Comando WhatsApp detectado localmente');
+            
+            $("#Oval").attr("hidden", true);
+            $("#SiriWave").attr("hidden", false);
+            
+            // Ativar SiriWave
+            if (sw && typeof sw.start === 'function') {
+                sw.start();
+            }
+            
+            updateWishMessage("📱 Abrindo WhatsApp Web para João Manoel...");
+            
+            // Abrir WhatsApp Web
+            setTimeout(() => {
+                try {
+                    window.open('https://web.whatsapp.com', '_blank');
+                    updateWishMessage("✅ WhatsApp Web aberto com sucesso!");
+                    console.log('✅ WhatsApp Web aberto');
+                } catch (error) {
+                    console.error('❌ Erro ao abrir WhatsApp Web:', error);
+                    updateWishMessage("❌ Erro ao abrir WhatsApp Web. Tente manualmente: web.whatsapp.com");
+                }
+                
+                // Parar SiriWave
+                if (sw && typeof sw.stop === 'function') {
+                    sw.stop();
+                }
+                
+                // Voltar para tela principal
+                setTimeout(() => {
+                    $("#SiriWave").attr("hidden", true);
+                    $("#Oval").attr("hidden", false);
+                    updateWishMessage("Ask me anything");
+                }, 3000);
+            }, 1000);
+            
+            return true; // Comando processado localmente
+        }
+        
+        // Outros comandos locais podem ser adicionados aqui
+        
+        return false; // Não é comando local, enviar para API
     }
 
     // toogle fucntion to hide and display mic and send button 
