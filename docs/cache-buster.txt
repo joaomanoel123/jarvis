@@ -1,4 +1,1 @@
-Cache buster for GitHub Pages deployment
-Generated at: 2025-08-10 15:45:00
-Build ID: jarvis-v1.1.0-groq-api-integration
-Feature: Groq API integration with Google Gemini fallback - ultra-fast responses
+dom 10 ago 2025 20:57:30 -03
