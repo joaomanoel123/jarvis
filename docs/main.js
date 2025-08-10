@@ -20,19 +20,47 @@ $(document).ready(function () {
 
     // Siri configuration
     var container = document.getElementById("siri-container");
-    var sw = new SiriWave({
-        container: container,
-        width: container.clientWidth || 320,
-        height: 160,
-        style: "ios9",
-        amplitude: 1,
-        speed: 0.30,
-        autostart: true
-      });
-      window.addEventListener('resize', function() {
-        sw.setWidth(container.clientWidth || 320);
-        sw.setHeight(160);
-      });
+    var sw = null;
+    
+    function initSiriWave() {
+        if (container && typeof SiriWave !== 'undefined') {
+            try {
+                sw = new SiriWave({
+                    container: container,
+                    width: container.clientWidth || 320,
+                    height: 160,
+                    style: "ios9",
+                    amplitude: 1,
+                    speed: 0.30,
+                    autostart: true
+                });
+                console.log('SiriWave inicializado com sucesso');
+            } catch (error) {
+                console.warn('Erro ao inicializar SiriWave:', error);
+            }
+        } else {
+            console.warn('SiriWave não disponível ou container não encontrado');
+        }
+    }
+    
+    // Inicializar SiriWave
+    initSiriWave();
+    
+    // Recriar SiriWave no resize (método mais compatível)
+    window.addEventListener('resize', function() {
+        if (container && sw) {
+            try {
+                // Destruir instância anterior se existir
+                if (sw && typeof sw.stop === 'function') {
+                    sw.stop();
+                }
+                // Recriar com nova largura
+                initSiriWave();
+            } catch (error) {
+                console.warn('Erro no resize do SiriWave:', error);
+            }
+        }
+    });
 
     // Siri message animation
     if (typeof $.fn.textillate === 'function') {
@@ -53,6 +81,10 @@ $(document).ready(function () {
     // mic button click event
 
     $("#MicBtn").click(function () { 
+        // Ativar SiriWave se disponível
+        if (sw && typeof sw.start === 'function') {
+            sw.start();
+        }
         eel.playAssistantSound()
         $("#Oval").attr("hidden", true);
         $("#SiriWave").attr("hidden", false);
@@ -80,6 +112,11 @@ $(document).ready(function () {
         if (message != "") {
             $("#Oval").attr("hidden", true);
             $("#SiriWave").attr("hidden", false);
+            
+            // Ativar SiriWave se disponível
+            if (sw && typeof sw.start === 'function') {
+                sw.start();
+            }
             
             // Mostrar indicador de carregamento
             updateWishMessage("🤖 Processando...");
@@ -114,6 +151,11 @@ $(document).ready(function () {
                 updateWishMessage(`❌ Erro: ${error.message}. Verifique a configuração da API.`);
             })
             .finally(() => {
+                // Parar SiriWave se disponível
+                if (sw && typeof sw.stop === 'function') {
+                    sw.stop();
+                }
+                
                 // Limpar input e resetar botões
                 $("#chatbox").val("");
                 $("#MicBtn").attr('hidden', false);

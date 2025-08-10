@@ -1,3 +1,4 @@
 Cache buster for GitHub Pages deployment
-Generated at: 2025-08-10 11:59:27
-Build ID: jarvis-v1.0.0-20250810115927
+Generated at: 2025-08-10 15:05:00
+Build ID: jarvis-v1.0.2-siriwave-fix
+Fix: SiriWave TypeError resolved - setWidth/setHeight methods
