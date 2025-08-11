@@ -236,6 +236,14 @@ $(document).ready(function () {
     // Função para atualizar a mensagem
     function updateWishMessage(text) {
         $("#WishMessage").text(text);
+        
+        // Integração com TTS - falar a mensagem se disponível
+        if (window.jarvisTTS && typeof window.jarvisTTS.speakResponse === 'function') {
+            // Aguardar um pouco para a mensagem aparecer na tela
+            setTimeout(() => {
+                window.jarvisTTS.speakResponse(text);
+            }, 500);
+        }
     }
     
     // Função para lidar com comandos locais no GitHub Pages
@@ -376,31 +384,71 @@ $(document).ready(function () {
 
     // settings button: configure backend URL
     $("#SettingsBtn").click(function () {
-        const options = [
-            '🔧 Configurar URL da API',
-            '🧪 Testar conexão',
-            '💬 Teste rápido de mensagem',
-            '📊 Ver logs do console',
-            '❌ Cancelar'
-        ];
-        
-        const choice = prompt(`Configurações do Jarvis:\n\n${options.map((opt, i) => `${i + 1}. ${opt}`).join('\n')}\n\nEscolha uma opção (1-${options.length}):`);
-        
-        switch(choice) {
-            case '1':
-                configureApiUrl();
-                break;
-            case '2':
-                testApiConnection();
-                break;
-            case '3':
-                PlayAssistant('Olá, você está funcionando?');
-                break;
-            case '4':
-                alert('📊 Verifique o console do navegador (F12) para ver os logs detalhados.');
-                break;
-            default:
-                return;
+        // Usar o handler do TTS se disponível, senão usar o padrão
+        if (window.jarvisTTS && typeof window.jarvisTTS.showTTSSettings === 'function') {
+            // Se TTS está carregado, usar o menu expandido
+            const options = [
+                '🔧 Configurar URL da API',
+                '🧪 Testar conexão',
+                '💬 Teste rápido de mensagem',
+                '🗣️ Configurações de Voz',
+                '🎤 Testar Text-to-Speech',
+                '📊 Ver logs do console',
+                '❌ Cancelar'
+            ];
+            
+            const choice = prompt(`Configurações do Jarvis:\n\n${options.map((opt, i) => `${i + 1}. ${opt}`).join('\n')}\n\nEscolha uma opção (1-${options.length}):`);
+            
+            switch(choice) {
+                case '1':
+                    configureApiUrl();
+                    break;
+                case '2':
+                    testApiConnection();
+                    break;
+                case '3':
+                    PlayAssistant('Olá, você está funcionando?');
+                    break;
+                case '4':
+                    window.jarvisTTS.showTTSSettings();
+                    break;
+                case '5':
+                    window.jarvisTTS.testTTS();
+                    break;
+                case '6':
+                    alert('📊 Verifique o console do navegador (F12) para ver os logs detalhados.');
+                    break;
+                default:
+                    return;
+            }
+        } else {
+            // Handler padrão (fallback)
+            const options = [
+                '🔧 Configurar URL da API',
+                '🧪 Testar conexão',
+                '💬 Teste rápido de mensagem',
+                '📊 Ver logs do console',
+                '❌ Cancelar'
+            ];
+            
+            const choice = prompt(`Configurações do Jarvis:\n\n${options.map((opt, i) => `${i + 1}. ${opt}`).join('\n')}\n\nEscolha uma opção (1-${options.length}):`);
+            
+            switch(choice) {
+                case '1':
+                    configureApiUrl();
+                    break;
+                case '2':
+                    testApiConnection();
+                    break;
+                case '3':
+                    PlayAssistant('Olá, você está funcionando?');
+                    break;
+                case '4':
+                    alert('📊 Verifique o console do navegador (F12) para ver os logs detalhados.');
+                    break;
+                default:
+                    return;
+            }
         }
     });
     
@@ -420,6 +468,26 @@ $(document).ready(function () {
         // Testar a conexão
         testApiConnection();
     }
+    
+    // Tornar funções disponíveis globalmente para o TTS
+    window.jarvisSettingsHandler = function(choice) {
+        switch(choice) {
+            case '1':
+                configureApiUrl();
+                break;
+            case '2':
+                testApiConnection();
+                break;
+            case '3':
+                PlayAssistant('Olá, você está funcionando?');
+                break;
+            case '6':
+                alert('📊 Verifique o console do navegador (F12) para ver os logs detalhados.');
+                break;
+            default:
+                return;
+        }
+    };
     
 
     
