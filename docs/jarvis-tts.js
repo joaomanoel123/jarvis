@@ -172,15 +172,19 @@ class JarvisTTS {
         if (!text) return '';
         
         return text
-            // Remover emojis
-            .replace(/[\\u{1F600}-\\u{1F64F}]|[\\u{1F300}-\\u{1F5FF}]|[\\u{1F680}-\\u{1F6FF}]|[\\u{1F1E0}-\\u{1F1FF}]|[\\u{2600}-\\u{26FF}]|[\\u{2700}-\\u{27BF}]/gu, '')
-            // Remover símbolos especiais
+            // Remover emojis comuns
+            .replace(/[\u{1F600}-\u{1F64F}]/gu, '') // Emoticons
+            .replace(/[\u{1F300}-\u{1F5FF}]/gu, '') // Misc Symbols
+            .replace(/[\u{1F680}-\u{1F6FF}]/gu, '') // Transport
+            .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '') // Flags
+            .replace(/[\u{2600}-\u{26FF}]/gu, '')   // Misc symbols
+            .replace(/[\u{2700}-\u{27BF}]/gu, '')   // Dingbats
+            // Remover símbolos especiais específicos
             .replace(/[🤖🗣️📱✅❌⚠️🔄🔍🎯📡📝🌊🔙💬🚫⏱️🔌🎆💾⚙️🎤]/g, '')
             // Limpar múltiplos espaços
-            .replace(/\\s+/g, ' ')
+            .replace(/\s+/g, ' ')
             // Remover quebras de linha
-            .replace(/\
-/g, ' ')
+            .replace(/\n/g, ' ')
             .trim();
     }
 
