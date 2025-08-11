@@ -2,8 +2,156 @@ $(document).ready(function () {
 
     eel.init()()
     
+    // Otimizações para mobile
+    initializeMobileOptimizations();
+    
     // Inicializar sequência de loading
     initializeJarvis();
+    
+    // Função de otimizações para mobile
+    function initializeMobileOptimizations() {
+        console.log('📱 Inicializando otimizações mobile...');
+        
+        // Detectar dispositivo móvel
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isSmallScreen = window.innerWidth <= 768;
+        
+        if (isMobile || isSmallScreen) {
+            console.log('📱 Dispositivo móvel detectado');
+            
+            // Adicionar classe mobile ao body
+            $('body').addClass('mobile-device');
+            
+            // Prevenir zoom duplo toque
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Melhorar performance em mobile
+            document.addEventListener('touchstart', function() {}, {passive: true});
+            document.addEventListener('touchmove', function() {}, {passive: true});
+            
+            // Otimizar SiriWave para mobile
+            if (typeof SiriWave !== 'undefined') {
+                // Reduzir complexidade da animação em mobile
+                const originalInitSiriWave = window.initSiriWave;
+                window.initSiriWave = function() {
+                    if (container && typeof SiriWave !== 'undefined') {
+                        try {
+                            sw = new SiriWave({
+                                container: container,
+                                width: Math.min(container.clientWidth || 320, 350),
+                                height: isSmallScreen ? 100 : 160,
+                                style: "ios9",
+                                amplitude: isSmallScreen ? 0.8 : 1,
+                                speed: isSmallScreen ? 0.25 : 0.30,
+                                autostart: true
+                            });
+                            console.log('🌊 SiriWave otimizado para mobile');
+                        } catch (error) {
+                            console.warn('⚠️ Erro ao inicializar SiriWave mobile:', error);
+                        }
+                    }
+                };
+            }
+            
+            // Ajustar timeouts para mobile (conexão mais lenta)
+            if (window.PlayAssistant) {
+                const originalTimeout = 45000;
+                const mobileTimeout = 60000; // 60 segundos para mobile
+                console.log(`⏱️ Timeout ajustado para mobile: ${mobileTimeout}ms`);
+            }
+            
+            // Otimizar animações para mobile
+            const style = document.createElement('style');
+            style.textContent = `
+                @media (max-width: 768px) {
+                    /* Reduzir animações complexas em mobile */
+                    .svg-frame {
+                        animation-duration: 3s !important;
+                    }
+                    
+                    svg {
+                        animation-duration: 6s !important;
+                    }
+                    
+                    /* Melhorar performance de scroll */
+                    * {
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                    }
+                    
+                    /* Otimizar hover states para touch */
+                    .glow-on-hover:hover:before {
+                        opacity: 0 !important;
+                    }
+                    
+                    /* Melhor feedback tátil */
+                    .glow-on-hover:active {
+                        transform: scale(0.95) !important;
+                        transition: transform 0.1s !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Adicionar suporte a gestos
+            addMobileGestures();
+            
+            console.log('✅ Otimizações mobile aplicadas');
+        }
+    }
+    
+    // Função para adicionar gestos mobile
+    function addMobileGestures() {
+        let touchStartY = 0;
+        let touchEndY = 0;
+        
+        // Gesto de swipe para abrir/fechar chat
+        document.addEventListener('touchstart', function(e) {
+            touchStartY = e.changedTouches[0].screenY;
+        }, {passive: true});
+        
+        document.addEventListener('touchend', function(e) {
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipeGesture();
+        }, {passive: true});
+        
+        function handleSwipeGesture() {
+            const swipeThreshold = 100;
+            const swipeDistance = touchStartY - touchEndY;
+            
+            // Swipe up para abrir chat (apenas se estiver na tela principal)
+            if (swipeDistance > swipeThreshold && !$('#Oval').attr('hidden')) {
+                console.log('👆 Swipe up detectado - abrindo chat');
+                $('#ChatBtn').click();
+            }
+        }
+        
+        // Toque duplo para ativar microfone (apenas na tela principal)
+        let lastTap = 0;
+        document.addEventListener('touchend', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            if (tapLength < 500 && tapLength > 0) {
+                // Toque duplo detectado
+                if (!$('#Oval').attr('hidden') && !$('#MicBtn').attr('hidden')) {
+                    console.log('👆👆 Toque duplo detectado - ativando microfone');
+                    e.preventDefault();
+                    $('#MicBtn').click();
+                }
+            }
+            lastTap = currentTime;
+        }, {passive: false});
+        
+        console.log('👆 Gestos mobile adicionados: swipe up (chat), toque duplo (mic)');
+    }
 
     // Verificar se textillate está disponível antes de usar
     if (typeof $.fn.textillate === 'function') {
@@ -253,7 +401,10 @@ $(document).ready(function () {
         $("#MicBtn").attr('hidden', false);
         $("#SendBtn").attr('hidden', true);
         
-        // Criar o diálogo personalizado
+        // Detectar se é dispositivo móvel
+        const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Criar o diálogo personalizado responsivo
         const dialogHtml = `
             <div id="permissionDialog" style="
                 position: fixed;
@@ -261,52 +412,62 @@ $(document).ready(function () {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.8);
+                background: rgba(0, 0, 0, 0.9);
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 z-index: 10000;
                 backdrop-filter: blur(5px);
+                padding: ${isMobile ? '20px' : '40px'};
+                box-sizing: border-box;
             ">
                 <div style="
                     background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
                     border: 2px solid #00d4ff;
-                    border-radius: 15px;
-                    padding: 30px;
-                    max-width: 400px;
-                    width: 90%;
+                    border-radius: ${isMobile ? '20px' : '15px'};
+                    padding: ${isMobile ? '25px 20px' : '30px'};
+                    max-width: ${isMobile ? '350px' : '400px'};
+                    width: ${isMobile ? '95%' : '90%'};
                     text-align: center;
                     box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
                     color: #00d4ff;
                     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    max-height: 90vh;
+                    overflow-y: auto;
                 ">
-                    <h3 style="margin: 0 0 20px 0; font-size: 24px; text-shadow: 0 0 10px #00d4ff;">${title}</h3>
-                    <p style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.5;">${message}</p>
-                    <div style="display: flex; gap: 15px; justify-content: center;">
+                    <h3 style="margin: 0 0 ${isMobile ? '15px' : '20px'} 0; font-size: ${isMobile ? '20px' : '24px'}; text-shadow: 0 0 10px #00d4ff; line-height: 1.3;">${title}</h3>
+                    <p style="margin: 0 0 ${isMobile ? '25px' : '30px'} 0; font-size: ${isMobile ? '15px' : '16px'}; line-height: 1.5;">${message}</p>
+                    <div style="display: flex; gap: ${isMobile ? '12px' : '15px'}; justify-content: center; flex-direction: ${isMobile ? 'column' : 'row'};">
                         <button id="permissionAllow" style="
                             background: rgba(0, 212, 255, 0.2);
                             border: 2px solid #00d4ff;
                             color: #00d4ff;
-                            padding: 12px 25px;
-                            border-radius: 8px;
+                            padding: ${isMobile ? '15px 20px' : '12px 25px'};
+                            border-radius: ${isMobile ? '12px' : '8px'};
                             cursor: pointer;
-                            font-size: 16px;
+                            font-size: ${isMobile ? '18px' : '16px'};
                             font-weight: bold;
                             transition: all 0.3s ease;
+                            min-height: ${isMobile ? '50px' : 'auto'};
+                            touch-action: manipulation;
+                            order: ${isMobile ? '1' : '0'};
                         ">✅ Sim, abrir</button>
                         <button id="permissionDeny" style="
                             background: rgba(255, 0, 0, 0.2);
                             border: 2px solid #ff4444;
                             color: #ff4444;
-                            padding: 12px 25px;
-                            border-radius: 8px;
+                            padding: ${isMobile ? '15px 20px' : '12px 25px'};
+                            border-radius: ${isMobile ? '12px' : '8px'};
                             cursor: pointer;
-                            font-size: 16px;
+                            font-size: ${isMobile ? '18px' : '16px'};
                             font-weight: bold;
                             transition: all 0.3s ease;
+                            min-height: ${isMobile ? '50px' : 'auto'};
+                            touch-action: manipulation;
+                            order: ${isMobile ? '2' : '0'};
                         ">❌ Cancelar</button>
                     </div>
-                    <p style="margin: 20px 0 0 0; font-size: 12px; opacity: 0.7;">🔒 Sua segurança é importante para nós</p>
+                    <p style="margin: ${isMobile ? '15px' : '20px'} 0 0 0; font-size: ${isMobile ? '11px' : '12px'}; opacity: 0.7; line-height: 1.3;">🔒 Sua segurança é importante para nós</p>
                 </div>
             </div>
         `;
