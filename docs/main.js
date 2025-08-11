@@ -240,11 +240,24 @@ $(document).ready(function () {
     
     // Função para lidar com comandos locais no GitHub Pages
     function handleLocalCommands(message) {
-        const msg = message.toLowerCase();
+        console.log('🔍 DEBUG: Verificando comando local:', message);
+        const msg = message.toLowerCase().trim();
+        console.log('🔍 DEBUG: Mensagem normalizada:', msg);
         
-        // Comandos do WhatsApp
-        if (msg.includes('whatsapp') || msg.includes('abrir whatsapp') || msg.includes('abra whatsapp')) {
-            console.log('🎯 Comando WhatsApp detectado localmente');
+        // Comandos do WhatsApp - Detecção mais ampla
+        const whatsappKeywords = ['whatsapp', 'whats app', 'whats', 'zap', 'abrir whatsapp', 'abra whatsapp', 'abre whatsapp'];
+        const isWhatsAppCommand = whatsappKeywords.some(keyword => msg.includes(keyword));
+        
+        console.log('🔍 DEBUG: É comando WhatsApp?', isWhatsAppCommand);
+        
+        if (isWhatsAppCommand) {
+            console.log('🎯 COMANDO WHATSAPP DETECTADO LOCALMENTE!');
+            console.log('📱 Iniciando processo de abertura do WhatsApp Web...');
+            
+            // Limpar input imediatamente
+            $("#chatbox").val("");
+            $("#MicBtn").attr('hidden', false);
+            $("#SendBtn").attr('hidden', true);
             
             $("#Oval").attr("hidden", true);
             $("#SiriWave").attr("hidden", false);
@@ -252,39 +265,84 @@ $(document).ready(function () {
             // Ativar SiriWave
             if (sw && typeof sw.start === 'function') {
                 sw.start();
+                console.log('🌊 SiriWave ativado');
             }
             
             updateWishMessage("📱 Abrindo WhatsApp Web para João Manoel...");
             
-            // Abrir WhatsApp Web
+            // Abrir WhatsApp Web com múltiplas tentativas
             setTimeout(() => {
+                console.log('🚀 Tentando abrir WhatsApp Web...');
+                
                 try {
-                    window.open('https://web.whatsapp.com', '_blank');
-                    updateWishMessage("✅ WhatsApp Web aberto com sucesso!");
-                    console.log('✅ WhatsApp Web aberto');
+                    // Primeira tentativa: window.open
+                    const newWindow = window.open('https://web.whatsapp.com', '_blank', 'noopener,noreferrer');
+                    
+                    if (newWindow) {
+                        console.log('✅ WhatsApp Web aberto com window.open');
+                        updateWishMessage("✅ WhatsApp Web aberto com sucesso!");
+                    } else {
+                        console.warn('⚠️ window.open bloqueado, tentando alternativa...');
+                        
+                        // Segunda tentativa: criar link e clicar
+                        const link = document.createElement('a');
+                        link.href = 'https://web.whatsapp.com';
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        console.log('✅ WhatsApp Web aberto com link click');
+                        updateWishMessage("✅ WhatsApp Web aberto! (Verifique se não foi bloqueado pelo navegador)");
+                    }
                 } catch (error) {
                     console.error('❌ Erro ao abrir WhatsApp Web:', error);
-                    updateWishMessage("❌ Erro ao abrir WhatsApp Web. Tente manualmente: web.whatsapp.com");
+                    updateWishMessage("❌ Erro ao abrir WhatsApp Web. Copie e cole: https://web.whatsapp.com");
+                    
+                    // Terceira tentativa: copiar para clipboard
+                    try {
+                        navigator.clipboard.writeText('https://web.whatsapp.com');
+                        updateWishMessage("📋 Link copiado! Cole no navegador: Ctrl+V");
+                    } catch (clipError) {
+                        console.error('❌ Erro ao copiar para clipboard:', clipError);
+                    }
                 }
                 
                 // Parar SiriWave
                 if (sw && typeof sw.stop === 'function') {
                     sw.stop();
+                    console.log('🌊 SiriWave parado');
                 }
                 
                 // Voltar para tela principal
                 setTimeout(() => {
+                    console.log('🔙 Voltando para tela principal...');
                     $("#SiriWave").attr("hidden", true);
                     $("#Oval").attr("hidden", false);
                     updateWishMessage("Ask me anything");
-                }, 3000);
+                }, 4000); // Mais tempo para ler a mensagem
             }, 1000);
             
             return true; // Comando processado localmente
         }
         
-        // Outros comandos locais podem ser adicionados aqui
+        // Outros comandos locais
+        if (msg.includes('google') || msg.includes('pesquisar google') || msg.includes('pesquise google')) {
+            console.log('🎯 Comando Google detectado localmente');
+            window.open('https://www.google.com', '_blank');
+            updateWishMessage("✅ Google aberto!");
+            return true;
+        }
         
+        if (msg.includes('youtube')) {
+            console.log('🎯 Comando YouTube detectado localmente');
+            window.open('https://www.youtube.com', '_blank');
+            updateWishMessage("✅ YouTube aberto!");
+            return true;
+        }
+        
+        console.log('🔍 DEBUG: Nenhum comando local detectado, enviando para API');
         return false; // Não é comando local, enviar para API
     }
 
