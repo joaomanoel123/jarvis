@@ -246,6 +246,181 @@ $(document).ready(function () {
         }
     }
     
+    // Função para mostrar diálogo de permissão elegante
+    function showPermissionDialog(title, message, url, loadingMessage, successMessage) {
+        // Limpar input imediatamente
+        $("#chatbox").val("");
+        $("#MicBtn").attr('hidden', false);
+        $("#SendBtn").attr('hidden', true);
+        
+        // Criar o diálogo personalizado
+        const dialogHtml = `
+            <div id="permissionDialog" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                backdrop-filter: blur(5px);
+            ">
+                <div style="
+                    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+                    border: 2px solid #00d4ff;
+                    border-radius: 15px;
+                    padding: 30px;
+                    max-width: 400px;
+                    width: 90%;
+                    text-align: center;
+                    box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+                    color: #00d4ff;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                ">
+                    <h3 style="margin: 0 0 20px 0; font-size: 24px; text-shadow: 0 0 10px #00d4ff;">${title}</h3>
+                    <p style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.5;">${message}</p>
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button id="permissionAllow" style="
+                            background: rgba(0, 212, 255, 0.2);
+                            border: 2px solid #00d4ff;
+                            color: #00d4ff;
+                            padding: 12px 25px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 16px;
+                            font-weight: bold;
+                            transition: all 0.3s ease;
+                        ">✅ Sim, abrir</button>
+                        <button id="permissionDeny" style="
+                            background: rgba(255, 0, 0, 0.2);
+                            border: 2px solid #ff4444;
+                            color: #ff4444;
+                            padding: 12px 25px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 16px;
+                            font-weight: bold;
+                            transition: all 0.3s ease;
+                        ">❌ Cancelar</button>
+                    </div>
+                    <p style="margin: 20px 0 0 0; font-size: 12px; opacity: 0.7;">🔒 Sua segurança é importante para nós</p>
+                </div>
+            </div>
+        `;
+        
+        // Adicionar o diálogo ao body
+        $('body').append(dialogHtml);
+        
+        // Adicionar efeitos hover via JavaScript
+        $('#permissionAllow').hover(
+            function() { $(this).css('background', 'rgba(0, 212, 255, 0.4)'); },
+            function() { $(this).css('background', 'rgba(0, 212, 255, 0.2)'); }
+        );
+        
+        $('#permissionDeny').hover(
+            function() { $(this).css('background', 'rgba(255, 0, 0, 0.4)'); },
+            function() { $(this).css('background', 'rgba(255, 0, 0, 0.2)'); }
+        );
+        
+        // Handler para "Sim, abrir"
+        $('#permissionAllow').click(function() {
+            $('#permissionDialog').remove();
+            openExternalSite(url, loadingMessage, successMessage);
+        });
+        
+        // Handler para "Cancelar"
+        $('#permissionDeny').click(function() {
+            $('#permissionDialog').remove();
+            updateWishMessage("❌ Operação cancelada pelo usuário");
+            
+            // Voltar para tela principal após 2 segundos
+            setTimeout(() => {
+                updateWishMessage("Ask me anything");
+            }, 2000);
+        });
+        
+        // Fechar com ESC
+        $(document).on('keydown.permissionDialog', function(e) {
+            if (e.key === 'Escape') {
+                $('#permissionDialog').remove();
+                $(document).off('keydown.permissionDialog');
+                updateWishMessage("❌ Operação cancelada");
+                setTimeout(() => {
+                    updateWishMessage("Ask me anything");
+                }, 2000);
+            }
+        });
+    }
+    
+    // Função para abrir site externo com feedback visual
+    function openExternalSite(url, loadingMessage, successMessage) {
+        console.log('🚀 Abrindo site:', url);
+        
+        // Mostrar tela de carregamento
+        $("#Oval").attr("hidden", true);
+        $("#SiriWave").attr("hidden", false);
+        
+        // Ativar SiriWave
+        if (sw && typeof sw.start === 'function') {
+            sw.start();
+        }
+        
+        updateWishMessage(loadingMessage);
+        
+        // Abrir site com múltiplas tentativas
+        setTimeout(() => {
+            try {
+                // Primeira tentativa: window.open
+                const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+                
+                if (newWindow) {
+                    console.log('✅ Site aberto com window.open');
+                    updateWishMessage(successMessage);
+                } else {
+                    console.warn('⚠️ window.open bloqueado, tentando alternativa...');
+                    
+                    // Segunda tentativa: criar link e clicar
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    console.log('✅ Site aberto com link click');
+                    updateWishMessage(successMessage + " (Verifique se não foi bloqueado pelo navegador)");
+                }
+            } catch (error) {
+                console.error('❌ Erro ao abrir site:', error);
+                updateWishMessage(`❌ Erro ao abrir ${url}. Copie e cole: ${url}`);
+                
+                // Terceira tentativa: copiar para clipboard
+                try {
+                    navigator.clipboard.writeText(url);
+                    updateWishMessage("📋 Link copiado! Cole no navegador: Ctrl+V");
+                } catch (clipError) {
+                    console.error('❌ Erro ao copiar para clipboard:', clipError);
+                }
+            }
+            
+            // Parar SiriWave
+            if (sw && typeof sw.stop === 'function') {
+                sw.stop();
+            }
+            
+            // Voltar para tela principal
+            setTimeout(() => {
+                $("#SiriWave").attr("hidden", true);
+                $("#Oval").attr("hidden", false);
+                updateWishMessage("Ask me anything");
+            }, 3000);
+        }, 1000);
+    }
+    
     // Função para lidar com comandos locais no GitHub Pages
     function handleLocalCommands(message) {
         console.log('🔍 DEBUG: Verificando comando local:', message);
@@ -260,77 +435,15 @@ $(document).ready(function () {
         
         if (isWhatsAppCommand) {
             console.log('🎯 COMANDO WHATSAPP DETECTADO LOCALMENTE!');
-            console.log('📱 Iniciando processo de abertura do WhatsApp Web...');
             
-            // Limpar input imediatamente
-            $("#chatbox").val("");
-            $("#MicBtn").attr('hidden', false);
-            $("#SendBtn").attr('hidden', true);
-            
-            $("#Oval").attr("hidden", true);
-            $("#SiriWave").attr("hidden", false);
-            
-            // Ativar SiriWave
-            if (sw && typeof sw.start === 'function') {
-                sw.start();
-                console.log('🌊 SiriWave ativado');
-            }
-            
-            updateWishMessage("📱 Abrindo WhatsApp Web para João Manoel...");
-            
-            // Abrir WhatsApp Web com múltiplas tentativas
-            setTimeout(() => {
-                console.log('🚀 Tentando abrir WhatsApp Web...');
-                
-                try {
-                    // Primeira tentativa: window.open
-                    const newWindow = window.open('https://web.whatsapp.com', '_blank', 'noopener,noreferrer');
-                    
-                    if (newWindow) {
-                        console.log('✅ WhatsApp Web aberto com window.open');
-                        updateWishMessage("✅ WhatsApp Web aberto com sucesso!");
-                    } else {
-                        console.warn('⚠️ window.open bloqueado, tentando alternativa...');
-                        
-                        // Segunda tentativa: criar link e clicar
-                        const link = document.createElement('a');
-                        link.href = 'https://web.whatsapp.com';
-                        link.target = '_blank';
-                        link.rel = 'noopener noreferrer';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        
-                        console.log('✅ WhatsApp Web aberto com link click');
-                        updateWishMessage("✅ WhatsApp Web aberto! (Verifique se não foi bloqueado pelo navegador)");
-                    }
-                } catch (error) {
-                    console.error('❌ Erro ao abrir WhatsApp Web:', error);
-                    updateWishMessage("❌ Erro ao abrir WhatsApp Web. Copie e cole: https://web.whatsapp.com");
-                    
-                    // Terceira tentativa: copiar para clipboard
-                    try {
-                        navigator.clipboard.writeText('https://web.whatsapp.com');
-                        updateWishMessage("📋 Link copiado! Cole no navegador: Ctrl+V");
-                    } catch (clipError) {
-                        console.error('❌ Erro ao copiar para clipboard:', clipError);
-                    }
-                }
-                
-                // Parar SiriWave
-                if (sw && typeof sw.stop === 'function') {
-                    sw.stop();
-                    console.log('🌊 SiriWave parado');
-                }
-                
-                // Voltar para tela principal
-                setTimeout(() => {
-                    console.log('🔙 Voltando para tela principal...');
-                    $("#SiriWave").attr("hidden", true);
-                    $("#Oval").attr("hidden", false);
-                    updateWishMessage("Ask me anything");
-                }, 4000); // Mais tempo para ler a mensagem
-            }, 1000);
+            // Solicitar permissão do usuário
+            showPermissionDialog(
+                '📱 WhatsApp Web',
+                'Deseja abrir o WhatsApp Web em uma nova aba?',
+                'https://web.whatsapp.com',
+                '📱 Abrindo WhatsApp Web...',
+                '✅ WhatsApp Web aberto com sucesso!'
+            );
             
             return true; // Comando processado localmente
         }
@@ -338,15 +451,29 @@ $(document).ready(function () {
         // Outros comandos locais
         if (msg.includes('google') || msg.includes('pesquisar google') || msg.includes('pesquise google')) {
             console.log('🎯 Comando Google detectado localmente');
-            window.open('https://www.google.com', '_blank');
-            updateWishMessage("✅ Google aberto!");
+            
+            showPermissionDialog(
+                '🔍 Google',
+                'Deseja abrir o Google em uma nova aba?',
+                'https://www.google.com',
+                '🔍 Abrindo Google...',
+                '✅ Google aberto com sucesso!'
+            );
+            
             return true;
         }
         
         if (msg.includes('youtube')) {
             console.log('🎯 Comando YouTube detectado localmente');
-            window.open('https://www.youtube.com', '_blank');
-            updateWishMessage("✅ YouTube aberto!");
+            
+            showPermissionDialog(
+                '🎥 YouTube',
+                'Deseja abrir o YouTube em uma nova aba?',
+                'https://www.youtube.com',
+                '🎥 Abrindo YouTube...',
+                '✅ YouTube aberto com sucesso!'
+            );
+            
             return true;
         }
         
