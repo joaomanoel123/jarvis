@@ -99,8 +99,14 @@ class JarvisTTS {
         try {
             const saved = localStorage.getItem('jarvis_tts_settings');
             if (saved) {
-                this.settings = { ...this.settings, ...JSON.parse(saved) };
-                console.log('⚙️ Configurações TTS carregadas');
+                try {
+                    const parsedSettings = JSON.parse(saved);
+                    this.settings = { ...this.settings, ...parsedSettings };
+                    console.log('⚙️ Configurações TTS carregadas');
+                } catch (parseError) {
+                    console.warn('⚠️ Erro ao carregar configurações TTS, usando padrões:', parseError);
+                    localStorage.removeItem('jarvis_tts_settings'); // Limpar configuração corrompida
+                }
             }
         } catch (error) {
             console.warn('⚠️ Erro ao carregar configurações TTS:', error);
