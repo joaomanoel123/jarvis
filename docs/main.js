@@ -229,18 +229,178 @@ $(document).ready(function () {
         });
     }
 
-    // mic button click event
-
-    $("#MicBtn").click(function () { 
+    // mic button click event - Sistema melhorado de reconhecimento de voz
+    $("#MicBtn").click(function () {
+        console.log('🎤 Botão de microfone clicado');
+        
+        // Verificar se o novo sistema de reconhecimento está disponível
+        if (window.jarvisSpeechRecognition && window.jarvisSpeechRecognition.isAvailable()) {
+            startAdvancedSpeechRecognition();
+        } else {
+            // Fallback para o sistema original (eel)
+            console.log('🔄 Usando sistema original (eel)');
+            startOriginalSpeechRecognition();
+        }
+    });
+    
+    // Função para iniciar reconhecimento avançado
+    function startAdvancedSpeechRecognition() {
+        console.log('🎆 Iniciando reconhecimento avançado de voz...');
+        
+        const speechRecognition = window.jarvisSpeechRecognition;
+        
+        // Verificar se já está ouvindo
+        if (speechRecognition.isActive()) {
+            console.log('⚠️ Reconhecimento já ativo, parando...');
+            speechRecognition.stop();
+            return;
+        }
+        
+        // Configurar callbacks
+        speechRecognition.onStart(() => {
+            console.log('🎤 Reconhecimento iniciado');
+            
+            // Ativar SiriWave
+            if (sw && typeof sw.start === 'function') {
+                sw.start();
+            }
+            
+            // Mostrar interface de escuta
+            $("#Oval").attr("hidden", true);
+            $("#SiriWave").attr("hidden", false);
+            
+            // Atualizar mensagem
+            updateWishMessage('🎤 Escutando... Fale agora!');
+            
+            // Mudar ícone do botão para indicar que está ouvindo
+            $('#MicBtn').html('<i class="bi bi-mic-fill"></i>');
+            $('#MicBtn').css('background', 'rgba(255, 0, 0, 0.3)');
+        });
+        
+        speechRecognition.onInterim((transcript) => {
+            console.log('⏳ Transcrição parcial:', transcript);
+            updateWishMessage(`🎤 Ouvindo: "${transcript}"`);
+        });
+        
+        speechRecognition.onResult((transcript, confidence) => {
+            console.log('✅ Transcrição final:', transcript);
+            console.log('🎯 Confiança:', (confidence * 100).toFixed(1) + '%');
+            
+            // Limpar interface
+            resetMicInterface();
+            
+            // Processar comando
+            if (transcript && transcript.trim().length > 0) {
+                updateWishMessage(`💬 Você disse: "${transcript}"`);
+                
+                // Aguardar um pouco e processar
+                setTimeout(() => {
+                    PlayAssistant(transcript);
+                }, 1000);
+            } else {
+                updateWishMessage('⚠️ Nenhum comando detectado. Tente novamente.');
+                setTimeout(() => {
+                    updateWishMessage('Ask me anything');
+                }, 3000);
+            }
+        });
+        
+        speechRecognition.onError((error, message) => {
+            console.error('❌ Erro no reconhecimento:', error, message);
+            
+            // Limpar interface
+            resetMicInterface();
+            
+            // Mostrar erro amigável
+            let userMessage = '❌ Erro no reconhecimento de voz.';
+            
+            switch (error) {
+                case 'not-allowed':
+                    userMessage = '🚫 Permissão de microfone negada. Clique no ícone de microfone na barra de endereços para permitir.';
+                    break;
+                case 'no-speech':
+                    userMessage = '🔇 Nenhuma fala detectada. Tente falar mais alto ou verificar o microfone.';
+                    break;
+                case 'audio-capture':
+                    userMessage = '🎤 Erro na captação de áudio. Verifique se o microfone está conectado.';
+                    break;
+                case 'network':
+                    userMessage = '🌐 Erro de rede. Verifique sua conexão com a internet.';
+                    break;
+                case 'timeout':
+                    userMessage = '⏰ Tempo limite excedido. Tente falar mais rápido.';
+                    break;
+                default:
+                    userMessage = `❌ ${message || 'Erro desconhecido no reconhecimento de voz.'}`;
+            }
+            
+            updateWishMessage(userMessage);
+            
+            // Voltar para mensagem padrão após alguns segundos
+            setTimeout(() => {
+                updateWishMessage('Ask me anything');
+            }, 5000);
+        });
+        
+        speechRecognition.onEnd(() => {
+            console.log('🔄 Reconhecimento finalizado');
+            resetMicInterface();
+        });
+        
+        // Iniciar reconhecimento
+        const started = speechRecognition.start();
+        
+        if (!started) {
+            console.error('❌ Falha ao iniciar reconhecimento');
+            resetMicInterface();
+            updateWishMessage('❌ Erro ao iniciar reconhecimento de voz.');
+            
+            setTimeout(() => {
+                updateWishMessage('Ask me anything');
+            }, 3000);
+        }
+    }
+    
+    // Função para resetar interface do microfone
+    function resetMicInterface() {
+        // Parar SiriWave
+        if (sw && typeof sw.stop === 'function') {
+            sw.stop();
+        }
+        
+        // Voltar para tela principal
+        $("#SiriWave").attr("hidden", true);
+        $("#Oval").attr("hidden", false);
+        
+        // Resetar botão do microfone
+        $('#MicBtn').html('<i class="bi bi-mic"></i>');
+        $('#MicBtn').css('background', '');
+    }
+    
+    // Função para sistema original (fallback)
+    function startOriginalSpeechRecognition() {
+        console.log('🔄 Iniciando sistema original de reconhecimento...');
+        
         // Ativar SiriWave se disponível
         if (sw && typeof sw.start === 'function') {
             sw.start();
         }
-        eel.playAssistantSound()
-        $("#Oval").attr("hidden", true);
-        $("#SiriWave").attr("hidden", false);
-        eel.allCommands()()
-    });
+        
+        // Tentar usar eel se disponível
+        if (typeof eel !== 'undefined' && eel.playAssistantSound && eel.allCommands) {
+            eel.playAssistantSound();
+            $("#Oval").attr("hidden", true);
+            $("#SiriWave").attr("hidden", false);
+            eel.allCommands()();
+        } else {
+            // Se eel não estiver disponível, mostrar mensagem
+            updateWishMessage('⚠️ Sistema de reconhecimento não disponível. Use o campo de texto.');
+            
+            setTimeout(() => {
+                updateWishMessage('Ask me anything');
+            }, 3000);
+        }
+    }
 
 
     function doc_keyUp(e) {
@@ -681,6 +841,8 @@ $(document).ready(function () {
                 '💬 Teste rápido de mensagem',
                 '🗣️ Configurações de Voz',
                 '🎤 Testar Text-to-Speech',
+                '🎤 Testar Reconhecimento de Voz',
+                '🔍 Diagnóstico de Áudio',
                 '📊 Ver logs do console',
                 '❌ Cancelar'
             ];
@@ -704,6 +866,12 @@ $(document).ready(function () {
                     window.jarvisTTS.testTTS();
                     break;
                 case '6':
+                    testSpeechRecognition();
+                    break;
+                case '7':
+                    runAudioDiagnostic();
+                    break;
+                case '8':
                     alert('📊 Verifique o console do navegador (F12) para ver os logs detalhados.');
                     break;
                 default:
@@ -755,6 +923,130 @@ $(document).ready(function () {
         
         // Testar a conexão
         testApiConnection();
+    }
+    
+    // Função para testar reconhecimento de voz
+    function testSpeechRecognition() {
+        console.log('🎤 Iniciando teste de reconhecimento de voz...');
+        
+        if (!window.jarvisSpeechRecognition) {
+            alert('❌ Sistema de reconhecimento de voz não carregado. Recarregue a página.');
+            return;
+        }
+        
+        const speechRecognition = window.jarvisSpeechRecognition;
+        
+        if (!speechRecognition.isAvailable()) {
+            alert('❌ Reconhecimento de voz não suportado neste navegador.\n\nNavegadores suportados:\n• Chrome\n• Edge\n• Safari (parcial)');
+            return;
+        }
+        
+        alert('🎤 Teste de Reconhecimento de Voz\n\nClique OK e fale algo como:\n• "Olá Jarvis"\n• "Abrir WhatsApp"\n• "Como você está?"\n\nO resultado aparecerá na tela.');
+        
+        // Configurar callbacks para o teste
+        speechRecognition.onStart(() => {
+            updateWishMessage('🎤 TESTE: Fale agora! Diga algo...');
+        });
+        
+        speechRecognition.onInterim((transcript) => {
+            updateWishMessage(`🎤 TESTE: Ouvindo "${transcript}"`);
+        });
+        
+        speechRecognition.onResult((transcript, confidence) => {
+            const confidencePercent = (confidence * 100).toFixed(1);
+            updateWishMessage(`✅ TESTE CONCLUÍDO!\nVocê disse: "${transcript}"\nConfiança: ${confidencePercent}%`);
+            
+            // Voltar ao normal após 5 segundos
+            setTimeout(() => {
+                updateWishMessage('Ask me anything');
+            }, 5000);
+        });
+        
+        speechRecognition.onError((error, message) => {
+            updateWishMessage(`❌ TESTE FALHOU: ${message}`);
+            
+            setTimeout(() => {
+                updateWishMessage('Ask me anything');
+            }, 5000);
+        });
+        
+        // Iniciar teste
+        speechRecognition.start();
+    }
+    
+    // Função para diagnóstico de áudio
+    async function runAudioDiagnostic() {
+        console.log('🔍 Executando diagnóstico de áudio...');
+        
+        updateWishMessage('🔍 Executando diagnóstico de áudio...');
+        
+        let report = '🔍 DIAGNÓSTICO DE ÁUDIO\n\n';
+        
+        // Verificar suporte a Speech Recognition
+        const speechSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+        report += `🎤 Speech Recognition: ${speechSupported ? '✅ Suportado' : '❌ Não suportado'}\n`;
+        
+        // Verificar suporte a TTS
+        const ttsSupported = 'speechSynthesis' in window;
+        report += `🗣️ Text-to-Speech: ${ttsSupported ? '✅ Suportado' : '❌ Não suportado'}\n`;
+        
+        // Verificar contexto seguro
+        const isSecure = window.isSecureContext;
+        report += `🔒 Contexto Seguro: ${isSecure ? '✅ HTTPS' : '❌ HTTP (recomenda-se HTTPS)'}\n`;
+        
+        // Verificar acesso ao microfone
+        if (window.jarvisSpeechRecognition) {
+            const micAccess = await window.jarvisSpeechRecognition.testMicrophone();
+            report += `🎤 Acesso ao Microfone: ${micAccess ? '✅ Permitido' : '❌ Negado ou indisponível'}\n`;
+        }
+        
+        // Verificar navegador
+        const userAgent = navigator.userAgent;
+        let browser = 'Desconhecido';
+        if (userAgent.includes('Chrome')) browser = 'Chrome ✅';
+        else if (userAgent.includes('Firefox')) browser = 'Firefox ⚠️ (suporte limitado)';
+        else if (userAgent.includes('Safari')) browser = 'Safari ⚠️ (suporte parcial)';
+        else if (userAgent.includes('Edge')) browser = 'Edge ✅';
+        
+        report += `🌐 Navegador: ${browser}\n`;
+        
+        // Verificar dispositivo
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+        report += `📱 Dispositivo: ${isMobile ? 'Móvel' : 'Desktop'}\n`;
+        
+        // Recomendações
+        report += '\n💡 RECOMENDAÇÕES:\n';
+        
+        if (!speechSupported) {
+            report += '• Use Chrome ou Edge para melhor suporte\n';
+        }
+        
+        if (!isSecure) {
+            report += '• Use HTTPS para melhor funcionamento\n';
+        }
+        
+        if (window.jarvisSpeechRecognition) {
+            const micAccess = await window.jarvisSpeechRecognition.testMicrophone();
+            if (!micAccess) {
+                report += '• Permita acesso ao microfone nas configurações\n';
+            }
+        }
+        
+        if (isMobile) {
+            report += '• Em mobile, toque no botão de microfone para ativar\n';
+        }
+        
+        // Mostrar relatório
+        alert(report);
+        
+        // Atualizar mensagem
+        updateWishMessage('✅ Diagnóstico concluído! Verifique o resultado.');
+        
+        setTimeout(() => {
+            updateWishMessage('Ask me anything');
+        }, 3000);
+        
+        console.log('📊 Relatório de diagnóstico:', report);
     }
     
     // Tornar funções disponíveis globalmente para o TTS
