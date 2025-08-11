@@ -334,7 +334,7 @@ $(document).ready(function () {
                     userMessage = `❌ ${message || 'Erro desconhecido no reconhecimento de voz.'}`;
             }
             
-            updateWishMessage(userMessage);
+            updateWishMessage(userMessage, true); // Tocar áudio
             
             // Voltar para mensagem padrão após alguns segundos
             setTimeout(() => {
@@ -353,7 +353,7 @@ $(document).ready(function () {
         if (!started) {
             console.error('❌ Falha ao iniciar reconhecimento');
             resetMicInterface();
-            updateWishMessage('❌ Erro ao iniciar reconhecimento de voz.');
+            updateWishMessage('❌ Erro ao iniciar reconhecimento de voz.', true); // Tocar áudio
             
             setTimeout(() => {
                 updateWishMessage('Ask me anything');
@@ -394,7 +394,7 @@ $(document).ready(function () {
             eel.allCommands()();
         } else {
             // Se eel não estiver disponível, mostrar mensagem
-            updateWishMessage('⚠️ Sistema de reconhecimento não disponível. Use o campo de texto.');
+            updateWishMessage('⚠️ Sistema de reconhecimento não disponível. Use o campo de texto.', true); // Tocar áudio
             
             setTimeout(() => {
                 updateWishMessage('Ask me anything');
@@ -489,7 +489,7 @@ $(document).ready(function () {
                 console.log('📝 Dados recebidos:', data);
                 
                 if (data && data.reply) {
-                    updateWishMessage(data.reply);
+                    updateWishMessage(data.reply, true); // Tocar áudio da resposta
                     console.log('✅ Resposta processada com sucesso');
                     
                     // Se há função eel disponível, usa também
@@ -512,14 +512,14 @@ $(document).ready(function () {
                         errorMessage = `🔧 Erro interno: ${data.error_type || 'Desconhecido'}. Detalhes: ${data.details || 'N/A'}`;
                     }
                     
-                    updateWishMessage(errorMessage);
+                    updateWishMessage(errorMessage, true); // Tocar áudio
                     
                     // Log detalhado para debug
                     if (data.details) {
                         console.log('🔍 Detalhes do erro:', data.details);
                     }
                 } else {
-                    updateWishMessage("🤖 Resposta inválida da API. Tente novamente.");
+                    updateWishMessage("🤖 Resposta inválida da API. Tente novamente.", true); // Tocar áudio
                 }
             })
             .catch(error => {
@@ -527,11 +527,11 @@ $(document).ready(function () {
                 console.error('❌ Erro na API:', error);
                 
                 if (error.name === 'AbortError') {
-                    updateWishMessage("⏱️ Timeout: A API demorou muito para responder. O servidor pode estar iniciando (cold start). Tente novamente em 30 segundos.");
+                    updateWishMessage("⏱️ Timeout: A API demorou muito para responder. O servidor pode estar iniciando (cold start). Tente novamente em 30 segundos.", true); // Tocar áudio
                 } else if (error.message.includes('Failed to fetch')) {
-                    updateWishMessage("🚫 Erro de conexão: Verifique sua internet ou se a API está disponível.");
+                    updateWishMessage("🚫 Erro de conexão: Verifique sua internet ou se a API está disponível.", true); // Tocar áudio
                 } else {
-                    updateWishMessage(`❌ ${error.message}`);
+                    updateWishMessage(`❌ ${error.message}`, true); // Tocar áudio
                 }
             })
             .finally(() => {
@@ -556,15 +556,17 @@ $(document).ready(function () {
     }
     
     // Função para atualizar a mensagem
-    function updateWishMessage(text) {
+    function updateWishMessage(text, playAudio = false) {
         $("#WishMessage").text(text);
         
-        // Integração com TTS - falar a mensagem se disponível
-        if (window.jarvisTTS && typeof window.jarvisTTS.speakResponse === 'function') {
-            // Aguardar um pouco para a mensagem aparecer na tela
-            setTimeout(() => {
-                window.jarvisTTS.speakResponse(text);
-            }, 500);
+        // Se a flag playAudio for verdadeira, tenta tocar o áudio
+        if (playAudio) {
+            if (window.jarvisTTS && typeof window.jarvisTTS.speakResponse === 'function') {
+                // Aguardar um pouco para a mensagem aparecer na tela
+                setTimeout(() => {
+                    window.jarvisTTS.speakResponse(text);
+                }, 500);
+            }
         }
     }
     
@@ -669,7 +671,7 @@ $(document).ready(function () {
         // Handler para "Cancelar"
         $('#permissionDeny').click(function() {
             $('#permissionDialog').remove();
-            updateWishMessage("❌ Operação cancelada pelo usuário");
+            updateWishMessage("❌ Operação cancelada pelo usuário", true); // Tocar áudio
             
             // Voltar para tela principal após 2 segundos
             setTimeout(() => {
@@ -682,7 +684,7 @@ $(document).ready(function () {
             if (e.key === 'Escape') {
                 $('#permissionDialog').remove();
                 $(document).off('keydown.permissionDialog');
-                updateWishMessage("❌ Operação cancelada");
+                updateWishMessage("❌ Operação cancelada", true); // Tocar áudio
                 setTimeout(() => {
                     updateWishMessage("Ask me anything");
                 }, 2000);
@@ -703,7 +705,7 @@ $(document).ready(function () {
             sw.start();
         }
         
-        updateWishMessage(loadingMessage);
+        updateWishMessage(loadingMessage, true); // Tocar áudio
         
         // Abrir site com múltiplas tentativas
         setTimeout(() => {
@@ -713,7 +715,7 @@ $(document).ready(function () {
                 
                 if (newWindow) {
                     console.log('✅ Site aberto com window.open');
-                    updateWishMessage(successMessage);
+                    updateWishMessage(successMessage, true); // Tocar áudio
                 } else {
                     console.warn('⚠️ window.open bloqueado, tentando alternativa...');
                     
@@ -727,16 +729,16 @@ $(document).ready(function () {
                     document.body.removeChild(link);
                     
                     console.log('✅ Site aberto com link click');
-                    updateWishMessage(successMessage + " (Verifique se não foi bloqueado pelo navegador)");
+                    updateWishMessage(successMessage + " (Verifique se não foi bloqueado pelo navegador)", true); // Tocar áudio
                 }
             } catch (error) {
                 console.error('❌ Erro ao abrir site:', error);
-                updateWishMessage(`❌ Erro ao abrir ${url}. Copie e cole: ${url}`);
+                updateWishMessage(`❌ Erro ao abrir ${url}. Copie e cole: ${url}`, true); // Tocar áudio
                 
                 // Terceira tentativa: copiar para clipboard
                 try {
                     navigator.clipboard.writeText(url);
-                    updateWishMessage("📋 Link copiado! Cole no navegador: Ctrl+V");
+                    updateWishMessage("📋 Link copiado! Cole no navegador: Ctrl+V", true); // Tocar áudio
                 } catch (clipError) {
                     console.error('❌ Erro ao copiar para clipboard:', clipError);
                 }
@@ -1101,7 +1103,7 @@ $(document).ready(function () {
         
         // Estado inicial: mostrar apenas o loader
         showOnlyElement('#Loader');
-        updateWishMessage('🔄 Initializing systems...');
+        updateWishMessage('🔄 Initializing systems...', true); // Tocar áudio
         
         // Permitir pular animação com clique ou tecla
         let skipInitialization = false;
@@ -1128,27 +1130,27 @@ $(document).ready(function () {
             
             // Fase 1: Face Authentication
             showOnlyElement('#FaceAuth');
-            updateWishMessage('🔍 Scanning biometric data...');
+            updateWishMessage('🔍 Scanning biometric data...', true); // Tocar áudio
             
             setTimeout(() => {
                 if (skipInitialization) return;
                 
                 // Fase 2: Authentication Success
                 showOnlyElement('#FaceAuthSuccess');
-                updateWishMessage('✅ Authentication successful!');
+                updateWishMessage('✅ Authentication successful!', true); // Tocar áudio
                 
                 setTimeout(() => {
                     if (skipInitialization) return;
                     
                     // Fase 3: Hello Greeting
                     showOnlyElement('#HelloGreet');
-                    updateWishMessage('👋 Hello! I am J.A.R.V.I.S');
+                    updateWishMessage('👋 Hello! I am J.A.R.V.I.S', true); // Tocar áudio
                     
                     setTimeout(() => {
                         if (skipInitialization) return;
                         
                         // Ir direto para tela principal (sem testar API)
-                        updateWishMessage('🔌 Systems ready!');
+                        updateWishMessage('🔌 Systems ready!', true); // Tocar áudio
                         
                         setTimeout(() => {
                             if (skipInitialization) return;
@@ -1177,8 +1179,8 @@ $(document).ready(function () {
             $('#Start').attr('hidden', true);
             $('#Oval').attr('hidden', false);
             
-            // Mensagem de boas-vindas
-            updateWishMessage('🎆 Welcome! How can I assist you today?');
+            // Mensagem de boas-vindas com áudio
+            updateWishMessage('🎆 Bem-vindo! Como posso ajudá-lo hoje?', true);
             
             // Focar no input de texto
             setTimeout(() => {
@@ -1218,17 +1220,17 @@ $(document).ready(function () {
                 const provider = data.api_provider || 'none';
                 const providerEmoji = provider === 'groq' ? '⚡' : provider === 'google' ? '🤖' : '❌';
                 const message = `✅ API conectada! (${responseTime}ms)\nProvedor: ${providerEmoji} ${provider.toUpperCase()}\nAmbiente: ${data.environment}\nAPI configurada: ${data.api_configured ? 'Sim' : 'Não'}`;
-                updateWishMessage(message);
+                updateWishMessage(message, true); // Tocar áudio
                 console.log(`✅ API conectada com sucesso! Provedor: ${provider}`);
                 
                 if (!data.api_configured) {
                     console.warn('⚠️ Nenhuma API Key configurada no servidor');
                     setTimeout(() => {
-                        updateWishMessage('⚠️ Nenhuma API Key configurada. Configure GROQ_API_KEY ou GOOGLE_API_KEY no Render Dashboard.');
+                        updateWishMessage('⚠️ Nenhuma API Key configurada. Configure GROQ_API_KEY ou GOOGLE_API_KEY no Render Dashboard.', true); // Tocar áudio
                     }, 3000);
                 }
             } else {
-                updateWishMessage('⚠️ API respondeu mas status não é OK');
+                updateWishMessage('⚠️ API respondeu mas status não é OK', true); // Tocar áudio
                 console.warn('⚠️ API não está funcionando corretamente:', data);
             }
         })
@@ -1245,7 +1247,7 @@ $(document).ready(function () {
                 errorMessage = `❌ ${error.message}`;
             }
             
-            updateWishMessage(`${errorMessage} (${responseTime}ms)`);
+            updateWishMessage(`${errorMessage} (${responseTime}ms)`, true); // Tocar áudio
         });
     }
 

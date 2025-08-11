@@ -136,6 +136,9 @@ class JarvisTTS {
         console.log('🗣️ Falando:', cleanText);
 
         return new Promise((resolve, reject) => {
+            // Garantir que a síntese não está pausada
+            this.resume();
+
             // Parar qualquer fala anterior
             this.stop();
 
