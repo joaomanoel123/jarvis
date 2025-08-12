@@ -32,6 +32,9 @@
     
     <link rel="shortcut icon" href="assets/img/logo.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="assets/img/logo.ico">
+    
+    <!-- Google OAuth -->
+    <meta name="google-signin-client_id" content="679324504794-78c86mu8ddnj5m0o1l88utansi0rei3s.apps.googleusercontent.com">
 
     <!-- Bootsrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -395,7 +398,13 @@
 
     <!-- lottie files -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    
+    <!-- Google OAuth API -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 
+    <!-- Jarvis Configuration -->
+    <script src="jarvis-config.js"></script>
+    
     <!-- Jarvis Voice System -->
     <script src="jarvis-tts.js"></script>
     <script src="jarvis-google-tts.js"></script>
@@ -405,12 +414,15 @@
     <script>
         // Detectar se está no GitHub Pages e carregar script apropriado
         if (window.location.hostname.includes('github.io')) {
-            document.write('<script src="main-github-pages.js"><\/script>');
+            document.write('<script src="main-github-pages-fixed.js"><\/script>');
         } else {
             document.write('<script src="main.js"><\/script>');
         }
     </script>
     <script src="controller.js"></script>
+    
+    <!-- Google Auth Integration -->
+    <script src="google_auth_integration.js"></script>
 
 
 </body>
