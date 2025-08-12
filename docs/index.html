@@ -1,19 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S - Assistente Virtual Inteligente | João Manoel</title>
+    <meta name="description" content="Assistente virtual inteligente com IA, reconhecimento de voz e interface futurista. Criado por João Manoel com Groq API e tecnologias modernas.">
+    <meta name="keywords" content="jarvis, assistente virtual, ia, inteligencia artificial, joao manoel, groq, chatbot, português">
+    <meta name="author" content="João Manoel">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://joaomanoel123.github.io/jarvis">
+    <meta property="og:title" content="J.A.R.V.I.S - Assistente Virtual Inteligente">
+    <meta property="og:description" content="Assistente virtual com IA, interface futurista e respostas em português brasileiro.">
+    <meta property="og:image" content="https://joaomanoel123.github.io/jarvis/assets/img/logo.ico">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://joaomanoel123.github.io/jarvis">
+    <meta property="twitter:title" content="J.A.R.V.I.S - Assistente Virtual Inteligente">
+    <meta property="twitter:description" content="Assistente virtual com IA, interface futurista e respostas em português brasileiro.">
+    <meta property="twitter:image" content="https://joaomanoel123.github.io/jarvis/assets/img/logo.ico">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00AAFF">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#00d4ff">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Jarvis - Assistente Virtual</title>
-
+    <meta name="apple-mobile-web-app-title" content="JARVIS">
+    
     <link rel="shortcut icon" href="assets/img/logo.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="assets/img/logo.ico">
 
     <!-- Bootsrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -365,32 +383,34 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
 
-    <!-- Scripts optimized for GitHub Pages -->
+    <!-- Removed duplicate/legacy jQuery and unused scripts for GitHub Pages -->
 
     <!-- Siri wave -->
     <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
 
-    <!-- Texllate js - HTTPS CDN without SRI (compatibility) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FitText.js/1.2.0/jquery.fittext.min.js" 
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script>window.jQuery.fn.fitText || document.write('<script src="assets/vendore/texllate/jquery.fittext.js"><\/script>')</script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lettering.js/0.7.0/jquery.lettering.min.js" 
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script>window.jQuery.fn.lettering || document.write('<script src="assets/vendore/texllate/jquery.lettering.js"><\/script>')</script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/textillate/0.4.0/jquery.textillate.min.js" 
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script>window.jQuery.fn.textillate || document.write('<script>console.warn("Textillate CDN failed, animations may not work");<\/script>')</script>
+    <!-- Texllate js -->
+    <script src="assets/vendore/texllate/jquery.fittext.js"></script>
+    <script src="assets/vendore/texllate/jquery.lettering.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/textillate/0.4.0/jquery.textillate.min.js" integrity="sha512-0bHMhYsdpiur1bT84kDH4MwVBUVLsPOEM+9yArj+r3MW7gu/7Q8vRVLbNqPGraPOuEVcb+xFJ/6FxiSyXfGOVg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <!-- lottie files -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-    <script src="eel.js?v=2025-08-11-13-00"></script>
-    <script src="jarvis-speech-recognition.js?v=2025-08-11-13-00"></script>
-    <script src="jarvis-tts.js?v=2025-08-11-13-00"></script>
-    <script src="main.js?v=2025-08-11-13-00"></script>
-    <script src="controller.js?v=2025-08-11-13-00"></script>
+    <!-- Jarvis Voice System -->
+    <script src="jarvis-tts.js"></script>
+    <script src="jarvis-google-tts.js"></script>
+    <script src="jarvis-speech-recognition.js"></script>
+
+    <script src="eel.js"></script>
+    <script>
+        // Detectar se está no GitHub Pages e carregar script apropriado
+        if (window.location.hostname.includes('github.io')) {
+            document.write('<script src="main-github-pages.js"><\/script>');
+        } else {
+            document.write('<script src="main.js"><\/script>');
+        }
+    </script>
+    <script src="controller.js"></script>
 
 
 </body>
