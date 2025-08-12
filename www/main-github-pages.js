@@ -139,22 +139,139 @@ $(document).ready(function () {
     
     });
 
-    // mic button click event
+    // mic button click event - Sistema melhorado de reconhecimento de voz
     $("#MicBtn").click(function () {
-        eel.playAssistantSound()
-        $("#Oval").attr("hidden", true);
-        $("#SiriWave").attr("hidden", false);
-        eel.allCommands()()
+        console.log('🎤 Botão de microfone clicado');
+        
+        // Verificar se o sistema de reconhecimento de voz está disponível
+        if (window.jarvisSpeechRecognition && window.jarvisSpeechRecognition.isAvailable()) {
+            startAdvancedSpeechRecognition();
+        } else {
+            // Fallback para modo local se disponível
+            console.log('⚠️ Sistema avançado não disponível, usando fallback');
+            startOriginalSpeechRecognition();
+        }
     });
 
-    function doc_keyUp(e) {
-        // this would test for whichever key is 40 (down arrow) and the ctrl key at the same time
-
-        if (e.key === 'j' && e.metaKey) {
-            eel.playAssistantSound()
+    // Função de reconhecimento de voz avançado
+    function startAdvancedSpeechRecognition() {
+        console.log('🚀 Iniciando reconhecimento de voz avançado...');
+        
+        const speechRecognition = window.jarvisSpeechRecognition;
+        
+        // Se já está ativo, parar
+        if (speechRecognition.isActive()) {
+            console.log('🛑 Parando reconhecimento ativo...');
+            speechRecognition.stop();
+            resetMicButton();
+            return;
+        }
+        
+        // Configurar callbacks
+        speechRecognition.onStart(() => {
+            console.log('🎤 Reconhecimento iniciado');
             $("#Oval").attr("hidden", true);
             $("#SiriWave").attr("hidden", false);
-            eel.allCommands()()
+            
+            // Ativar SiriWave se disponível
+            if (typeof sw !== 'undefined' && sw !== null) {
+                sw.start();
+            }
+            
+            // Atualizar visual do botão
+            $('#MicBtn').html('<i class="bi bi-mic-fill"></i>');
+            $('#MicBtn').css('background', 'rgba(255, 0, 0, 0.3)');
+            $("#WishMessage").text("Escutando... Fale agora!");
+        });
+        
+        speechRecognition.onInterim((transcript) => {
+            console.log('⏳ Transcrição parcial:', transcript);
+            $("#WishMessage").text(`Ouvindo: "${transcript}"`);
+        });
+        
+        speechRecognition.onResult((transcript, confidence) => {
+            console.log('✅ Transcrição final:', transcript);
+            console.log('🎯 Confiança:', (confidence * 100).toFixed(1) + '%');
+            
+            if (transcript.trim()) {
+                $("#chatbox").val(transcript);
+                $("#WishMessage").text(`Processando: "${transcript}"`);
+                
+                // Processar comando automaticamente
+                setTimeout(() => {
+                    PlayAssistant(transcript);
+                }, 500);
+            }
+        });
+        
+        speechRecognition.onError((error, message) => {
+            console.error('❌ Erro no reconhecimento:', error, message);
+            $("#WishMessage").text(`Erro: ${message}`);
+            resetMicButton();
+            
+            // Voltar para interface principal após erro
+            setTimeout(() => {
+                $("#SiriWave").attr("hidden", true);
+                $("#Oval").attr("hidden", false);
+                $("#WishMessage").text("Ask me anything");
+            }, 3000);
+        });
+        
+        speechRecognition.onEnd(() => {
+            console.log('🛑 Reconhecimento finalizado');
+            resetMicButton();
+        });
+        
+        // Iniciar reconhecimento
+        const started = speechRecognition.start();
+        if (!started) {
+            console.error('❌ Falha ao iniciar reconhecimento');
+            resetMicButton();
+        }
+    }
+    
+    // Função fallback para modo local
+    function startOriginalSpeechRecognition() {
+        if (typeof eel !== 'undefined' && eel.playAssistantSound) {
+            eel.playAssistantSound();
+            $("#Oval").attr("hidden", true);
+            $("#SiriWave").attr("hidden", false);
+            eel.allCommands()();
+        } else {
+            console.log('⚠️ Sistema de voz não disponível');
+            $("#WishMessage").text("Sistema de voz não disponível. Use o campo de texto.");
+            
+            setTimeout(() => {
+                $("#WishMessage").text("Ask me anything");
+            }, 3000);
+        }
+    }
+    
+    // Função para resetar o botão do microfone
+    function resetMicButton() {
+        $('#MicBtn').html('<i class="bi bi-mic"></i>');
+        $('#MicBtn').css('background', '');
+        
+        // Parar SiriWave se disponível
+        if (typeof sw !== 'undefined' && sw !== null) {
+            sw.stop();
+        }
+    }
+
+    // Atalho de teclado para ativar reconhecimento de voz
+    function doc_keyUp(e) {
+        // Cmd+J (Mac) ou Ctrl+J (Windows/Linux) para ativar microfone
+        if (e.key === 'j' && (e.metaKey || e.ctrlKey)) {
+            e.preventDefault();
+            console.log('⌨️ Atalho de voz ativado (Cmd/Ctrl+J)');
+            $("#MicBtn").click();
+        }
+        
+        // Espaço para ativar microfone (apenas se não estiver digitando)
+        if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            console.log('⌨️ Atalho de voz ativado (Espaço)');
+            $("#MicBtn").click();
         }
     }
     document.addEventListener('keyup', doc_keyUp, false);
@@ -236,6 +353,11 @@ $(document).ready(function () {
                     $("#WishMessage").text(data.reply);
                     console.log('Resposta processada com sucesso');
                     
+                    // Usar TTS para falar a resposta
+                    if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                        window.jarvisTTS.speakResponse(data.reply);
+                    }
+                    
                     // Se há função eel disponível, usa também
                     if (window.eel && window.eel.exposed_functions && window.eel.exposed_functions.receiverText) {
                         window.eel.exposed_functions.receiverText(data.reply);
@@ -315,6 +437,12 @@ $(document).ready(function () {
             console.log('COMANDO WHATSAPP DETECTADO LOCALMENTE!');
             window.open('https://web.whatsapp.com', '_blank');
             $("#WishMessage").text("Abrindo WhatsApp Web...");
+            
+            // Falar resposta se TTS estiver ativo
+            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                window.jarvisTTS.speak("Abrindo WhatsApp Web para você");
+            }
+            
             return true; // Comando processado localmente
         }
         
@@ -323,6 +451,12 @@ $(document).ready(function () {
             console.log('Comando Google detectado localmente');
             window.open('https://www.google.com', '_blank');
             $("#WishMessage").text("Abrindo Google...");
+            
+            // Falar resposta se TTS estiver ativo
+            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                window.jarvisTTS.speak("Abrindo Google para você");
+            }
+            
             return true;
         }
         
@@ -330,6 +464,12 @@ $(document).ready(function () {
             console.log('Comando YouTube detectado localmente');
             window.open('https://www.youtube.com', '_blank');
             $("#WishMessage").text("Abrindo YouTube...");
+            
+            // Falar resposta se TTS estiver ativo
+            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                window.jarvisTTS.speak("Abrindo YouTube para você");
+            }
+            
             return true;
         }
         
@@ -337,10 +477,63 @@ $(document).ready(function () {
         return false; // Não é comando local, enviar para API
     }
 
-    // settings button: configure backend URL
+    // settings button: configure backend URL and voice settings
     $("#SettingsBtn").click(function () {
+        showJarvisSettings();
+    });
+    
+    // Função principal de configurações
+    function showJarvisSettings() {
+        const options = [
+            '🔧 Configurar URL da API',
+            '🎤 Configurações de Voz',
+            '🧪 Testar Microfone',
+            '🔊 Testar Text-to-Speech',
+            '📊 Diagnóstico do Sistema',
+            '📝 Ver Logs do Console',
+            '❌ Cancelar'
+        ];
+        
+        const choice = prompt(`Configurações do Jarvis:\
+\
+${options.map((opt, i) => `${i + 1}. ${opt}`).join('\
+')}\
+\
+Escolha uma opção (1-${options.length}):`);
+        
+        switch(choice) {
+            case '1':
+                configureAPI();
+                break;
+            case '2':
+                configureVoice();
+                break;
+            case '3':
+                testMicrophone();
+                break;
+            case '4':
+                testTTS();
+                break;
+            case '5':
+                runDiagnostics();
+                break;
+            case '6':
+                showConsoleLogs();
+                break;
+            default:
+                return;
+        }
+    }
+    
+    // Configurar API
+    function configureAPI() {
         const current = localStorage.getItem('FRONT_API_URL') || DEFAULT_API_URL;
-        const input = prompt(`URL da API do Jarvis:\n\nPadrão: ${DEFAULT_API_URL}\nAtual: ${current}\n\nDigite a nova URL ou deixe vazio para usar o padrão:`, current);
+        const input = prompt(`URL da API do Jarvis:\
+\
+Padrão: ${DEFAULT_API_URL}\
+Atual: ${current}\
+\
+Digite a nova URL ou deixe vazio para usar o padrão:`, current);
         if (input === null) return; // cancel
         const trimmed = (input || '').trim();
         if (trimmed === '' || trimmed === DEFAULT_API_URL) {
@@ -350,7 +543,97 @@ $(document).ready(function () {
             localStorage.setItem('FRONT_API_URL', trimmed);
             alert(`API configurada: ${trimmed}`);
         }
-    });
+    }
+    
+    // Configurar voz
+    function configureVoice() {
+        if (window.jarvisTTS && window.jarvisTTS.showTTSSettings) {
+            window.jarvisTTS.showTTSSettings();
+        } else {
+            alert('❌ Sistema de voz não disponível.');
+        }
+    }
+    
+    // Testar microfone
+    async function testMicrophone() {
+        if (window.jarvisSpeechRecognition) {
+            const result = await window.jarvisSpeechRecognition.testMicrophone();
+            if (result) {
+                alert('✅ Microfone funcionando corretamente!');
+            } else {
+                alert('❌ Problema com o microfone. Verifique as permissões.');
+            }
+        } else {
+            alert('❌ Sistema de reconhecimento de voz não disponível.');
+        }
+    }
+    
+    // Testar TTS
+    function testTTS() {
+        if (window.jarvisTTS && window.jarvisTTS.testTTS) {
+            window.jarvisTTS.testTTS();
+        } else {
+            alert('❌ Sistema de text-to-speech não disponível.');
+        }
+    }
+    
+    // Executar diagnósticos
+    async function runDiagnostics() {
+        let diagnostics = '🔍 Diagnóstico do Sistema Jarvis\
+\
+';
+        
+        // Verificar TTS
+        if (window.jarvisTTS) {
+            diagnostics += `🔊 TTS: ✅ Disponível (${window.jarvisTTS.voices.length} vozes)\
+`;
+        } else {
+            diagnostics += '🔊 TTS: ❌ Não disponível\
+';
+        }
+        
+        // Verificar Speech Recognition
+        if (window.jarvisSpeechRecognition) {
+            const isAvailable = window.jarvisSpeechRecognition.isAvailable();
+            diagnostics += `🎤 Speech Recognition: ${isAvailable ? '✅' : '❌'} ${isAvailable ? 'Disponível' : 'Não disponível'}\
+`;
+            
+            if (isAvailable) {
+                const micTest = await window.jarvisSpeechRecognition.testMicrophone();
+                diagnostics += `🎤 Microfone: ${micTest ? '✅' : '❌'} ${micTest ? 'Funcionando' : 'Com problemas'}\
+`;
+            }
+        } else {
+            diagnostics += '🎤 Speech Recognition: ❌ Não disponível\
+';
+        }
+        
+        // Verificar navegador
+        diagnostics += `🌐 Navegador: ${navigator.userAgent.split(' ').pop()}\
+`;
+        diagnostics += `🔒 HTTPS: ${window.location.protocol === 'https:' ? '✅' : '❌'}\
+`;
+        diagnostics += `🌍 Idioma: ${navigator.language}\
+`;
+        
+        alert(diagnostics);
+    }
+    
+    // Mostrar logs do console
+    function showConsoleLogs() {
+        alert('📝 Para ver os logs detalhados:\
+\
+1. Pressione F12 para abrir DevTools\
+2. Clique na aba "Console"\
+3. Veja os logs do Jarvis com emojis 🤖\
+\
+Logs importantes:\
+• 🎤 Reconhecimento de voz\
+• 🔊 Text-to-Speech\
+• 📶 Conexões de API\
+• ❌ Erros e avisos');
+        console.log('📝 Logs do Jarvis - Abra o console para ver detalhes!');
+    }
 
     // Registrar Service Worker para PWA
     if ("serviceWorker" in navigator && window.location.hostname.includes("github.io")) {
