@@ -499,4 +499,4 @@ $(document).ready(function() {
 // Exportar para uso em outros scripts
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = JarvisTTS;
-}"
+}

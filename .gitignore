@@ -48,3 +48,10 @@ ENV/
 temp/
 tmp/
 cache/
+# OAuth Credentials
+google_oauth_config.json
+.env
+.env.backup.*
+*.key
+*.pem
+client_secret*.json
