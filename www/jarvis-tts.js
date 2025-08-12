@@ -6,11 +6,19 @@
 
 class JarvisTTS {
     constructor() {
-        this.synth = window.speechSynthesis;
+        // Verificação robusta de speechSynthesis
+        this.isSupported = this.checkSpeechSynthesisSupport();
+        
+        if (this.isSupported) {
+            this.synth = window.speechSynthesis;
+        } else {
+            this.synth = null;
+            console.error('❌ Text-to-Speech não suportado neste navegador');
+        }
+        
         this.voices = [];
         this.currentUtterance = null;
-        this.isSupported = 'speechSynthesis' in window;
-        this.isEnabled = true;
+        this.isEnabled = this.isSupported;
         this.settings = {
             rate: 1.0,
             pitch: 1.0,
@@ -22,11 +30,39 @@ class JarvisTTS {
         this.init();
     }
 
+    checkSpeechSynthesisSupport() {
+        // Verificação múltipla de suporte
+        if (!('speechSynthesis' in window)) {
+            console.warn('❌ speechSynthesis não encontrado no window');
+            return false;
+        }
+        
+        if (!window.speechSynthesis) {
+            console.warn('❌ window.speechSynthesis é null/undefined');
+            return false;
+        }
+        
+        if (typeof window.speechSynthesis.speak !== 'function') {
+            console.warn('❌ speechSynthesis.speak não é uma função');
+            return false;
+        }
+        
+        if (typeof SpeechSynthesisUtterance === 'undefined') {
+            console.warn('❌ SpeechSynthesisUtterance não está disponível');
+            return false;
+        }
+        
+        console.log('✅ Text-to-Speech suportado');
+        return true;
+    }
+
     init() {
         console.log('🗣️ Inicializando Jarvis TTS...');
         
         if (!this.isSupported) {
-            console.warn('❌ Text-to-Speech não suportado neste navegador');
+            console.error('❌ Text-to-Speech não suportado neste navegador');
+            console.log('💡 Navegadores suportados: Chrome, Edge, Safari, Firefox');
+            console.log('💡 Certifique-se de que está usando HTTPS');
             return;
         }
 
@@ -50,6 +86,11 @@ class JarvisTTS {
     }
 
     loadVoices() {
+        if (!this.synth) {
+            console.warn('⚠️ Synth não disponível para carregar vozes');
+            return;
+        }
+        
         this.voices = this.synth.getVoices();
         console.log(`🎤 ${this.voices.length} vozes carregadas`);
         
@@ -123,7 +164,10 @@ class JarvisTTS {
     }
 
     speak(text, options = {}) {
-        if (!this.isSupported || !this.isEnabled || !text) {
+        if (!this.isSupported || !this.isEnabled || !text || !this.synth) {
+            if (!this.isSupported) {
+                console.warn('⚠️ TTS não suportado - ignorando comando de fala');
+            }
             return Promise.resolve();
         }
 
@@ -198,7 +242,7 @@ class JarvisTTS {
     }
 
     stop() {
-        if (this.synth.speaking) {
+        if (this.synth && this.synth.speaking) {
             this.synth.cancel();
             this.currentUtterance = null;
             console.log('⏹️ Fala interrompida');
@@ -206,14 +250,14 @@ class JarvisTTS {
     }
 
     pause() {
-        if (this.synth.speaking && !this.synth.paused) {
+        if (this.synth && this.synth.speaking && !this.synth.paused) {
             this.synth.pause();
             console.log('⏸️ Fala pausada');
         }
     }
 
     resume() {
-        if (this.synth.paused) {
+        if (this.synth && this.synth.paused) {
             this.synth.resume();
             console.log('▶️ Fala retomada');
         }
