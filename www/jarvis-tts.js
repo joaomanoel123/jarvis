@@ -75,9 +75,26 @@ class JarvisTTS {
         // Recarregar vozes quando disponíveis (alguns navegadores carregam assincronamente)
         if (this.synth.onvoiceschanged !== undefined) {
             this.synth.onvoiceschanged = () => {
+                console.log('🔄 Evento onvoiceschanged disparado');
                 this.loadVoices();
             };
         }
+        
+        // Fallback: tentar carregar vozes novamente após um delay
+        setTimeout(() => {
+            if (this.voices.length === 0) {
+                console.log('🔄 Tentando carregar vozes novamente...');
+                this.loadVoices();
+            }
+        }, 1000);
+        
+        // Segundo fallback para navegadores mais lentos
+        setTimeout(() => {
+            if (this.voices.length === 0) {
+                console.log('🔄 Última tentativa de carregar vozes...');
+                this.loadVoices();
+            }
+        }, 3000);
 
         // Adicionar controles de TTS à interface
         this.addTTSControls();
@@ -94,6 +111,14 @@ class JarvisTTS {
         this.voices = this.synth.getVoices();
         console.log(`🎤 ${this.voices.length} vozes carregadas`);
         
+        // Log das vozes disponíveis para debug
+        if (this.voices.length > 0) {
+            console.log('🎤 Vozes disponíveis:');
+            this.voices.forEach((voice, index) => {
+                console.log(`  ${index}: ${voice.name} (${voice.lang}) ${voice.default ? '[Padrão]' : ''}`);
+            });
+        }
+        
         // Auto-selecionar melhor voz em português
         if (this.settings.voiceIndex === -1) {
             this.autoSelectVoice();
@@ -101,6 +126,11 @@ class JarvisTTS {
     }
 
     autoSelectVoice() {
+        if (this.voices.length === 0) {
+            console.warn('⚠️ Nenhuma voz disponível para seleção automática');
+            return;
+        }
+        
         // Priorizar vozes em português brasileiro
         const ptBrVoices = this.voices.filter(voice => 
             voice.lang.includes('pt-BR') || voice.lang.includes('pt_BR')
@@ -119,20 +149,38 @@ class JarvisTTS {
         let selectedVoice = null;
         
         if (ptBrVoices.length > 0) {
-            // Preferir vozes femininas para Jarvis
-            selectedVoice = ptBrVoices.find(v => v.name.toLowerCase().includes('female')) || ptBrVoices[0];
+            // Preferir vozes específicas do Google ou Microsoft
+            selectedVoice = ptBrVoices.find(v => 
+                v.name.toLowerCase().includes('google') || 
+                v.name.toLowerCase().includes('microsoft') ||
+                v.name.toLowerCase().includes('female')
+            ) || ptBrVoices[0];
             console.log('🇧🇷 Voz selecionada: Português Brasileiro');
         } else if (ptVoices.length > 0) {
-            selectedVoice = ptVoices.find(v => v.name.toLowerCase().includes('female')) || ptVoices[0];
+            selectedVoice = ptVoices.find(v => 
+                v.name.toLowerCase().includes('google') || 
+                v.name.toLowerCase().includes('microsoft') ||
+                v.name.toLowerCase().includes('female')
+            ) || ptVoices[0];
             console.log('🇵🇹 Voz selecionada: Português');
         } else if (enVoices.length > 0) {
-            selectedVoice = enVoices.find(v => v.name.toLowerCase().includes('female')) || enVoices[0];
+            selectedVoice = enVoices.find(v => 
+                v.name.toLowerCase().includes('google') || 
+                v.name.toLowerCase().includes('microsoft') ||
+                v.name.toLowerCase().includes('female')
+            ) || enVoices[0];
             console.log('🇺🇸 Voz selecionada: Inglês (fallback)');
+        } else {
+            // Usar a primeira voz disponível como último recurso
+            selectedVoice = this.voices[0];
+            console.log('🌍 Voz selecionada: Primeira disponível (fallback)');
         }
 
         if (selectedVoice) {
             this.settings.voiceIndex = this.voices.indexOf(selectedVoice);
             console.log(`🎯 Voz auto-selecionada: ${selectedVoice.name} (${selectedVoice.lang})`);
+        } else {
+            console.warn('⚠️ Não foi possível selecionar uma voz automaticamente');
         }
     }
 
