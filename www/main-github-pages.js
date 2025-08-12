@@ -353,8 +353,10 @@ $(document).ready(function () {
                     $("#WishMessage").text(data.reply);
                     console.log('Resposta processada com sucesso');
                     
-                    // Usar TTS para falar a resposta
-                    if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                    // Usar TTS para falar a resposta (priorizar Google TTS se disponível)
+                    if (window.jarvisGoogleTTS && window.jarvisGoogleTTS.isEnabled && window.jarvisGoogleTTS.apiKey) {
+                        window.jarvisGoogleTTS.speakResponse(data.reply);
+                    } else if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
                         window.jarvisTTS.speakResponse(data.reply);
                     }
                     
@@ -438,8 +440,10 @@ $(document).ready(function () {
             window.open('https://web.whatsapp.com', '_blank');
             $("#WishMessage").text("Abrindo WhatsApp Web...");
             
-            // Falar resposta se TTS estiver ativo
-            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+            // Falar resposta se TTS estiver ativo (priorizar Google TTS)
+            if (window.jarvisGoogleTTS && window.jarvisGoogleTTS.isEnabled && window.jarvisGoogleTTS.apiKey) {
+                window.jarvisGoogleTTS.speak("Abrindo WhatsApp Web para você");
+            } else if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
                 window.jarvisTTS.speak("Abrindo WhatsApp Web para você");
             }
             
@@ -452,8 +456,10 @@ $(document).ready(function () {
             window.open('https://www.google.com', '_blank');
             $("#WishMessage").text("Abrindo Google...");
             
-            // Falar resposta se TTS estiver ativo
-            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+            // Falar resposta se TTS estiver ativo (priorizar Google TTS)
+            if (window.jarvisGoogleTTS && window.jarvisGoogleTTS.isEnabled && window.jarvisGoogleTTS.apiKey) {
+                window.jarvisGoogleTTS.speak("Abrindo Google para você");
+            } else if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
                 window.jarvisTTS.speak("Abrindo Google para você");
             }
             
@@ -465,8 +471,10 @@ $(document).ready(function () {
             window.open('https://www.youtube.com', '_blank');
             $("#WishMessage").text("Abrindo YouTube...");
             
-            // Falar resposta se TTS estiver ativo
-            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+            // Falar resposta se TTS estiver ativo (priorizar Google TTS)
+            if (window.jarvisGoogleTTS && window.jarvisGoogleTTS.isEnabled && window.jarvisGoogleTTS.apiKey) {
+                window.jarvisGoogleTTS.speak("Abrindo YouTube para você");
+            } else if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
                 window.jarvisTTS.speak("Abrindo YouTube para você");
             }
             
@@ -487,6 +495,7 @@ $(document).ready(function () {
         const options = [
             '🔧 Configurar URL da API',
             '🎤 Configurações de Voz',
+            '🌐 Google Cloud TTS',
             '🧪 Testar Microfone',
             '🔊 Testar Text-to-Speech',
             '📊 Diagnóstico do Sistema',
@@ -509,15 +518,18 @@ Escolha uma opção (1-${options.length}):`);
                 configureVoice();
                 break;
             case '3':
-                testMicrophone();
+                configureGoogleTTS();
                 break;
             case '4':
-                testTTS();
+                testMicrophone();
                 break;
             case '5':
-                runDiagnostics();
+                testTTS();
                 break;
             case '6':
+                runDiagnostics();
+                break;
+            case '7':
                 showConsoleLogs();
                 break;
             default:
@@ -554,6 +566,15 @@ Digite a nova URL ou deixe vazio para usar o padrão:`, current);
         }
     }
     
+    // Configurar Google TTS
+    function configureGoogleTTS() {
+        if (window.jarvisGoogleTTS && window.jarvisGoogleTTS.showGoogleTTSSettings) {
+            window.jarvisGoogleTTS.showGoogleTTSSettings();
+        } else {
+            alert('❌ Google Cloud TTS não disponível.');
+        }
+    }
+    
     // Testar microfone
     async function testMicrophone() {
         if (window.jarvisSpeechRecognition) {
@@ -583,13 +604,22 @@ Digite a nova URL ou deixe vazio para usar o padrão:`, current);
 \
 ';
         
-        // Verificar TTS
+        // Verificar TTS Nativo
         if (window.jarvisTTS) {
-            diagnostics += `🔊 TTS: ✅ Disponível (${window.jarvisTTS.voices.length} vozes)\
-`;
+            diagnostics += `🔊 TTS Nativo: ✅ Disponível (${window.jarvisTTS.voices.length} vozes)\n`;
         } else {
-            diagnostics += '🔊 TTS: ❌ Não disponível\
-';
+            diagnostics += '🔊 TTS Nativo: ❌ Não disponível\n';
+        }
+        
+        // Verificar Google TTS
+        if (window.jarvisGoogleTTS) {
+            const hasApiKey = window.jarvisGoogleTTS.apiKey ? '✅' : '❌';
+            const isEnabled = window.jarvisGoogleTTS.isEnabled ? '✅' : '❌';
+            diagnostics += `🌐 Google TTS: ✅ Disponível\n`;
+            diagnostics += `🔑 API Key: ${hasApiKey} ${window.jarvisGoogleTTS.apiKey ? 'Configurada' : 'Não configurada'}\n`;
+            diagnostics += `⚡ Ativo: ${isEnabled} ${window.jarvisGoogleTTS.isEnabled ? 'Sim' : 'Não'}\n`;
+        } else {
+            diagnostics += '🌐 Google TTS: ❌ Não disponível\n';
         }
         
         // Verificar Speech Recognition
