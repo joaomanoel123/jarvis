@@ -1,1 +1,595 @@
-$(document).ready(function () {\n\n    // Aguardar configurações serem carregadas\n    setTimeout(() => {\n        initializeJarvis();\n    }, 500);\n    \n    function initializeJarvis() {\n        console.log('🤖 Inicializando Jarvis para GitHub Pages...');\n        \n        // Verificar se as configurações estão disponíveis\n        if (!window.jarvisConfig) {\n            console.error('❌ Configurações não carregadas!');\n            return;\n        }\n        \n        const config = window.jarvisConfig;\n        console.log('🌐 Ambiente:', config.getEnvironment());\n        console.log('🔗 API URL:', config.getApiUrl());\n        \n        // Inicializar sequência de startup para GitHub Pages\n        startGitHubPagesSequence();\n        \n        // Configurar animações de texto (com fallback)\n        setupTextAnimations();\n        \n        // Configurar SiriWave\n        setupSiriWave();\n        \n        // Configurar event listeners\n        setupEventListeners();\n        \n        console.log('✅ Jarvis inicializado com sucesso!');\n    }\n    \n    function startGitHubPagesSequence() {\n        console.log('🚀 Iniciando sequência de startup...');\n        \n        // Sequência de inicialização simulando o backend\n        setTimeout(() => {\n            console.log('👤 Iniciando Face Auth...');\n            $(\"#Loader\").attr(\"hidden\", true);\n            $(\"#FaceAuth\").attr(\"hidden\", false);\n            $(\"#WishMessage\").text(\"Autenticando...\");\n        }, 2000);\n        \n        setTimeout(() => {\n            console.log('✅ Face Auth Success...');\n            $(\"#FaceAuth\").attr(\"hidden\", true);\n            $(\"#FaceAuthSuccess\").attr(\"hidden\", false);\n            $(\"#WishMessage\").text(\"Autenticação bem-sucedida!\");\n        }, 4000);\n        \n        setTimeout(() => {\n            console.log('👋 Hello Greet...');\n            $(\"#FaceAuthSuccess\").attr(\"hidden\", true);\n            $(\"#HelloGreet\").attr(\"hidden\", false);\n            $(\"#WishMessage\").text(\"Olá, bem-vindo João Manoel!\");\n        }, 6000);\n        \n        setTimeout(() => {\n            console.log('🎯 Carregando interface principal...');\n            $(\"#Start\").attr(\"hidden\", true);\n            $(\"#Oval\").addClass(\"animate__animated animate__zoomIn\");\n            $(\"#Oval\").attr(\"hidden\", false);\n            $(\"#WishMessage\").text(\"Ask me anything\");\n            \n            // Falar mensagem de boas-vindas se TTS estiver disponível\n            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {\n                setTimeout(() => {\n                    window.jarvisTTS.speak(\"Olá João Manoel! Como posso ajudá-lo hoje?\");\n                }, 1000);\n            }\n        }, 8000);\n    }\n    \n    function setupTextAnimations() {\n        // Verificar se textillate está disponível\n        if (typeof $.fn.textillate === 'function') {\n            try {\n                $('.text').textillate({\n                    loop: true,\n                    sync: true,\n                    in: {\n                        effect: \"bounceIn\",\n                    },\n                    out: {\n                        effect: \"bounceOut\",\n                    },\n                });\n\n                $('.siri-message').textillate({\n                    loop: true,\n                    sync: true,\n                    in: {\n                        effect: \"fadeInUp\",\n                    },\n                    out: {\n                        effect: \"fadeOutUp\",\n                    },\n                });\n                console.log('🎨 Animações de texto configuradas com textillate');\n            } catch (error) {\n                console.warn('⚠️ Erro ao configurar textillate:', error);\n                setupFallbackAnimations();\n            }\n        } else {\n            console.warn('⚠️ Textillate não disponível, usando animações CSS básicas');\n            setupFallbackAnimations();\n        }\n    }\n    \n    function setupFallbackAnimations() {\n        // Fallback para animações CSS simples\n        $('.text, .siri-message').addClass('animate__animated animate__fadeIn');\n        console.log('🎨 Animações CSS básicas configuradas');\n    }\n    \n    let siriWave = null;\n    \n    function setupSiriWave() {\n        const container = document.getElementById(\"siri-container\");\n        if (container && typeof SiriWave !== 'undefined') {\n            try {\n                siriWave = new SiriWave({\n                    container: container,\n                    width: container.clientWidth || 320,\n                    height: 160,\n                    style: \"ios9\",\n                    amplitude: 1,\n                    speed: 0.30,\n                    autostart: true\n                });\n                \n                window.addEventListener('resize', function() {\n                    if (siriWave) {\n                        siriWave.setWidth(container.clientWidth || 320);\n                        siriWave.setHeight(160);\n                    }\n                });\n                \n                console.log('🌊 SiriWave configurado');\n            } catch (error) {\n                console.warn('⚠️ Erro ao configurar SiriWave:', error);\n            }\n        } else {\n            console.warn('⚠️ SiriWave não disponível');\n        }\n    }\n    \n    function setupEventListeners() {\n        // Botão do microfone\n        $(\"#MicBtn\").click(function () {\n            console.log('🎤 Botão de microfone clicado');\n            startSpeechRecognition();\n        });\n        \n        // Botão de envio\n        $(\"#SendBtn\").click(function () {\n            const message = $(\"#chatbox\").val().trim();\n            if (message) {\n                sendMessage(message);\n            }\n        });\n        \n        // Campo de texto\n        $(\"#chatbox\").keyup(function () {\n            const message = $(\"#chatbox\").val();\n            toggleSendButton(message);\n        });\n        \n        $(\"#chatbox\").keypress(function (e) {\n            if (e.which === 13) { // Enter\n                const message = $(\"#chatbox\").val().trim();\n                if (message) {\n                    sendMessage(message);\n                }\n            }\n        });\n        \n        // Botão de configurações\n        $(\"#SettingsBtn\").click(function () {\n            if (window.jarvisConfig) {\n                window.jarvisConfig.showQuickSettings();\n            }\n        });\n        \n        // Atalhos de teclado\n        document.addEventListener('keyup', function(e) {\n            // Cmd+J (Mac) ou Ctrl+J (Windows/Linux) para ativar microfone\n            if (e.key === 'j' && (e.metaKey || e.ctrlKey)) {\n                e.preventDefault();\n                console.log('⌨️ Atalho de voz ativado (Cmd/Ctrl+J)');\n                startSpeechRecognition();\n            }\n            \n            // Espaço para ativar microfone (apenas se não estiver digitando)\n            if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {\n                e.preventDefault();\n                console.log('⌨️ Atalho de voz ativado (Espaço)');\n                startSpeechRecognition();\n            }\n        });\n    }\n    \n    function toggleSendButton(message) {\n        if (message.length === 0) {\n            $(\"#MicBtn\").attr('hidden', false);\n            $(\"#SendBtn\").attr('hidden', true);\n        } else {\n            $(\"#MicBtn\").attr('hidden', true);\n            $(\"#SendBtn\").attr('hidden', false);\n        }\n    }\n    \n    function startSpeechRecognition() {\n        console.log('🎤 Iniciando reconhecimento de voz...');\n        \n        // Verificar se o sistema de reconhecimento está disponível\n        if (!window.jarvisSpeechRecognition || !window.jarvisSpeechRecognition.isAvailable()) {\n            console.warn('⚠️ Sistema de reconhecimento de voz não disponível');\n            $(\"#WishMessage\").text(\"Reconhecimento de voz não disponível. Use o campo de texto.\");\n            \n            setTimeout(() => {\n                $(\"#WishMessage\").text(\"Ask me anything\");\n            }, 3000);\n            return;\n        }\n        \n        const speechRecognition = window.jarvisSpeechRecognition;\n        \n        // Se já está ativo, parar\n        if (speechRecognition.isActive()) {\n            console.log('🛑 Parando reconhecimento ativo...');\n            speechRecognition.stop();\n            resetInterface();\n            return;\n        }\n        \n        // Configurar callbacks\n        speechRecognition.onStart(() => {\n            console.log('🎤 Reconhecimento iniciado');\n            $(\"#Oval\").attr(\"hidden\", true);\n            $(\"#SiriWave\").attr(\"hidden\", false);\n            \n            // Ativar SiriWave\n            if (siriWave) {\n                siriWave.start();\n            }\n            \n            // Atualizar visual do botão\n            $('#MicBtn').html('<i class=\"bi bi-mic-fill\"></i>');\n            $('#MicBtn').css('background', 'rgba(255, 0, 0, 0.3)');\n            $(\"#WishMessage\").text(\"Escutando... Fale agora!\");\n        });\n        \n        speechRecognition.onInterim((transcript) => {\n            console.log('⏳ Transcrição parcial:', transcript);\n            $(\"#WishMessage\").text(`Ouvindo: \"${transcript}\"`);\n        });\n        \n        speechRecognition.onResult((transcript, confidence) => {\n            console.log('✅ Transcrição final:', transcript);\n            console.log('🎯 Confiança:', (confidence * 100).toFixed(1) + '%');\n            \n            if (transcript.trim()) {\n                $(\"#chatbox\").val(transcript);\n                $(\"#WishMessage\").text(`Processando: \"${transcript}\"`);\n                \n                // Processar comando automaticamente\n                setTimeout(() => {\n                    sendMessage(transcript);\n                }, 500);\n            }\n        });\n        \n        speechRecognition.onError((error, message) => {\n            console.error('❌ Erro no reconhecimento:', error, message);\n            $(\"#WishMessage\").text(`Erro: ${message}`);\n            resetInterface();\n            \n            // Voltar para interface principal após erro\n            setTimeout(() => {\n                $(\"#SiriWave\").attr(\"hidden\", true);\n                $(\"#Oval\").attr(\"hidden\", false);\n                $(\"#WishMessage\").text(\"Ask me anything\");\n            }, 3000);\n        });\n        \n        speechRecognition.onEnd(() => {\n            console.log('🛑 Reconhecimento finalizado');\n            resetInterface();\n        });\n        \n        // Iniciar reconhecimento\n        const started = speechRecognition.start();\n        if (!started) {\n            console.error('❌ Falha ao iniciar reconhecimento');\n            resetInterface();\n        }\n    }\n    \n    function resetInterface() {\n        $('#MicBtn').html('<i class=\"bi bi-mic\"></i>');\n        $('#MicBtn').css('background', '');\n        \n        // Parar SiriWave\n        if (siriWave) {\n            siriWave.stop();\n        }\n    }\n    \n    function sendMessage(message) {\n        if (!message || !message.trim()) {\n            return;\n        }\n        \n        console.log('📤 Enviando mensagem:', message);\n        \n        // Verificar comandos locais primeiro\n        if (handleLocalCommands(message)) {\n            return;\n        }\n        \n        // Mostrar interface de processamento\n        $(\"#Oval\").attr(\"hidden\", true);\n        $(\"#SiriWave\").attr(\"hidden\", false);\n        \n        // Ativar SiriWave\n        if (siriWave) {\n            siriWave.start();\n        }\n        \n        $(\"#WishMessage\").text(\"Processando sua mensagem...\");\n        \n        // Enviar para API\n        sendToAPI(message)\n            .then(response => {\n                console.log('✅ Resposta recebida:', response);\n                $(\"#WishMessage\").text(response);\n                \n                // Falar resposta se TTS estiver ativo\n                if (window.jarvisTTS && window.jarvisTTS.isEnabled) {\n                    window.jarvisTTS.speak(response);\n                }\n            })\n            .catch(error => {\n                console.error('❌ Erro na API:', error);\n                $(\"#WishMessage\").text(`Erro: ${error.message}`);\n            })\n            .finally(() => {\n                // Parar SiriWave\n                if (siriWave) {\n                    siriWave.stop();\n                }\n                \n                // Limpar input e resetar botões\n                $(\"#chatbox\").val(\"\");\n                $(\"#MicBtn\").attr('hidden', false);\n                $(\"#SendBtn\").attr('hidden', true);\n                \n                // Voltar para a tela principal após 5 segundos\n                setTimeout(() => {\n                    $(\"#SiriWave\").attr(\"hidden\", true);\n                    $(\"#Oval\").attr(\"hidden\", false);\n                    $(\"#WishMessage\").text(\"Ask me anything\");\n                }, 5000);\n            });\n    }\n    \n    function handleLocalCommands(message) {\n        const msg = message.toLowerCase().trim();\n        console.log('🔍 Verificando comando local:', msg);\n        \n        // Comandos do WhatsApp - Detecção ampla\n        const whatsappKeywords = [\n            'whatsapp', 'whats app', 'whats', 'zap', 'zapzap',\n            'abrir whatsapp', 'abra whatsapp', 'abre whatsapp',\n            'abrir whats', 'abra whats', 'abre whats'\n        ];\n        \n        if (whatsappKeywords.some(keyword => msg.includes(keyword))) {\n            console.log('✅ Comando WhatsApp detectado!');\n            window.open('https://web.whatsapp.com', '_blank');\n            $(\"#WishMessage\").text(\"Abrindo WhatsApp Web...\");\n            \n            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {\n                window.jarvisTTS.speak(\"Abrindo WhatsApp Web para você\");\n            }\n            \n            return true;\n        }\n        \n        // Comando Google\n        if (msg.includes('google') || msg.includes('pesquisar google') || msg.includes('pesquise google')) {\n            console.log('✅ Comando Google detectado!');\n            window.open('https://www.google.com', '_blank');\n            $(\"#WishMessage\").text(\"Abrindo Google...\");\n            \n            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {\n                window.jarvisTTS.speak(\"Abrindo Google para você\");\n            }\n            \n            return true;\n        }\n        \n        // Comando YouTube\n        if (msg.includes('youtube')) {\n            console.log('✅ Comando YouTube detectado!');\n            window.open('https://www.youtube.com', '_blank');\n            $(\"#WishMessage\").text(\"Abrindo YouTube...\");\n            \n            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {\n                window.jarvisTTS.speak(\"Abrindo YouTube para você\");\n            }\n            \n            return true;\n        }\n        \n        // Comando de configurações\n        if (msg.includes('configurações') || msg.includes('configuracao') || msg.includes('settings')) {\n            console.log('✅ Comando de configurações detectado!');\n            if (window.jarvisConfig) {\n                window.jarvisConfig.showQuickSettings();\n            }\n            return true;\n        }\n        \n        console.log('ℹ️ Nenhum comando local detectado, enviando para API');\n        return false;\n    }\n    \n    async function sendToAPI(message) {\n        const config = window.jarvisConfig;\n        const apiUrl = config.getApiUrl();\n        \n        console.log('📡 Enviando para API:', apiUrl);\n        \n        // Timeout mais longo para cold start do Render\n        const controller = new AbortController();\n        const timeoutId = setTimeout(() => controller.abort(), config.settings.apiTimeout);\n        \n        try {\n            const response = await fetch(apiUrl + '/command', {\n                method: 'POST',\n                headers: {\n                    'Content-Type': 'application/json',\n                    'Accept': 'application/json'\n                },\n                body: JSON.stringify({ message }),\n                signal: controller.signal\n            });\n            \n            clearTimeout(timeoutId);\n            \n            if (!response.ok) {\n                if (response.status === 503) {\n                    throw new Error('Servidor temporariamente indisponível (cold start). Tente novamente em alguns segundos.');\n                } else if (response.status === 500) {\n                    throw new Error('Erro interno do servidor. Verifique se a chave API está configurada.');\n                } else {\n                    throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);\n                }\n            }\n            \n            const data = await response.json();\n            \n            if (data && data.reply) {\n                return data.reply;\n            } else if (data && data.error) {\n                throw new Error(data.reply || 'Erro na API');\n            } else {\n                throw new Error('Resposta inválida da API');\n            }\n            \n        } catch (error) {\n            clearTimeout(timeoutId);\n            \n            if (error.name === 'AbortError') {\n                throw new Error('Timeout: A API demorou muito para responder. O servidor pode estar iniciando (cold start). Tente novamente em 30 segundos.');\n            } else if (error.message.includes('Failed to fetch')) {\n                throw new Error('Erro de conexão: Verifique sua internet ou se a API está disponível.');\n            } else {\n                throw error;\n            }\n        }\n    }\n    \n    // Registrar Service Worker para PWA\n    if (\"serviceWorker\" in navigator && window.location.hostname.includes(\"github.io\")) {\n        window.addEventListener(\"load\", function() {\n            navigator.serviceWorker.register(\"/jarvis/sw.js\")\n                .then(function(registration) {\n                    console.log(\"✅ Service Worker registrado:\", registration.scope);\n                })\n                .catch(function(error) {\n                    console.log(\"❌ Falha ao registrar Service Worker:\", error);\n                });\n        });\n    }\n    \n    console.log('🎯 Event listeners configurados!');\n});
+$(document).ready(function () {
+
+    // Aguardar configurações serem carregadas
+    setTimeout(() => {
+        initializeJarvis();
+    }, 500);
+    
+    function initializeJarvis() {
+        console.log('🤖 Inicializando Jarvis para GitHub Pages...');
+        
+        // Verificar se as configurações estão disponíveis
+        if (!window.jarvisConfig) {
+            console.error('❌ Configurações não carregadas!');
+            return;
+        }
+        
+        const config = window.jarvisConfig;
+        console.log('🌐 Ambiente:', config.getEnvironment());
+        console.log('🔗 API URL:', config.getApiUrl());
+        
+        // Inicializar sequência de startup para GitHub Pages
+        startGitHubPagesSequence();
+        
+        // Configurar animações de texto (com fallback)
+        setupTextAnimations();
+        
+        // Configurar SiriWave
+        setupSiriWave();
+        
+        // Configurar event listeners
+        setupEventListeners();
+        
+        console.log('✅ Jarvis inicializado com sucesso!');
+    }
+    
+    function startGitHubPagesSequence() {
+        console.log('🚀 Iniciando sequência de startup...');
+        
+        // Sequência de inicialização simulando o backend
+        setTimeout(() => {
+            console.log('👤 Iniciando Face Auth...');
+            $("#Loader").attr("hidden", true);
+            $("#FaceAuth").attr("hidden", false);
+            $("#WishMessage").text("Autenticando...");
+        }, 2000);
+        
+        setTimeout(() => {
+            console.log('✅ Face Auth Success...');
+            $("#FaceAuth").attr("hidden", true);
+            $("#FaceAuthSuccess").attr("hidden", false);
+            $("#WishMessage").text("Autenticação bem-sucedida!");
+        }, 4000);
+        
+        setTimeout(() => {
+            console.log('👋 Hello Greet...');
+            $("#FaceAuthSuccess").attr("hidden", true);
+            $("#HelloGreet").attr("hidden", false);
+            $("#WishMessage").text("Olá, bem-vindo João Manoel!");
+        }, 6000);
+        
+        setTimeout(() => {
+            console.log('🎯 Carregando interface principal...');
+            $("#Start").attr("hidden", true);
+            $("#Oval").addClass("animate__animated animate__zoomIn");
+            $("#Oval").attr("hidden", false);
+            $("#WishMessage").text("Ask me anything");
+            
+            // Falar mensagem de boas-vindas se TTS estiver disponível
+            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                setTimeout(() => {
+                    window.jarvisTTS.speak("Olá João Manoel! Como posso ajudá-lo hoje?");
+                }, 1000);
+            }
+        }, 8000);
+    }
+    
+    function setupTextAnimations() {
+        // Verificar se textillate está disponível
+        if (typeof $.fn.textillate === 'function') {
+            try {
+                $('.text').textillate({
+                    loop: true,
+                    sync: true,
+                    in: {
+                        effect: "bounceIn",
+                    },
+                    out: {
+                        effect: "bounceOut",
+                    },
+                });
+
+                $('.siri-message').textillate({
+                    loop: true,
+                    sync: true,
+                    in: {
+                        effect: "fadeInUp",
+                    },
+                    out: {
+                        effect: "fadeOutUp",
+                    },
+                });
+                console.log('🎨 Animações de texto configuradas com textillate');
+            } catch (error) {
+                console.warn('⚠️ Erro ao configurar textillate:', error);
+                setupFallbackAnimations();
+            }
+        } else {
+            console.warn('⚠️ Textillate não disponível, usando animações CSS básicas');
+            setupFallbackAnimations();
+        }
+    }
+    
+    function setupFallbackAnimations() {
+        // Fallback para animações CSS simples
+        $('.text, .siri-message').addClass('animate__animated animate__fadeIn');
+        console.log('🎨 Animações CSS básicas configuradas');
+    }
+    
+    let siriWave = null;
+    
+    function setupSiriWave() {
+        const container = document.getElementById("siri-container");
+        if (container && typeof SiriWave !== 'undefined') {
+            try {
+                siriWave = new SiriWave({
+                    container: container,
+                    width: container.clientWidth || 320,
+                    height: 160,
+                    style: "ios9",
+                    amplitude: 1,
+                    speed: 0.30,
+                    autostart: true
+                });
+                
+                window.addEventListener('resize', function() {
+                    if (siriWave) {
+                        siriWave.setWidth(container.clientWidth || 320);
+                        siriWave.setHeight(160);
+                    }
+                });
+                
+                console.log('🌊 SiriWave configurado');
+            } catch (error) {
+                console.warn('⚠️ Erro ao configurar SiriWave:', error);
+            }
+        } else {
+            console.warn('⚠️ SiriWave não disponível');
+        }
+    }
+    
+    function setupEventListeners() {
+        // Botão do microfone
+        $("#MicBtn").click(function () {
+            console.log('🎤 Botão de microfone clicado');
+            startSpeechRecognition();
+        });
+        
+        // Botão de envio
+        $("#SendBtn").click(function () {
+            const message = $("#chatbox").val().trim();
+            if (message) {
+                sendMessage(message);
+            }
+        });
+        
+        // Campo de texto
+        $("#chatbox").keyup(function () {
+            const message = $("#chatbox").val();
+            toggleSendButton(message);
+        });
+        
+        $("#chatbox").keypress(function (e) {
+            if (e.which === 13) { // Enter
+                const message = $("#chatbox").val().trim();
+                if (message) {
+                    sendMessage(message);
+                }
+            }
+        });
+        
+        // Botão de configurações
+        $("#SettingsBtn").click(function () {
+            if (window.jarvisConfig) {
+                window.jarvisConfig.showQuickSettings();
+            }
+        });
+        
+        // Atalhos de teclado
+        document.addEventListener('keyup', function(e) {
+            // Cmd+J (Mac) ou Ctrl+J (Windows/Linux) para ativar microfone
+            if (e.key === 'j' && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                console.log('⌨️ Atalho de voz ativado (Cmd/Ctrl+J)');
+                startSpeechRecognition();
+            }
+            
+            // Espaço para ativar microfone (apenas se não estiver digitando)
+            if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                console.log('⌨️ Atalho de voz ativado (Espaço)');
+                startSpeechRecognition();
+            }
+        });
+    }
+    
+    function toggleSendButton(message) {
+        if (message.length === 0) {
+            $("#MicBtn").attr('hidden', false);
+            $("#SendBtn").attr('hidden', true);
+        } else {
+            $("#MicBtn").attr('hidden', true);
+            $("#SendBtn").attr('hidden', false);
+        }
+    }
+    
+    function startSpeechRecognition() {
+        console.log('🎤 Iniciando reconhecimento de voz...');
+        
+        // Verificar se o sistema de reconhecimento está disponível
+        if (!window.jarvisSpeechRecognition || !window.jarvisSpeechRecognition.isAvailable()) {
+            console.warn('⚠️ Sistema de reconhecimento de voz não disponível');
+            $("#WishMessage").text("Reconhecimento de voz não disponível. Use o campo de texto.");
+            
+            setTimeout(() => {
+                $("#WishMessage").text("Ask me anything");
+            }, 3000);
+            return;
+        }
+        
+        const speechRecognition = window.jarvisSpeechRecognition;
+        
+        // Se já está ativo, parar
+        if (speechRecognition.isActive()) {
+            console.log('🛑 Parando reconhecimento ativo...');
+            speechRecognition.stop();
+            resetInterface();
+            return;
+        }
+        
+        // Configurar callbacks
+        speechRecognition.onStart(() => {
+            console.log('🎤 Reconhecimento iniciado');
+            $("#Oval").attr("hidden", true);
+            $("#SiriWave").attr("hidden", false);
+            
+            // Ativar SiriWave
+            if (siriWave) {
+                siriWave.start();
+            }
+            
+            // Atualizar visual do botão
+            $('#MicBtn').html('<i class="bi bi-mic-fill"></i>');
+            $('#MicBtn').css('background', 'rgba(255, 0, 0, 0.3)');
+            $("#WishMessage").text("Escutando... Fale agora!");
+        });
+        
+        speechRecognition.onInterim((transcript) => {
+            console.log('⏳ Transcrição parcial:', transcript);
+            $("#WishMessage").text(`Ouvindo: "${transcript}"`);
+        });
+        
+        speechRecognition.onResult((transcript, confidence) => {
+            console.log('✅ Transcrição final:', transcript);
+            console.log('🎯 Confiança:', (confidence * 100).toFixed(1) + '%');
+            
+            if (transcript.trim()) {
+                $("#chatbox").val(transcript);
+                $("#WishMessage").text(`Processando: "${transcript}"`);
+                
+                // Processar comando automaticamente
+                setTimeout(() => {
+                    sendMessage(transcript);
+                }, 500);
+            }
+        });
+        
+        speechRecognition.onError((error, message) => {
+            console.error('❌ Erro no reconhecimento:', error, message);
+            $("#WishMessage").text(`Erro: ${message}`);
+            resetInterface();
+            
+            // Voltar para interface principal após erro
+            setTimeout(() => {
+                $("#SiriWave").attr("hidden", true);
+                $("#Oval").attr("hidden", false);
+                $("#WishMessage").text("Ask me anything");
+            }, 3000);
+        });
+        
+        speechRecognition.onEnd(() => {
+            console.log('🛑 Reconhecimento finalizado');
+            resetInterface();
+        });
+        
+        // Iniciar reconhecimento
+        const started = speechRecognition.start();
+        if (!started) {
+            console.error('❌ Falha ao iniciar reconhecimento');
+            resetInterface();
+        }
+    }
+    
+    function resetInterface() {
+        $('#MicBtn').html('<i class="bi bi-mic"></i>');
+        $('#MicBtn').css('background', '');
+        
+        // Parar SiriWave
+        if (siriWave) {
+            siriWave.stop();
+        }
+    }
+    
+    function sendMessage(message) {
+        if (!message || !message.trim()) {
+            return;
+        }
+        
+        console.log('📤 Enviando mensagem:', message);
+        
+        // Verificar comandos locais primeiro
+        if (handleLocalCommands(message)) {
+            return;
+        }
+        
+        // Mostrar interface de processamento
+        $("#Oval").attr("hidden", true);
+        $("#SiriWave").attr("hidden", false);
+        
+        // Ativar SiriWave
+        if (siriWave) {
+            siriWave.start();
+        }
+        
+        $("#WishMessage").text("Processando sua mensagem...");
+        
+        // Enviar para API
+        sendToAPI(message)
+            .then(response => {
+                console.log('✅ Resposta recebida:', response);
+                $("#WishMessage").text(response);
+                
+                // Falar resposta se TTS estiver ativo
+                if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                    window.jarvisTTS.speak(response);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Erro na API:', error);
+                $("#WishMessage").text(`Erro: ${error.message}`);
+            })
+            .finally(() => {
+                // Parar SiriWave
+                if (siriWave) {
+                    siriWave.stop();
+                }
+                
+                // Limpar input e resetar botões
+                $("#chatbox").val("");
+                $("#MicBtn").attr('hidden', false);
+                $("#SendBtn").attr('hidden', true);
+                
+                // Voltar para a tela principal após 5 segundos
+                setTimeout(() => {
+                    $("#SiriWave").attr("hidden", true);
+                    $("#Oval").attr("hidden", false);
+                    $("#WishMessage").text("Ask me anything");
+                }, 5000);
+            });
+    }
+    
+    function handleLocalCommands(message) {
+        const msg = message.toLowerCase().trim();
+        console.log('🔍 Verificando comando local:', msg);
+        
+        // Comandos do WhatsApp - Detecção ampla
+        const whatsappKeywords = [
+            'whatsapp', 'whats app', 'whats', 'zap', 'zapzap',
+            'abrir whatsapp', 'abra whatsapp', 'abre whatsapp',
+            'abrir whats', 'abra whats', 'abre whats'
+        ];
+        
+        if (whatsappKeywords.some(keyword => msg.includes(keyword))) {
+            console.log('✅ Comando WhatsApp detectado!');
+            window.open('https://web.whatsapp.com', '_blank');
+            $("#WishMessage").text("Abrindo WhatsApp Web...");
+            
+            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                window.jarvisTTS.speak("Abrindo WhatsApp Web para você!");
+            }
+            
+            setTimeout(() => {
+                $("#WishMessage").text("Ask me anything");
+            }, 3000);
+            return true;
+        }
+        
+        // Comandos do YouTube
+        const youtubeKeywords = [
+            'youtube', 'you tube', 'abrir youtube', 'abra youtube', 'abre youtube'
+        ];
+        
+        if (youtubeKeywords.some(keyword => msg.includes(keyword))) {
+            console.log('✅ Comando YouTube detectado!');
+            window.open('https://www.youtube.com', '_blank');
+            $("#WishMessage").text("Abrindo YouTube...");
+            
+            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                window.jarvisTTS.speak("Abrindo YouTube para você!");
+            }
+            
+            setTimeout(() => {
+                $("#WishMessage").text("Ask me anything");
+            }, 3000);
+            return true;
+        }
+        
+        // Comandos do Google
+        const googleKeywords = [
+            'google', 'abrir google', 'abra google', 'abre google', 'pesquisar no google'
+        ];
+        
+        if (googleKeywords.some(keyword => msg.includes(keyword))) {
+            console.log('✅ Comando Google detectado!');
+            window.open('https://www.google.com', '_blank');
+            $("#WishMessage").text("Abrindo Google...");
+            
+            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                window.jarvisTTS.speak("Abrindo Google para você!");
+            }
+            
+            setTimeout(() => {
+                $("#WishMessage").text("Ask me anything");
+            }, 3000);
+            return true;
+        }
+        
+        // Comandos de configuração
+        const configKeywords = [
+            'configurações', 'configuracao', 'config', 'settings', 'ajustes'
+        ];
+        
+        if (configKeywords.some(keyword => msg.includes(keyword))) {
+            console.log('✅ Comando de configurações detectado!');
+            if (window.jarvisConfig) {
+                window.jarvisConfig.showQuickSettings();
+            }
+            return true;
+        }
+        
+        // Comandos de teste
+        const testKeywords = [
+            'teste', 'test', 'testar', 'diagnóstico', 'diagnostico'
+        ];
+        
+        if (testKeywords.some(keyword => msg.includes(keyword))) {
+            console.log('✅ Comando de teste detectado!');
+            $("#WishMessage").text("Executando diagnóstico do sistema...");
+            
+            if (window.jarvisConfig) {
+                window.jarvisConfig.diagnose().then(diagnosis => {
+                    const status = diagnosis.apiConnectivity ? 'Sistema funcionando normalmente' : 'Problemas de conectividade detectados';
+                    $("#WishMessage").text(status);
+                    
+                    if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                        window.jarvisTTS.speak(status);
+                    }
+                });
+            }
+            
+            setTimeout(() => {
+                $("#WishMessage").text("Ask me anything");
+            }, 5000);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    async function sendToAPI(message) {
+        const config = window.jarvisConfig;
+        const apiUrl = config.getApiUrl();
+        
+        console.log('🌐 Enviando para API:', apiUrl);
+        
+        try {
+            const response = await fetch(`${apiUrl}/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    user_id: 'github_pages_user',
+                    session_id: 'github_pages_session'
+                }),
+                timeout: config.settings.apiTimeout
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.response) {
+                return data.response;
+            } else if (data.error) {
+                throw new Error(data.error);
+            } else {
+                throw new Error('Resposta inválida da API');
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro na API:', error);
+            
+            // Respostas de fallback para GitHub Pages
+            const fallbackResponses = [
+                "Desculpe, estou com problemas de conectividade no momento. Tente novamente em alguns instantes.",
+                "Não consegui processar sua solicitação agora. Verifique sua conexão com a internet.",
+                "Sistema temporariamente indisponível. Por favor, tente novamente mais tarde.",
+                "Erro de comunicação com o servidor. Tentando reconectar..."
+            ];
+            
+            const randomResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+            
+            // Se for erro de rede, tentar URL alternativa
+            if (error.message.includes('fetch') || error.message.includes('network')) {
+                console.log('🔄 Tentando URL alternativa...');
+                try {
+                    const fallbackUrl = config.API_URLS.fallback;
+                    const fallbackResponse = await fetch(`${fallbackUrl}/chat`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            user_id: 'github_pages_user',
+                            session_id: 'github_pages_session'
+                        }),
+                        timeout: 15000
+                    });
+                    
+                    if (fallbackResponse.ok) {
+                        const fallbackData = await fallbackResponse.json();
+                        if (fallbackData.response) {
+                            console.log('✅ Resposta obtida via URL alternativa');
+                            return fallbackData.response;
+                        }
+                    }
+                } catch (fallbackError) {
+                    console.error('❌ Erro também na URL alternativa:', fallbackError);
+                }
+            }
+            
+            throw new Error(randomResponse);
+        }
+    }
+    
+    // Função global para configurações (compatibilidade)
+    window.showJarvisSettings = function() {
+        if (window.jarvisConfig) {
+            window.jarvisConfig.showQuickSettings();
+        }
+    };
+    
+    // Função global para handler de configurações (compatibilidade)
+    window.jarvisSettingsHandler = function(choice) {
+        const config = window.jarvisConfig;
+        
+        switch(choice) {
+            case '1':
+                config.configureApiUrl();
+                break;
+            case '2':
+                config.testConnectivity();
+                break;
+            case '3':
+                $("#WishMessage").text("Teste: Olá! Eu sou o Jarvis funcionando no GitHub Pages!");
+                if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                    window.jarvisTTS.speak("Teste: Olá! Eu sou o Jarvis funcionando no GitHub Pages!");
+                }
+                setTimeout(() => {
+                    $("#WishMessage").text("Ask me anything");
+                }, 5000);
+                break;
+            case '6':
+                console.log('📊 Logs do console exibidos');
+                alert('📊 Verifique o console do navegador (F12) para ver os logs detalhados do sistema.');
+                break;
+        }
+    };
+    
+    console.log('🎯 Main GitHub Pages script carregado com sucesso!');
+});
