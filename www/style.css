@@ -299,3 +299,47 @@ svg {
     transform: rotate(360deg);
   }
 }
+
+/* Melhorias para mobile */
+@media (max-width: 768px) {
+    .svg-frame {
+        width: 250px !important;
+        height: 250px !important;
+    }
+    
+    #siri-container {
+        height: 80px;
+    }
+    
+    .glow-on-hover {
+        min-width: 44px; /* Touch target mínimo */
+        min-height: 44px;
+        margin: 2px;
+    }
+    
+    .input-field {
+        font-size: 16px; /* Previne zoom no iOS */
+    }
+}
+
+/* Melhorar visibilidade do sr-only */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.sr-only-focusable:active,
+.sr-only-focusable:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+}
