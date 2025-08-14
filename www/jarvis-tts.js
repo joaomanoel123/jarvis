@@ -4,6 +4,41 @@
  * Compatível com GitHub Pages
  */
 
+// Variável para controlar se TTS foi ativado
+let ttsActivated = false;
+
+// Função para ativar TTS silenciosamente
+function activateTTS() {
+    if (!ttsActivated && 'speechSynthesis' in window) {
+        // Fala uma string vazia para ativar o sistema
+        const utterance = new SpeechSynthesisUtterance('');
+        utterance.volume = 0; // Volume zero para ser silencioso
+        speechSynthesis.speak(utterance);
+        ttsActivated = true;
+        console.log('✅ TTS ativado pelo usuário');
+    }
+}
+
+// Função melhorada para falar
+function speakText(text, options = {}) {
+    // Se TTS não foi ativado, não tenta falar
+    if (!ttsActivated) {
+        console.warn('⚠️ TTS não ativado. Aguardando interação do usuário.');
+        return;
+    }
+    
+    // Código normal do TTS aqui
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = options.lang || 'pt-BR';
+        utterance.rate = options.rate || 1;
+        utterance.pitch = options.pitch || 1;
+        utterance.volume = options.volume || 1;
+        
+        speechSynthesis.speak(utterance);
+    }
+}
+
 class JarvisTTS {
     constructor() {
         // Verificação robusta de speechSynthesis
