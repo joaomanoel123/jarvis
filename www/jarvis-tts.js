@@ -137,28 +137,61 @@ class JarvisTTS {
         console.log('✅ Jarvis TTS inicializado com sucesso');
     }
 
-    loadVoices() {
+      loadVoices() {
         if (!this.synth) {
             console.warn('⚠️ Synth não disponível para carregar vozes');
-            return;
-        }
-        
+        return;
+    }
+    
+        // NOVO: Forçar o carregamento das vozes
+        const utterance = new SpeechSynthesisUtterance('');
+        this.synth.speak(utterance);
+        this.synth.cancel();
+    
         this.voices = this.synth.getVoices();
         console.log(`🎤 ${this.voices.length} vozes carregadas`);
+    
+        // NOVO: Se não carregou vozes, tentar diferentes estratégias
+        if (this.voices.length === 0) {
+            console.log('🔄 Tentando estratégias alternativas para carregar vozes...');
         
-        // Log das vozes disponíveis para debug
-        if (this.voices.length > 0) {
-            console.log('🎤 Vozes disponíveis:');
-            this.voices.forEach((voice, index) => {
-                console.log(`  ${index}: ${voice.name} (${voice.lang}) ${voice.default ? '[Padrão]' : ''}`);
-            });
-        }
+        // Estratégia 1: Aguardar e tentar novamente
+        setTimeout(() => {
+            this.voices = this.synth.getVoices();
+            if (this.voices.length > 0) {
+                console.log(`✅ Vozes carregadas com delay: ${this.voices.length}`);
+                this.autoSelectVoice();
+            }
+        }, 500);
+        
+        // Estratégia 2: Aguardar mais tempo
+        setTimeout(() => {
+            if (this.voices.length === 0) {
+                this.voices = this.synth.getVoices();
+                if (this.voices.length > 0) {
+                    console.log(`✅ Vozes carregadas com delay longo: ${this.voices.length}`);
+                    this.autoSelectVoice();
+                }
+            }
+        }, 2000);
+        
+        return; // Sair aqui se não tiver vozes ainda
+    }
+    
+    // Log das vozes disponíveis para debug
+    if (this.voices.length > 0) {
+        console.log('🎤 Vozes disponíveis:');
+        this.voices.forEach((voice, index) => {
+            console.log(`  ${index}: ${voice.name} (${voice.lang}) ${voice.default ? '[Padrão]' : ''}`);
+        });
         
         // Auto-selecionar melhor voz em português
         if (this.settings.voiceIndex === -1) {
             this.autoSelectVoice();
+            }
         }
     }
+
 
     autoSelectVoice() {
         if (this.voices.length === 0) {
@@ -608,6 +641,41 @@ Digite o novo volume:`, this.settings.volume);
     }
 }
 
+
+// Função de equelibrio para a voz 
+
+forceLoadVoices() {
+    return new Promise((resolve) => {
+        if (!this.synth) {
+            resolve([]);
+            return;
+        }
+        
+        // Estratégia agressiva para carregar vozes
+        const loadAttempt = () => {
+            const voices = this.synth.getVoices();
+            if (voices.length > 0) {
+                this.voices = voices;
+                resolve(voices);
+            } else {
+                // Forçar com utterance vazia
+                const utterance = new SpeechSynthesisUtterance('');
+                utterance.volume = 0;
+                this.synth.speak(utterance);
+                this.synth.cancel();
+                
+                setTimeout(() => {
+                    const voicesRetry = this.synth.getVoices();
+                    this.voices = voicesRetry;
+                    resolve(voicesRetry);
+                }, 100);
+            }
+        };
+        
+        loadAttempt();
+    });
+}
+
 // Inicializar TTS quando o documento estiver pronto
 let jarvisTTS = null;
 
@@ -626,4 +694,39 @@ $(document).ready(function() {
 // Exportar para uso em outros scripts
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = JarvisTTS;
+}
+
+async init() {
+    console.log('🗣️ Inicializando Jarvis TTS...');
+    
+    if (!this.isSupported) {
+        console.error('❌ Text-to-Speech não suportado neste navegador');
+        console.log('💡 Navegadores suportados: Chrome, Edge, Safari, Firefox');
+        console.log('💡 Certifique-se de que está usando HTTPS');
+        return;
+    }
+
+    // Carregar configurações salvas
+    this.loadSettings();
+    
+    // NOVO: Usar função robusta para carregar vozes
+    await this.forceLoadVoices();
+    
+    // Configurar listener para mudanças de vozes
+    if (this.synth.onvoiceschanged !== undefined) {
+        this.synth.onvoiceschanged = () => {
+            console.log('🔄 Evento onvoiceschanged disparado');
+            this.loadVoices();
+        };
+    }
+    
+    // Auto-selecionar voz se tiver vozes carregadas
+    if (this.voices.length > 0 && this.settings.voiceIndex === -1) {
+        this.autoSelectVoice();
+    }
+
+    // Adicionar controles de TTS à interface
+    this.addTTSControls();
+    
+    console.log('✅ Jarvis TTS inicializado com sucesso');
 }
