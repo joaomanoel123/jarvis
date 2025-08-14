@@ -416,8 +416,26 @@
    <!-- Siri wave -->
     <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
     
-    <!-- lottie files -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+   <!--CARREGAR A LOOTIE FILES-->
+   <script>
+   (function loadLottie() {
+    // Verificar se lottie-player já foi definido
+    if (!customElements.get('lottie-player')) {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js';
+        script.async = true;
+        script.onload = function() {
+            console.log('✅ Lottie Player carregado');
+        };
+        script.onerror = function() {
+            console.error('❌ Erro ao carregar Lottie Player');
+        };
+        document.head.appendChild(script);
+    } else {
+        console.log('⚠️ Lottie Player já estava carregado');
+    }
+})();
+   </script>
     
     <!-- Google OAuth API -->
     <script src="https://apis.google.com/js/platform.js" async defer></script>
