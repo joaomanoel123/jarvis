@@ -11,6 +11,7 @@ class JarvisTTS {
         this.currentUtterance = null;
         this.isSupported = 'speechSynthesis' in window;
         this.isEnabled = true;
+        this.isUnlocked = false; // Flag para controlar a ativação por gesto do usuário
         this.settings = {
             rate: 1.0,
             pitch: 1.0,
@@ -47,6 +48,19 @@ class JarvisTTS {
         this.addTTSControls();
         
         console.log('✅ Jarvis TTS inicializado com sucesso');
+        console.log('🔒 TTS aguardando interação do usuário para ativar.');
+    }
+
+    unlockAudio() {
+        if (this.isUnlocked || !this.isSupported) return;
+        
+        // Toca um som vazio para "acordar" a API em alguns navegadores
+        const utterance = new SpeechSynthesisUtterance('');
+        utterance.volume = 0;
+        this.synth.speak(utterance);
+        
+        this.isUnlocked = true;
+        console.log('🔊 Permissão de áudio concedida pelo usuário.');
     }
 
     loadVoices() {
@@ -123,7 +137,10 @@ class JarvisTTS {
     }
 
     speak(text, options = {}) {
-        if (!this.isSupported || !this.isEnabled || !text) {
+        if (!this.isSupported || !this.isEnabled || !text || !this.isUnlocked) {
+            if (!this.isUnlocked) {
+                console.warn('⚠️ Tentativa de falar antes da interação do usuário. A fala foi ignorada.');
+            }
             return Promise.resolve();
         }
 
@@ -167,9 +184,15 @@ class JarvisTTS {
             };
 
             this.currentUtterance.onerror = (event) => {
-                console.error('❌ Erro na fala:', event.error);
-                this.currentUtterance = null;
-                reject(new Error(`TTS Error: ${event.error}`));
+                // O erro 'audio-aborted' é comum e nem sempre um problema real, vamos tratá-lo com menos alarde.
+                if (event.error === 'audio-aborted') {
+                    console.warn('🟠 A fala foi interrompida (audio-aborted). Isso pode ser normal.');
+                    resolve(); // Resolve a promessa para não travar a execução
+                } else {
+                    console.error('❌ Erro na fala:', event.error);
+                    this.currentUtterance = null;
+                    reject(new Error(`TTS Error: ${event.error}`));
+                }
             };
 
             // Iniciar fala
@@ -182,12 +205,12 @@ class JarvisTTS {
         
         return text
             // Remover emojis comuns
-            .replace(/[\u{1F600}-\u{1F64F}]/gu, '') // Emoticons
-            .replace(/[\u{1F300}-\u{1F5FF}]/gu, '') // Misc Symbols
-            .replace(/[\u{1F680}-\u{1F6FF}]/gu, '') // Transport
-            .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '') // Flags
-            .replace(/[\u{2600}-\u{26FF}]/gu, '')   // Misc symbols
-            .replace(/[\u{2700}-\u{27BF}]/gu, '')   // Dingbats
+            .replace(/[😀-🙏]/gu, '') // Emoticons
+            .replace(/[🌀-🟿]/gu, '') // Misc Symbols
+            .replace(/[🚀-🛿]/gu, '') // Transport
+            .replace(/[🇠-🇿]/gu, '') // Flags
+            .replace(/[☀-⛿]/gu, '')   // Misc symbols
+            .replace(/[✀-➿]/gu, '')   // Dingbats
             // Remover símbolos especiais específicos
             .replace(/[🤖🗣️📱✅❌⚠️🔄🔍🎯📡📝🌊🔙💬🚫⏱️🔌🎆💾⚙️🎤]/g, '')
             // Limpar múltiplos espaços
@@ -238,7 +261,7 @@ class JarvisTTS {
             const ttsBtn = document.createElement('button');
             ttsBtn.id = 'TTSBtn';
             ttsBtn.className = 'glow-on-hover';
-            ttsBtn.innerHTML = '<i class=\"bi bi-volume-up\"></i>';
+            ttsBtn.innerHTML = '<i class="bi bi-volume-up"></i>';
             ttsBtn.title = 'Toggle Text-to-Speech';
             ttsBtn.onclick = () => this.toggle();
             
@@ -491,6 +514,13 @@ $(document).ready(function() {
         
         // Tornar disponível globalmente
         window.jarvisTTS = jarvisTTS;
+        
+        // Adicionar um listener de evento único para desbloquear o áudio na primeira interação do usuário
+        $(document).one('click keydown', () => {
+            if (jarvisTTS) {
+                jarvisTTS.unlockAudio();
+            }
+        });
         
         console.log('🎤 Jarvis TTS integrado com sucesso!');
     }, 1000);
