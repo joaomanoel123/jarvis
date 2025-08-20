@@ -34,6 +34,16 @@
     <meta name="application-name" content="JARVIS">
     <meta name="msapplication-TileColor" content="#00AAFF">
     <meta name="msapplication-config" content="/jarvis/browserconfig.xml">
+
+    <meta http-equiv="Content-Security-Policy" 
+      content="
+        default-src 'self';
+        script-src 'self' https://translate.googleapis.com https://www.gstatic.com;
+        style-src 'self' 'unsafe-inline' https://www.gstatic.com;
+        style-src-elem 'self' https://www.gstatic.com;
+        img-src 'self' https://www.gstatic.com https://translate.googleapis.com;
+        frame-src https://translate.googleapis.com;
+      ">
     
     <link rel="shortcut icon" href="assets/img/logo.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="assets/img/logo.ico">
@@ -52,6 +62,7 @@
     <link rel="stylesheet" href="assets/vendore/texllate/animate.css">
 
     <link rel="stylesheet" href="style.css">
+    
 
 </head>
 
