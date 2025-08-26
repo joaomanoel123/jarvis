@@ -55,3 +55,18 @@ google_oauth_config.json
 *.key
 *.pem
 client_secret*.json
+
+# Android/Gradle
+*.gradle/
+.gradle/
+build/
+*.tar.gz
+*.jar
+*.bin
+
+# Arquivos grandes
+*.yml
+trainer.yml
+
+# Mobile backup
+jarvis_backup.tar.gz
