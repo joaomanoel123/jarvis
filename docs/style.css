@@ -1,8 +1,19 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #000000; /* fundo escuro */
+}
 
-body{
-    background-color: black;
-    overflow-y: auto;
-    overflow-x: hidden;
+#particles-js {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* fica no fundo */
+  top: 0;
+  left: 0;
 }
 
 .square{
