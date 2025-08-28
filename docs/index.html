@@ -24,7 +24,7 @@
     <meta property="twitter:image" content="https://joaomanoel123.github.io/jarvis/assets/img/logo.ico">
     
     <!-- PWA -->
-    <link rel="manifest" href="./docs/manifest.json">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00AAFF">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -38,23 +38,24 @@
    <meta http-equiv="Content-Security-Policy" 
       content="
         default-src 'self';
-        script-src 'self' https://translate.googleapis.com https://www.gstatic.com;
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com;
-        style-src-elem 'self' https://fonts.googleapis.com https://www.gstatic.com;
-        font-src 'self' https://fonts.gstatic.com;
+        script-src 'self' 'unsafe-inline' https://code.jquery.com https://cdn.jsdelivr.net https://translate.googleapis.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://unpkg.com https://assets1.lottiefiles.com https://assets2.lottiefiles.com https://lottie.host;
+        style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://www.gstatic.com https://cdnjs.cloudflare.com;
+        style-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://www.gstatic.com https://cdnjs.cloudflare.com;
+        font-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+        connect-src 'self' https://jarvis-tdgt.onrender.com https://texttospeech.googleapis.com https://translate.googleapis.com https://www.gstatic.com;
         img-src 'self' data: https://www.gstatic.com https://translate.googleapis.com https:;
         frame-src https://translate.googleapis.com;
-        connect-src 'self' https://translate.googleapis.com https://www.gstatic.com;
+        manifest-src 'self';
       ">
     
     <link rel="shortcut icon" href="assets/img/logo.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="assets/img/logo.ico">
 
-    <!-- Bootsrap -->
-    <link href="./docs/assets/css/bootstrap.min.css" rel="stylesheet"
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <!-- Bootsrap Icons -->
-    <link rel="stylesheet" href="./docs/assets/css/bootstrap-icons.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <!-- Particle js -->
     <script src="./docs/js/particles.min.js"
@@ -400,51 +401,48 @@
     
 
 
-   <!-- Carregar Core antes do main -->
-   <script src="./docs/js/core/core.js"></script>
-   <script src="./docs/main.js"></script>
-
-    <!--Jquery  -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Bootstrap -->
-    <script src="./docs/js/bootstrap.bundle.min.js"
-      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
-
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>    
-
-    <!-- Removed duplicate/legacy jQuery and unused scripts for GitHub Pages -->
+    <!-- Other JS libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lettering.js/0.7.0/jquery.lettering.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/textillate/0.4.0/jquery.textillate.min.js"></script>
 
     <!-- Siri wave -->
     <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
 
-    <!-- Texllate js -->
-    <script src="./docs/js/jquery-3.6.0.min.js"></script>
-    <script src="./docs/js/jquery.lettering.min.js"></script>
-    <script src="./docs/js/jquery.textillate.js"></script>
-    <script src="./docs/js/jarvis-tts.js"></script>
-    <script src="./docs/js/main.js"></script>
-
-
-    <!-- lottie files -->
+    <!-- Lottie files -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-    <!-- Jarvis Voice System -->
-    <script src="jarvis-tts.js"></script>
-    <script src="jarvis-google-tts.js"></script>
-    <script src="jarvis-speech-recognition.js"></script>
-
-    <script src="eel.js"></script>
+    <!-- Error handling for missing scripts -->
     <script>
-        // Detectar se está no GitHub Pages e carregar script apropriado
-        if (window.location.hostname.includes('github.io')) {
-            document.write('<script src="main-github-pages.js"><\/script>');
-        } else {
-            document.write('<script src="main.js"><\/script>');
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'SCRIPT') {
+                console.warn('Script failed to load:', e.target.src);
+            }
+        });
+        
+        // Fallback for missing eel.js
+        if (typeof eel === 'undefined') {
+            window.eel = {
+                expose: function() {},
+                init: function() {}
+            };
         }
     </script>
-    <script src="controller.js"></script>
+    
+    <!-- Jarvis Core and Modules -->
+    <script src="core/core.js" onerror="console.warn('core.js not found')"></script>
+    <script src="eel.js" onerror="console.warn('eel.js not found')"></script>
+    <script src="jarvis-tts.js" onerror="console.warn('jarvis-tts.js not found')"></script>
+    <script src="jarvis-google-tts.js" onerror="console.warn('jarvis-google-tts.js not found')"></script>
+    <script src="jarvis-speech-recognition.js" onerror="console.warn('jarvis-speech-recognition.js not found')"></script>
+    <script src="controller.js" onerror="console.warn('controller.js not found')"></script>
+    <script src="main-github-pages.js" onerror="console.warn('main-github-pages.js not found')"></script>
 
 
 </body>
