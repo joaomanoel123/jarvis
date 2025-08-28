@@ -2,6 +2,8 @@
  * Jarvis Text-to-Speech Module
  * Integração de voz para o assistente Jarvis
  * Compatível com GitHub Pages
+ * 
+ * Implementa tratamento robusto de erros baseado na Web Speech API SpeechSynthesisErrorEvent
  */
 
 class JarvisTTS {
@@ -12,6 +14,8 @@ class JarvisTTS {
         this.isSupported = 'speechSynthesis' in window;
         this.isEnabled = true;
         this.isUnlocked = false; // Flag para controlar a ativação por gesto do usuário
+        this.maxRetries = 3; // Será ajustado baseado no navegador
+        this.retryDelay = 500; // Será ajustado baseado no navegador
         this.settings = {
             rate: 1.0,
             pitch: 1.0,
@@ -28,9 +32,13 @@ class JarvisTTS {
         
         if (!this.isSupported) {
             console.warn('❌ Text-to-Speech não suportado neste navegador');
+            this.showBrowserCompatibilityInfo();
             return;
         }
 
+        // Detectar navegador para otimizações específicas
+        this.detectBrowser();
+        
         // Carregar configurações salvas
         this.loadSettings();
         
@@ -43,12 +51,66 @@ class JarvisTTS {
                 this.loadVoices();
             };
         }
+        
+        // Configurar timeouts específicos do navegador
+        this.setupBrowserSpecificSettings();
 
         // Adicionar controles de TTS à interface
         this.addTTSControls();
         
         console.log('✅ Jarvis TTS inicializado com sucesso');
         console.log('🔒 TTS aguardando interação do usuário para ativar.');
+    }
+
+    detectBrowser() {
+        const userAgent = navigator.userAgent;
+        
+        this.browserInfo = {
+            isChrome: /Chrome/.test(userAgent) && !/Edge/.test(userAgent),
+            isFirefox: /Firefox/.test(userAgent),
+            isSafari: /Safari/.test(userAgent) && !/Chrome/.test(userAgent),
+            isEdge: /Edge/.test(userAgent),
+            isMobile: /Mobile|Android|iPhone|iPad/.test(userAgent)
+        };
+        
+        console.log('🌐 Navegador detectado:', this.browserInfo);
+    }
+
+    setupBrowserSpecificSettings() {
+        // Configurações específicas para cada navegador
+        if (this.browserInfo.isChrome) {
+            // Chrome tem boa compatibilidade, usar configurações padrão
+            this.maxRetries = 3;
+            this.retryDelay = 500;
+        } else if (this.browserInfo.isFirefox) {
+            // Firefox pode ter problemas com vozes específicas
+            this.maxRetries = 2;
+            this.retryDelay = 800;
+        } else if (this.browserInfo.isSafari) {
+            // Safari tem limitações mais rígidas
+            this.maxRetries = 1;
+            this.retryDelay = 1000;
+            // Safari pode precisar de configurações mais conservadoras
+            this.settings.rate = Math.min(this.settings.rate, 1.5);
+        } else if (this.browserInfo.isMobile) {
+            // Dispositivos móveis podem ter limitações de recursos
+            this.maxRetries = 2;
+            this.retryDelay = 1000;
+            this.settings.volume = Math.min(this.settings.volume, 0.8);
+        }
+    }
+
+    showBrowserCompatibilityInfo() {
+        const compatibleBrowsers = [
+            '✅ Google Chrome (recomendado)',
+            '✅ Mozilla Firefox',
+            '✅ Microsoft Edge',
+            '⚠️ Safari (funcionalidade limitada)',
+            '❌ Internet Explorer (não suportado)'
+        ];
+        
+        console.warn('📋 Compatibilidade de navegadores para Text-to-Speech:');
+        compatibleBrowsers.forEach(browser => console.warn(browser));
     }
 
     unlockAudio() {
@@ -137,6 +199,10 @@ class JarvisTTS {
     }
 
     speak(text, options = {}) {
+        return this.speakWithRetry(text, options, 0);
+    }
+
+    speakWithRetry(text, options = {}, retryCount = 0) {
         if (!this.isSupported || !this.isEnabled || !text || !this.isUnlocked) {
             if (!this.isUnlocked) {
                 console.warn('⚠️ Tentativa de falar antes da interação do usuário. A fala foi ignorada.');
@@ -150,7 +216,7 @@ class JarvisTTS {
             return Promise.resolve();
         }
 
-        console.log('🗣️ Falando:', cleanText);
+        console.log(`🗣️ Falando (tentativa ${retryCount + 1}):`, cleanText);
 
         return new Promise((resolve, reject) => {
             // Garantir que a síntese não está pausada
@@ -183,17 +249,168 @@ class JarvisTTS {
                 resolve();
             };
 
-            this.currentUtterance.onerror = (event) => {
-                // O erro 'audio-aborted' é comum e nem sempre um problema real, vamos tratá-lo com menos alarde.
-                if (event.error === 'audio-aborted') {
-                    console.warn('🟠 A fala foi interrompida (audio-aborted). Isso pode ser normal.');
-                    resolve(); // Resolve a promessa para não travar a execução
-                } else {
-                    console.error('❌ Erro na fala:', event.error);
-                    this.currentUtterance = null;
-                    reject(new Error(`TTS Error: ${event.error}`));
+            // Implementar tratamento de erro robusto baseado na Web Speech API
+            this.currentUtterance.addEventListener('error', (event) => {
+                console.log('🔍 Detalhes do erro TTS:', {
+                    error: event.error,
+                    charIndex: event.charIndex,
+                    elapsedTime: event.elapsedTime,
+                    utterance: event.utterance
+                });
+                
+                // Tratamento específico para diferentes tipos de erro
+                switch (event.error) {
+                    case 'audio-aborted':
+                        console.warn('🟠 A fala foi interrompida (audio-aborted). Isso pode ser normal.');
+                        this.currentUtterance = null;
+                        resolve(); // Resolve a promessa para não travar a execução
+                        break;
+                        
+                    case 'audio-busy':
+                        console.warn('🟡 Sistema de áudio ocupado. Tentando novamente...');
+                        this.currentUtterance = null;
+                        
+                        if (retryCount < this.maxRetries) {
+                            setTimeout(() => {
+                                this.speakWithRetry(cleanText, options, retryCount + 1)
+                                    .then(resolve)
+                                    .catch(reject);
+                            }, this.retryDelay);
+                        } else {
+                            reject(new Error('Sistema de áudio ocupado - máximo de tentativas excedido'));
+                        }
+                        break;
+                        
+                    case 'not-allowed':
+                        console.error('🚫 Permissão de áudio negada pelo usuário.');
+                        this.currentUtterance = null;
+                        reject(new Error('Permissão de áudio necessária para Text-to-Speech'));
+                        break;
+                        
+                    case 'network':
+                        console.error('🌐 Erro de rede durante síntese de voz.');
+                        this.currentUtterance = null;
+                        reject(new Error('Erro de rede durante Text-to-Speech'));
+                        break;
+                        
+                    case 'synthesis-unavailable':
+                        console.error('❌ Síntese de voz não disponível.');
+                        this.currentUtterance = null;
+                        reject(new Error('Síntese de voz não disponível'));
+                        break;
+                        
+                    case 'synthesis-failed':
+                        console.error('💥 Falha na síntese de voz. Tentando com configurações alternativas...');
+                        this.currentUtterance = null;
+                        
+                        if (retryCount < this.maxRetries) {
+                            // Tentar com configurações mais conservadoras
+                            const fallbackOptions = {
+                                rate: Math.min(options.rate || this.settings.rate, 1.0),
+                                pitch: 1.0, // Tom neutro
+                                volume: Math.min(options.volume || this.settings.volume, 0.8)
+                            };
+                            
+                            // Tentar com voz padrão do sistema
+                            const originalVoiceIndex = this.settings.voiceIndex;
+                            this.settings.voiceIndex = -1; // Usar voz padrão
+                            
+                            setTimeout(() => {
+                                this.speakWithRetry(cleanText, fallbackOptions, retryCount + 1)
+                                    .then(() => {
+                                        console.log('✅ Síntese recuperada com configurações alternativas');
+                                        this.settings.voiceIndex = originalVoiceIndex; // Restaurar configuração
+                                        resolve();
+                                    })
+                                    .catch(() => {
+                                        console.error('❌ Falha definitiva na síntese de voz');
+                                        this.settings.voiceIndex = originalVoiceIndex; // Restaurar configuração
+                                        reject(new Error('Falha na síntese de voz'));
+                                    });
+                            }, this.retryDelay);
+                        } else {
+                            reject(new Error('Falha na síntese de voz - máximo de tentativas excedido'));
+                        }
+                        break;
+                        
+                    case 'language-unavailable':
+                        console.warn('🌍 Idioma não disponível. Tentando com voz padrão...');
+                        this.currentUtterance = null;
+                        
+                        if (retryCount < this.maxRetries) {
+                            // Tentar com a primeira voz disponível
+                            const originalVoice = this.settings.voiceIndex;
+                            this.settings.voiceIndex = 0;
+                            
+                            setTimeout(() => {
+                                this.speakWithRetry(cleanText, options, retryCount + 1)
+                                    .then(() => {
+                                        console.log('✅ Síntese com voz alternativa bem-sucedida');
+                                        this.settings.voiceIndex = originalVoice;
+                                        resolve();
+                                    })
+                                    .catch(() => {
+                                        this.settings.voiceIndex = originalVoice;
+                                        reject(new Error('Idioma não disponível para síntese'));
+                                    });
+                            }, this.retryDelay);
+                        } else {
+                            reject(new Error('Idioma não disponível - máximo de tentativas excedido'));
+                        }
+                        break;
+                        
+                    case 'voice-unavailable':
+                        console.warn('🎤 Voz selecionada não disponível. Usando voz padrão...');
+                        this.currentUtterance = null;
+                        
+                        if (retryCount < this.maxRetries) {
+                            // Resetar para auto-seleção
+                            this.settings.voiceIndex = -1;
+                            this.autoSelectVoice();
+                            
+                            setTimeout(() => {
+                                this.speakWithRetry(cleanText, options, retryCount + 1)
+                                    .then(resolve)
+                                    .catch(reject);
+                            }, this.retryDelay);
+                        } else {
+                            reject(new Error('Voz não disponível - máximo de tentativas excedido'));
+                        }
+                        break;
+                        
+                    case 'text-too-long':
+                        console.warn('📝 Texto muito longo. Dividindo em partes menores...');
+                        this.currentUtterance = null;
+                        
+                        // Dividir texto em chunks menores
+                        this.speakInChunks(cleanText, options)
+                            .then(resolve)
+                            .catch(reject);
+                        break;
+                        
+                    case 'rate-not-supported':
+                        console.warn('⚡ Taxa de velocidade não suportada. Usando velocidade padrão...');
+                        this.currentUtterance = null;
+                        
+                        if (retryCount < this.maxRetries) {
+                            const normalizedOptions = { ...options, rate: 1.0 };
+                            setTimeout(() => {
+                                this.speakWithRetry(cleanText, normalizedOptions, retryCount + 1)
+                                    .then(resolve)
+                                    .catch(reject);
+                            }, this.retryDelay);
+                        } else {
+                            reject(new Error('Taxa de velocidade não suportada - máximo de tentativas excedido'));
+                        }
+                        break;
+                        
+                    default:
+                        console.error(`❌ Erro desconhecido na síntese de voz: ${event.error}`);
+                        this.currentUtterance = null;
+                        reject(new Error(`TTS Error: ${event.error}`));
+                        break;
                 }
-            };
+            });
 
             // Iniciar fala
             this.synth.speak(this.currentUtterance);
@@ -218,6 +435,43 @@ class JarvisTTS {
             // Remover quebras de linha
             .replace(/\n/g, ' ')
             .trim();
+    }
+
+    async speakInChunks(text, options = {}) {
+        const maxChunkLength = 200; // Limite de caracteres por chunk
+        const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+        const chunks = [];
+        
+        let currentChunk = '';
+        
+        for (const sentence of sentences) {
+            const trimmedSentence = sentence.trim();
+            if (currentChunk.length + trimmedSentence.length + 1 <= maxChunkLength) {
+                currentChunk += (currentChunk ? '. ' : '') + trimmedSentence;
+            } else {
+                if (currentChunk) {
+                    chunks.push(currentChunk + '.');
+                }
+                currentChunk = trimmedSentence;
+            }
+        }
+        
+        if (currentChunk) {
+            chunks.push(currentChunk + '.');
+        }
+        
+        console.log(`📝 Dividindo texto em ${chunks.length} partes`);
+        
+        // Falar cada chunk sequencialmente
+        for (let i = 0; i < chunks.length; i++) {
+            console.log(`🗣️ Falando parte ${i + 1}/${chunks.length}`);
+            await this.speak(chunks[i], options);
+            
+            // Pequena pausa entre chunks
+            if (i < chunks.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+        }
     }
 
     stop() {
@@ -304,12 +558,7 @@ class JarvisTTS {
                 '❌ Cancelar'
             ];
             
-            const choice = prompt(`Configurações do Jarvis:\
-\
-${options.map((opt, i) => `${i + 1}. ${opt}`).join('\
-')}\
-\
-Escolha uma opção (1-${options.length}):`);
+            const choice = prompt(`Configurações do Jarvis:\n\n${options.map((opt, i) => `${i + 1}. ${opt}`).join('\n')}\n\nEscolha uma opção (1-${options.length}):`);
             
             switch(choice) {
                 case '1':
@@ -352,12 +601,7 @@ Escolha uma opção (1-${options.length}):`);
             '❌ Voltar'
         ];
         
-        const choice = prompt(`Configurações de Voz:\
-\
-${settings.map((opt, i) => `${i + 1}. ${opt}`).join('\
-')}\
-\
-Escolha uma opção (1-${settings.length}):`);
+        const choice = prompt(`Configurações de Voz:\n\n${settings.map((opt, i) => `${i + 1}. ${opt}`).join('\n')}\n\nEscolha uma opção (1-${settings.length}):`);
         
         switch(choice) {
             case '1':
@@ -393,12 +637,7 @@ Escolha uma opção (1-${settings.length}):`);
             `${index + 1}. ${voice.name} (${voice.lang})${voice.default ? ' [Padrão]' : ''}`
         );
         
-        const choice = prompt(`Selecione uma voz:\
-\
-${voiceOptions.join('\
-')}\
-\
-Digite o número da voz (1-${this.voices.length}):`);
+        const choice = prompt(`Selecione uma voz:\n\n${voiceOptions.join('\n')}\n\nDigite o número da voz (1-${this.voices.length}):`);
         
         const voiceIndex = parseInt(choice) - 1;
         if (voiceIndex >= 0 && voiceIndex < this.voices.length) {
@@ -410,11 +649,7 @@ Digite o número da voz (1-${this.voices.length}):`);
     }
 
     adjustRate() {
-        const newRate = prompt(`Velocidade da fala (0.1 - 2.0):\
-\
-Atual: ${this.settings.rate}\
-\
-Digite a nova velocidade:`, this.settings.rate);
+        const newRate = prompt(`Velocidade da fala (0.1 - 2.0):\n\nAtual: ${this.settings.rate}\n\nDigite a nova velocidade:`, this.settings.rate);
         const rate = parseFloat(newRate);
         
         if (!isNaN(rate) && rate >= 0.1 && rate <= 2.0) {
@@ -428,11 +663,7 @@ Digite a nova velocidade:`, this.settings.rate);
     }
 
     adjustPitch() {
-        const newPitch = prompt(`Tom da voz (0.0 - 2.0):\
-\
-Atual: ${this.settings.pitch}\
-\
-Digite o novo tom:`, this.settings.pitch);
+        const newPitch = prompt(`Tom da voz (0.0 - 2.0):\n\nAtual: ${this.settings.pitch}\n\nDigite o novo tom:`, this.settings.pitch);
         const pitch = parseFloat(newPitch);
         
         if (!isNaN(pitch) && pitch >= 0.0 && pitch <= 2.0) {
@@ -446,11 +677,7 @@ Digite o novo tom:`, this.settings.pitch);
     }
 
     adjustVolume() {
-        const newVolume = prompt(`Volume da voz (0.0 - 1.0):\
-\
-Atual: ${this.settings.volume}\
-\
-Digite o novo volume:`, this.settings.volume);
+        const newVolume = prompt(`Volume da voz (0.0 - 1.0):\n\nAtual: ${this.settings.volume}\n\nDigite o novo volume:`, this.settings.volume);
         const volume = parseFloat(newVolume);
         
         if (!isNaN(volume) && volume >= 0.0 && volume <= 1.0) {
@@ -493,7 +720,87 @@ Digite o novo volume:`, this.settings.volume);
         ];
         
         const randomPhrase = testPhrases[Math.floor(Math.random() * testPhrases.length)];
-        this.speak(randomPhrase);
+        this.speak(randomPhrase)
+            .then(() => {
+                console.log('✅ Teste TTS concluído com sucesso');
+            })
+            .catch((error) => {
+                console.error('❌ Falha no teste TTS:', error);
+                this.diagnoseTTSIssues();
+            });
+    }
+
+    diagnoseTTSIssues() {
+        console.log('🔍 Iniciando diagnóstico do sistema TTS...');
+        
+        const diagnostics = {
+            speechSynthesisSupported: 'speechSynthesis' in window,
+            voicesAvailable: this.voices.length,
+            currentVoice: this.voices[this.settings.voiceIndex]?.name || 'Nenhuma',
+            isUnlocked: this.isUnlocked,
+            isEnabled: this.isEnabled,
+            isSpeaking: this.synth.speaking,
+            isPaused: this.synth.paused,
+            settings: this.settings
+        };
+        
+        console.table(diagnostics);
+        
+        // Sugestões baseadas no diagnóstico
+        const suggestions = [];
+        
+        if (!diagnostics.speechSynthesisSupported) {
+            suggestions.push('❌ Navegador não suporta Web Speech API');
+        }
+        
+        if (diagnostics.voicesAvailable === 0) {
+            suggestions.push('🎤 Nenhuma voz disponível - recarregue a página');
+        }
+        
+        if (!diagnostics.isUnlocked) {
+            suggestions.push('🔒 Sistema TTS não foi desbloqueado - clique em qualquer lugar da página');
+        }
+        
+        if (!diagnostics.isEnabled) {
+            suggestions.push('🔇 TTS está desabilitado - ative nas configurações');
+        }
+        
+        if (diagnostics.isSpeaking) {
+            suggestions.push('🗣️ Sistema já está falando - aguarde ou pare a fala atual');
+        }
+        
+        if (suggestions.length > 0) {
+            console.warn('💡 Sugestões para resolver problemas TTS:');
+            suggestions.forEach(suggestion => console.warn(suggestion));
+        } else {
+            console.log('✅ Sistema TTS parece estar funcionando corretamente');
+        }
+        
+        return diagnostics;
+    }
+
+    // Método para recuperação automática de erros
+    async recoverFromError() {
+        console.log('🔄 Tentando recuperar sistema TTS...');
+        
+        // Parar qualquer síntese em andamento
+        this.stop();
+        
+        // Recarregar vozes
+        this.loadVoices();
+        
+        // Auto-selecionar voz novamente
+        this.autoSelectVoice();
+        
+        // Tentar um teste simples
+        try {
+            await this.speak('Sistema recuperado');
+            console.log('✅ Sistema TTS recuperado com sucesso');
+            return true;
+        } catch (error) {
+            console.error('❌ Falha na recuperação do sistema TTS:', error);
+            return false;
+        }
     }
 
     // Método público para ser chamado pelo main.js
