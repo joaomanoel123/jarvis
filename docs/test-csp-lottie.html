@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste CSP - Animações Lottie</title>
+    
+    <!-- CSP Atualizado -->
+    <meta http-equiv="Content-Security-Policy" 
+      content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://unpkg.com;
+        connect-src 'self' https://assets1.lottiefiles.com https://assets2.lottiefiles.com https://lottie.host;
+        img-src 'self' data: https: https://assets1.lottiefiles.com https://assets2.lottiefiles.com https://lottie.host;
+      ">
+    
+    <style>
+        body {
+            background: #000;
+            color: #00d4ff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 2px solid #00d4ff;
+            border-radius: 10px;
+            background: rgba(0, 212, 255, 0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #00d4ff;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success { background: rgba(0, 255, 0, 0.2); color: #00ff00; }
+        .error { background: rgba(255, 0, 0, 0.2); color: #ff4444; }
+        .warning { background: rgba(255, 170, 0, 0.2); color: #ffaa44; }
+        .info { background: rgba(0, 212, 255, 0.2); color: #00d4ff; }
+        
+        lottie-player {
+            border: 2px solid #00d4ff;
+            border-radius: 10px;
+            margin: 10px;
+        }
+        
+        button {
+            background: #111;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: rgba(0, 212, 255, 0.2);
+        }
+        
+        .log-area {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00d4ff;
+            color: #00ff00;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 Teste CSP - Animações Lottie</h1>
+        <p>Verificação se as animações Lottie carregam corretamente com o CSP atualizado</p>
+        
+        <div class="status info" id="status">
+            ⏳ Carregando testes...
+        </div>
+        
+        <div class="test-section">
+            <h3>🎭 Animações do Jarvis</h3>
+            
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                <div>
+                    <h4>👤 Face Auth</h4>
+                    <lottie-player 
+                        id="faceAuth"
+                        src="https://assets2.lottiefiles.com/temp/lf20_XcJCfR.json"
+                        background="transparent" 
+                        speed="1" 
+                        style="width: 200px; height: 200px;" 
+                        loop 
+                        autoplay>
+                    </lottie-player>
+                    <div class="status info" id="status1">Carregando...</div>
+                </div>
+                
+                <div>
+                    <h4>✅ Auth Success</h4>
+                    <lottie-player 
+                        id="authSuccess"
+                        src="https://assets1.lottiefiles.com/packages/lf20_lk80fpsm.json"
+                        background="transparent" 
+                        speed="1" 
+                        style="width: 200px; height: 200px;" 
+                        loop 
+                        autoplay>
+                    </lottie-player>
+                    <div class="status info" id="status2">Carregando...</div>
+                </div>
+                
+                <div>
+                    <h4>👋 Hello Greet</h4>
+                    <lottie-player 
+                        id="helloGreet"
+                        src="https://lottie.host/f60d18d4-5199-412c-b687-e5e63ae38f75/CoqjMcJIx0.json"
+                        background="transparent" 
+                        speed="1" 
+                        style="width: 200px; height: 200px;" 
+                        loop 
+                        autoplay>
+                    </lottie-player>
+                    <div class="status info" id="status3">Carregando...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔍 Controles de Teste</h3>
+            <button onclick="testAllAnimations()">🧪 Testar Todas</button>
+            <button onclick="checkCSPErrors()">🔒 Verificar CSP</button>
+            <button onclick="reloadAnimations()">🔄 Recarregar</button>
+            <button onclick="clearLog()">🧹 Limpar Log</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>📝 Log de Eventos</h3>
+            <div class="log-area" id="logArea">
+                === Log de Teste CSP - Lottie ===
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Resultados</h3>
+            <div id="results">
+                <div class="status info">Aguardando testes...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lottie Player -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    
+    <script>
+        let testResults = {
+            faceAuth: false,
+            authSuccess: false,
+            helloGreet: false,
+            cspErrors: []
+        };
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logArea = document.getElementById('logArea');
+            const color = type === 'error' ? '#ff4444' : type === 'success' ? '#44ff44' : type === 'warning' ? '#ffaa44' : '#00d4ff';
+            
+            logArea.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logArea.scrollTop = logArea.scrollHeight;
+            
+            console.log(`[CSP Test] ${message}`);
+        }
+        
+        function updateStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+        
+        function updateAnimationStatus(id, message, type = 'info') {
+            const statusEl = document.getElementById(id);
+            if (statusEl) {
+                statusEl.textContent = message;
+                statusEl.className = `status ${type}`;
+            }
+        }
+        
+        // Capturar erros CSP
+        window.addEventListener('error', function(e) {
+            if (e.message && e.message.includes('Content Security Policy')) {
+                testResults.cspErrors.push(e.message);
+                log(`❌ Erro CSP: ${e.message}`, 'error');
+            }
+        });
+        
+        // Capturar erros de console
+        const originalConsoleError = console.error;
+        console.error = function(...args) {
+            const message = args.join(' ');
+            if (message.includes('Content Security Policy') || message.includes('Refused to connect')) {
+                testResults.cspErrors.push(message);
+                log(`❌ Console Error: ${message}`, 'error');
+            }
+            originalConsoleError.apply(console, args);
+        };
+        
+        // Monitorar carregamento das animações
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Iniciando testes CSP para animações Lottie...');
+            
+            // Configurar listeners para cada animação
+            setupAnimationListeners();
+            
+            // Iniciar teste automático após 3 segundos
+            setTimeout(() => {
+                testAllAnimations();
+            }, 3000);
+        });
+        
+        function setupAnimationListeners() {
+            const animations = [
+                { id: 'faceAuth', name: 'Face Auth', key: 'faceAuth' },
+                { id: 'authSuccess', name: 'Auth Success', key: 'authSuccess' },
+                { id: 'helloGreet', name: 'Hello Greet', key: 'helloGreet' }
+            ];
+            
+            animations.forEach(anim => {
+                const player = document.getElementById(anim.id);
+                if (player) {
+                    player.addEventListener('ready', () => {
+                        log(`✅ ${anim.name}: Carregado com sucesso`, 'success');
+                        testResults[anim.key] = true;
+                        updateAnimationStatus(`status${animations.indexOf(anim) + 1}`, '✅ Carregado', 'success');
+                        updateResults();
+                    });
+                    
+                    player.addEventListener('error', (e) => {
+                        log(`❌ ${anim.name}: Erro ao carregar - ${e.detail || 'Erro desconhecido'}`, 'error');
+                        testResults[anim.key] = false;
+                        updateAnimationStatus(`status${animations.indexOf(anim) + 1}`, '❌ Erro', 'error');
+                        updateResults();
+                    });
+                    
+                    // Timeout para detectar falhas de carregamento
+                    setTimeout(() => {
+                        if (!testResults[anim.key]) {
+                            log(`⚠️ ${anim.name}: Timeout - possível bloqueio CSP`, 'warning');
+                            updateAnimationStatus(`status${animations.indexOf(anim) + 1}`, '⚠️ Timeout', 'warning');
+                        }
+                    }, 10000);
+                }
+            });
+        }
+        
+        function testAllAnimations() {
+            log('🧪 Executando teste completo das animações...');
+            updateStatus('🧪 Testando animações...', 'info');
+            
+            // Reset dos resultados
+            testResults = {
+                faceAuth: false,
+                authSuccess: false,
+                helloGreet: false,
+                cspErrors: []
+            };
+            
+            // Aguardar 5 segundos para verificar resultados
+            setTimeout(() => {
+                const totalAnimations = 3;
+                const loadedAnimations = Object.values(testResults).filter(v => v === true).length;
+                
+                if (loadedAnimations === totalAnimations && testResults.cspErrors.length === 0) {
+                    log(`🎉 SUCESSO: Todas as ${totalAnimations} animações carregaram sem erros CSP!`, 'success');
+                    updateStatus('🎉 Teste bem-sucedido!', 'success');
+                } else if (testResults.cspErrors.length > 0) {
+                    log(`❌ FALHA: ${testResults.cspErrors.length} erros CSP detectados`, 'error');
+                    updateStatus('❌ Erros CSP detectados', 'error');
+                } else {
+                    log(`⚠️ PARCIAL: ${loadedAnimations}/${totalAnimations} animações carregaram`, 'warning');
+                    updateStatus('⚠️ Carregamento parcial', 'warning');
+                }
+                
+                updateResults();
+            }, 5000);
+        }
+        
+        function checkCSPErrors() {
+            log('🔒 Verificando erros CSP...');
+            
+            if (testResults.cspErrors.length === 0) {
+                log('✅ Nenhum erro CSP detectado!', 'success');
+                updateStatus('✅ CSP funcionando corretamente', 'success');
+            } else {
+                log(`❌ ${testResults.cspErrors.length} erros CSP encontrados:`, 'error');
+                testResults.cspErrors.forEach((error, index) => {
+                    log(`   ${index + 1}. ${error}`, 'error');
+                });
+                updateStatus('❌ Erros CSP encontrados', 'error');
+            }
+        }
+        
+        function reloadAnimations() {
+            log('🔄 Recarregando animações...');
+            updateStatus('🔄 Recarregando...', 'info');
+            
+            // Recarregar cada animação
+            const players = document.querySelectorAll('lottie-player');
+            players.forEach((player, index) => {
+                const src = player.getAttribute('src');
+                player.load(src);
+                updateAnimationStatus(`status${index + 1}`, 'Recarregando...', 'info');
+            });
+            
+            // Reset dos resultados
+            testResults.faceAuth = false;
+            testResults.authSuccess = false;
+            testResults.helloGreet = false;
+            
+            setTimeout(() => {
+                testAllAnimations();
+            }, 2000);
+        }
+        
+        function clearLog() {
+            document.getElementById('logArea').innerHTML = '=== Log de Teste CSP - Lottie ===';
+            log('🧹 Log limpo');
+        }
+        
+        function updateResults() {
+            const resultsDiv = document.getElementById('results');
+            const totalAnimations = 3;
+            const loadedAnimations = Object.values(testResults).filter(v => v === true).length;
+            
+            let html = '<h4>📊 Resumo dos Resultados:</h4>';
+            html += `<div class="status ${loadedAnimations === totalAnimations ? 'success' : 'warning'}">`;
+            html += `Animações carregadas: ${loadedAnimations}/${totalAnimations}</div>`;
+            
+            html += `<div class="status ${testResults.cspErrors.length === 0 ? 'success' : 'error'}">`;
+            html += `Erros CSP: ${testResults.cspErrors.length}</div>`;
+            
+            html += '<h5>Detalhes por animação:</h5>';
+            html += `<div class="status ${testResults.faceAuth ? 'success' : 'error'}">👤 Face Auth: ${testResults.faceAuth ? '✅' : '❌'}</div>`;
+            html += `<div class="status ${testResults.authSuccess ? 'success' : 'error'}">✅ Auth Success: ${testResults.authSuccess ? '✅' : '❌'}</div>`;
+            html += `<div class="status ${testResults.helloGreet ? 'success' : 'error'}">👋 Hello Greet: ${testResults.helloGreet ? '✅' : '❌'}</div>`;
+            
+            if (loadedAnimations === totalAnimations && testResults.cspErrors.length === 0) {
+                html += '<div class="status success">🎉 CSP configurado corretamente! Todas as animações funcionam.</div>';
+            } else if (testResults.cspErrors.length > 0) {
+                html += '<div class="status error">🔒 CSP precisa ser ajustado. Verifique os domínios bloqueados.</div>';
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Inicializar
+        log('📋 Teste CSP iniciado. Aguardando carregamento das animações...');
+        updateStatus('📋 Teste iniciado...', 'info');
+    </script>
+</body>
+</html>
