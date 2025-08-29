@@ -38,7 +38,7 @@
    <meta http-equiv="Content-Security-Policy" 
       content="
         default-src 'self';
-        script-src 'self' 'unsafe-inline' https://code.jquery.com https://cdn.jsdelivr.net https://translate.googleapis.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://unpkg.com https://assets1.lottiefiles.com https://assets2.lottiefiles.com https://lottie.host;
+        script-src 'self' 'unsafe-inline' https://code.jquery.com https://cdn.jsdelivr.net https://translate.googleapis.com https://www.gstatic.com https://cdnjs.cloudflare.com https://ajax.googleapis.com https://unpkg.com;
         style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://www.gstatic.com https://cdnjs.cloudflare.com;
         style-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://www.gstatic.com https://cdnjs.cloudflare.com;
         font-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com;
@@ -297,18 +297,17 @@
 
                             </div>
                             <div id="FaceAuth" class="mb-4" hidden>
-                                <lottie-player src="https://assets2.lottiefiles.com/temp/lf20_XcJCfR.json"
+                                <lottie-player src="assets/lottie/face-auth.json"
                                     background="transparent" speed="1" style="width: 300px; height: 300px;" loop
                                     autoplay></lottie-player>
                             </div>
                             <div id="FaceAuthSuccess" class="mb-4" hidden>
-                                <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_lk80fpsm.json"
+                                <lottie-player src="assets/lottie/success.json"
                                     background="transparent" speed="1" style="width: 300px; height: 300px;" loop
                                     autoplay></lottie-player>
                             </div>
                             <div id="HelloGreet" class="mb-4" hidden>
-                                <lottie-player
-                                    src="https://lottie.host/f60d18d4-5199-412c-b687-e5e63ae38f75/CoqjMcJIx0.json"
+                                <lottie-player src="assets/lottie/hello-greet.json"
                                     background="transparent" speed="1" style="width: 300px; height: 300px;" loop
                                     autoplay></lottie-player>
                             </div>
@@ -415,8 +414,8 @@
     <!-- Siri wave -->
     <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
 
-    <!-- Lottie files -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <!-- Lottie files (local) -->
+    <script src="js/lottie-player.js"></script>
 
     <!-- Error handling for missing scripts -->
     <script>
