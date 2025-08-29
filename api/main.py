@@ -10,12 +10,25 @@ from typing import Optional
 app = FastAPI(title="Jarvis API", version="1.0.0")
 
 # CORS - Configurado para GitHub Pages
-origins = os.getenv("CORS_ORIGINS", "*").split(",")
+default_origins = [
+    "https://joaomanoel123.github.io",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000"
+]
+
+# Permitir origens customizadas via env var, mas sempre incluir as padrões
+custom_origins = os.getenv("CORS_ORIGINS", "").split(",") if os.getenv("CORS_ORIGINS") else []
+origins = list(set(default_origins + [origin.strip() for origin in custom_origins if origin.strip()]))
+
+print(f"🔒 CORS Origins configuradas: {origins}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
