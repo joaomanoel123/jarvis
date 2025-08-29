@@ -1,19 +1,16 @@
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background-color: #000000; /* fundo escuro */
-}
-
-#particles-js {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  z-index: -1; /* fica no fundo */
-  top: 0;
-  left: 0;
+body{
+    background-color: black;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .square{
@@ -186,19 +183,11 @@ body, html {
   
   /* Input Filed End*/
 
-  
   /* Chat Box Start */
 
 .chat-canvas{
   background-color: #191919
 }
-
-#siri-container {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
 
 .receiver_message{
   padding: 8px;
@@ -231,8 +220,6 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: change-view 2s ease-in infinite;
-  max-width: 90vw;
 }
 
 @keyframes change-view {
@@ -244,243 +231,7 @@ body, html {
 
   70%,
   100% {
-    transform: rotate(-80deg) skew(30deg) translateX(calc(25px * var(--i))) translateY(calc(-20px * var(--i)));
-  }
-}
-
-/* ========================================
-   RESPONSIVIDADE MOBILE - JARVIS
-   ======================================== */
-
-/* Mobile Small (até 480px) */
-@media (max-width: 480px) {
-  body {
-    padding: 0;
-    margin: 0;
-    overflow-x: hidden;
-  }
-  
-  .container {
-    padding: 10px !important;
-  }
-  
-  /* Animações do Jarvis - Mobile */
-  .square { 
-    width: 250px; 
-    height: 250px; 
-    margin: 0 auto;
-  }
-  
-  .svg-frame { 
-    width: 280px; 
-    height: 280px;
-    margin: 0 auto;
-  }
-  
-  /* Input e controles - Mobile */
-  #TextInput { 
-    margin: 5px 10px;
-    padding: 8px 12px;
-    border-radius: 12px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  
-  .input-field {
-    width: 100%;
-    min-width: 200px;
-    font-size: 16px;
-    padding: 8px 0;
-  }
-  
-  .glow-on-hover { 
-    width: 45px; 
-    height: 45px;
-    margin: 2px;
-    border-radius: 12px;
-    font-size: 18px;
-    /* Melhor área de toque */
-    min-width: 44px;
-    min-height: 44px;
-  }
-  
-  /* Mensagens - Mobile */
-  .siri-message { 
-    font-size: 18px !important;
-    line-height: 1.4;
-    padding: 0 15px;
-    text-align: center;
-  }
-  
-  #WishMessage {
-    font-size: 16px;
-    line-height: 1.5;
-    padding: 0 20px;
-    word-wrap: break-word;
-  }
-  
-  /* SiriWave container - Mobile */
-  #siri-container {
-    width: 95%;
-    max-width: 350px;
-    height: 120px;
-  }
-  
-  /* Lottie animations - Mobile */
-  lottie-player {
-    width: 250px !important;
-    height: 250px !important;
-    margin: 0 auto;
-  }
-  
-  /* Chat canvas - Mobile */
-  .chat-canvas {
-    width: 100% !important;
-  }
-  
-  .offcanvas {
-    width: 85% !important;
-  }
-  
-  /* Altura das seções - Mobile */
-  .d-flex[style*="height: 80vh"] {
-    height: 70vh !important;
-  }
-  
-  .d-flex[style*="height: 100vh"] {
-    height: 90vh !important;
-  }
-}
-
-/* Mobile Medium (481px - 768px) */
-@media (min-width: 481px) and (max-width: 768px) {
-  .square { 
-    width: 320px; 
-    height: 320px; 
-  }
-  
-  .svg-frame { 
-    width: 350px; 
-    height: 350px;
-  }
-  
-  #TextInput { 
-    margin: 10px 15px;
-    padding: 10px 15px;
-  }
-  
-  .glow-on-hover { 
-    width: 42px; 
-    height: 42px;
-  }
-  
-  .siri-message { 
-    font-size: 22px !important;
-  }
-  
-  #siri-container {
-    max-width: 500px;
-    height: 140px;
-  }
-  
-  lottie-player {
-    width: 280px !important;
-    height: 280px !important;
-  }
-}
-
-/* Tablet (769px - 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .square { 
-    width: 380px; 
-    height: 380px; 
-  }
-  
-  .svg-frame { 
-    width: 420px; 
-    height: 420px;
-  }
-  
-  #TextInput { 
-    margin: 0px 15%;
-    padding: 8px 15px;
-  }
-  
-  .glow-on-hover { 
-    width: 38px; 
-    height: 38px;
-  }
-  
-  .siri-message { 
-    font-size: 26px !important;
-  }
-}
-
-/* Orientação landscape em mobile */
-@media (max-width: 768px) and (orientation: landscape) {
-  .d-flex[style*="height: 80vh"] {
-    height: 85vh !important;
-  }
-  
-  .d-flex[style*="height: 100vh"] {
-    height: 95vh !important;
-  }
-  
-  .square { 
-    width: 200px; 
-    height: 200px; 
-  }
-  
-  .svg-frame { 
-    width: 220px; 
-    height: 220px;
-  }
-  
-  lottie-player {
-    width: 200px !important;
-    height: 200px !important;
-  }
-}
-
-/* Touch improvements para todos os dispositivos móveis */
-@media (max-width: 1024px) {
-  /* Melhor área de toque */
-  button, .glow-on-hover {
-    min-width: 44px;
-    min-height: 44px;
-    touch-action: manipulation;
-  }
-  
-  /* Remover hover effects em touch devices */
-  .glow-on-hover:hover:before {
-    opacity: 0;
-  }
-  
-  /* Melhor feedback visual para touch */
-  .glow-on-hover:active {
-    transform: scale(0.95);
-    transition: transform 0.1s;
-  }
-  
-  /* Input mais amigável ao touch */
-  .input-field {
-    font-size: 16px; /* Previne zoom no iOS */
-    line-height: 1.5;
-  }
-  
-  /* Scroll suave */
-  body {
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-  }
-  
-  /* Prevenir seleção acidental */
-  .svg-frame, .square {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
+    transform: rotate(-80deg) skew(30deg) translateX(calc(45px * var(--i))) translateY(calc(-35px * var(--i)));
   }
 }
 
@@ -488,30 +239,11 @@ svg {
   position: absolute;
   transition: 0.5s;
   transform-origin: center;
-  width: 90vw;
-  max-width: 450px;
-  height: auto;
-  aspect-ratio: 1 / 1;
+  width: 450px;
+  height: 450px;
   fill: none;
   animation: change-view 5s ease-in-out infinite alternate;
   filter: drop-shadow(0 0 12px #00aaff);
-}
-
-/* SVG responsivo para mobile */
-@media (max-width: 480px) {
-  svg {
-    width: 85vw;
-    max-width: 280px;
-    filter: drop-shadow(0 0 8px #00aaff);
-  }
-}
-
-@media (min-width: 481px) and (max-width: 768px) {
-  svg {
-    width: 80vw;
-    max-width: 350px;
-    filter: drop-shadow(0 0 10px #00aaff);
-  }
 }
 
 #big-centro,
@@ -554,4 +286,164 @@ svg {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .square {
+        width: 280px;
+        height: 280px;
+    }
+    
+    .svg-frame {
+        width: 320px !important;
+        height: 320px !important;
+    }
+    
+    svg {
+        width: 300px !important;
+        height: 300px !important;
+    }
+    
+    #TextInput {
+        margin: 0px 5% !important;
+        padding: 8px 0px 8px 15px !important;
+    }
+    
+    .glow-on-hover {
+        width: 40px !important;
+        height: 40px !important;
+        margin-left: 8px !important;
+    }
+    
+    .input-field {
+        font-size: 16px;
+    }
+    
+    h1#WishMessage {
+        font-size: 1.5rem !important;
+    }
+    
+    h5 {
+        font-size: 1rem !important;
+    }
+    
+    .container {
+        padding: 0 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .square {
+        width: 220px;
+        height: 220px;
+    }
+    
+    .svg-frame {
+        width: 250px !important;
+        height: 250px !important;
+    }
+    
+    svg {
+        width: 230px !important;
+        height: 230px !important;
+    }
+    
+    #TextInput {
+        margin: 0px 2% !important;
+        padding: 10px !important;
+    }
+    
+    .input-field {
+        width: 90% !important;
+        font-size: 16px;
+        text-align: center;
+    }
+    
+    .glow-on-hover {
+        margin: 2px !important;
+        width: 38px !important;
+        height: 38px !important;
+    }
+    
+    h1#WishMessage {
+        font-size: 1.2rem !important;
+        padding: 0 10px;
+    }
+    
+    .d-flex {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    .glow-on-hover {
+        width: 45px !important;
+        height: 45px !important;
+    }
+    
+    .input-field {
+        font-size: 16px !important;
+        padding: 10px;
+    }
+    
+    #TextInput {
+        padding: 10px 15px !important;
+    }
+}
+
+/* Additional mobile optimizations */
+.glow-on-hover {
+    transition: transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.glow-on-hover:active {
+    transform: scale(0.95);
+}
+
+
+
+/* Allow text selection only in input fields */
+.input-field {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* Improve scrolling on mobile */
+body {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Fix viewport issues on mobile */
+@supports (-webkit-touch-callout: none) {
+    body {
+        height: -webkit-fill-available;
+    }
+}
+
+/* Landscape mode adjustments */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    .square {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .svg-frame {
+        width: 220px !important;
+        height: 220px !important;
+    }
+    
+    svg {
+        width: 200px !important;
+        height: 200px !important;
+    }
+    
+    h1#WishMessage {
+        font-size: 1rem !important;
+    }
 }

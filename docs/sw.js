@@ -1,38 +1,52 @@
-// Service Worker for Jarvis PWA
 const CACHE_NAME = 'jarvis-v1';
-const BASE_PATH = '/jarvis';
-
 const urlsToCache = [
-    `${BASE_PATH}/`,
-    `${BASE_PATH}/index.html`,
-    `${BASE_PATH}/style.css`,
-    `${BASE_PATH}/manifest.json`,
-    `${BASE_PATH}/main-github-pages.js`,
-    `${BASE_PATH}/jarvis-tts.js`,
-    `${BASE_PATH}/jarvis-google-tts.js`,
-    `${BASE_PATH}/jarvis-speech-recognition.js`,
-    `${BASE_PATH}/controller.js`,
-    `${BASE_PATH}/core/core.js`,
-    `${BASE_PATH}/eel.js`
+  './',
+  './index.html',
+  './style.css',
+  './manifest.json',
+  './assets/img/logo.ico',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css',
+  'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css',
+  'https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js',
+  'https://unpkg.com/siriwave/dist/siriwave.umd.min.js',
+  'https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js'
 ];
 
 self.addEventListener('install', function(event) {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(function(cache) {
-                console.log('Cache opened');
-                return cache.addAll(urlsToCache);
-            })
-    );
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
+      })
+  );
 });
 
 self.addEventListener('fetch', function(event) {
-    event.respondWith(
-        caches.match(event.request)
-            .then(function(response) {
-                // Return cached version or fetch from network
-                return response || fetch(event.request);
-            }
-        )
-    );
+  event.respondWith(
+    caches.match(event.request)
+      .then(function(response) {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      }
+    )
+  );
+});
+
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
 });
