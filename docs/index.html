@@ -424,7 +424,7 @@
     </div>
 
     <!-- Scripts -->
-    <!-- jQuery -->
+    <!-- jQuery (dependência para Bootstrap e UI) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <!-- Bootstrap -->
@@ -432,19 +432,12 @@
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
 
-    <!-- SiriWave -->
+    <!-- Bibliotecas de Animação -->
     <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
-
-    <!-- Textillate.js (com dependências) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lettering.js/0.7.0/jquery.lettering.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/textillate/0.4.0/jquery.textillate.min.js"></script>
-
-    <!-- Lottie Files -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-    <!-- Main Scripts (ajustados para GitHub Pages) -->
-    <script src="main.js"></script>
-    <script src="controller.js" onerror="console.warn('controller.js not found')"></script>
+    <!-- Ponto de Entrada da Aplicação JARVIS (Modular) -->
+    <script type="module" src="main.js"></script>
 
     <!-- Service Worker Registration -->
     <script>
