@@ -1,1 +1,5 @@
-2025-08-11-13-00-loading-fix"
+Cache buster: 2025-08-29-09:41:35
+Deploy timestamp: Fri, 29 Aug 2025 09:41:11 GMT
+Status: Jarvis funcionando corretamente
+Lottie: Local e funcionando
+API: jarvis-tdgt.onrender.com conectada
