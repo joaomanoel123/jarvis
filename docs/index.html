@@ -448,8 +448,11 @@
     <!-- Jarvis Text-to-Speech -->
     <script src="jarvis-tts.js"></script>
     
-    <!-- Ponto de Entrada da Aplicação JARVIS (GitHub Pages) -->
-    <script src="main-github-pages.js"></script>
+    <!-- Ponto de Entrada da Aplicação JARVIS (Modular ES6) -->
+    <script type="module" src="main.js"></script>
+    
+    <!-- Fallback para navegadores que não suportam módulos ES6 -->
+    <script nomodule src="main-github-pages.js"></script>
 
     <!-- Service Worker Registration -->
     <script>
