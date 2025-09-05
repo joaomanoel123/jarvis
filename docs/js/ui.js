@@ -6,7 +6,7 @@
  * Nenhum outro módulo deve interagir diretamente com o HTML.
  */
 
-import { initSiriWave } from './siriwave.js';
+import { initSiriWave } from 'js/siriwave.js';
 
 // Mapeamento dos seletores do DOM para fácil acesso e manutenção
 const SELECTORS = {
