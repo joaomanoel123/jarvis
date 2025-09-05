@@ -432,6 +432,7 @@
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
 
+
     <!-- Bibliotecas de Animação -->
     <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
@@ -447,6 +448,9 @@
     
     <!-- Jarvis Text-to-Speech -->
     <script src="jarvis-tts.js"></script>
+
+    <!--módulo da interface -->
+    <script type="module" src="ui.js"></script>
     
     <!-- Ponto de Entrada da Aplicação JARVIS (Modular ES6) -->
     <script type="module" src="main.js"></script>
@@ -468,19 +472,6 @@
                     });
             });
         }
-
-        // Hide loading screen after page load
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                const loadingScreen = document.getElementById('loadingScreen');
-                if (loadingScreen) {
-                    loadingScreen.classList.add('fade-out');
-                    setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                    }, 500);
-                }
-            }, 1500);
-        });
 
         // Mobile optimizations
         document.addEventListener('DOMContentLoaded', function() {
