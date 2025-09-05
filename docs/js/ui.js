@@ -153,17 +153,14 @@ export function startInitialAnimation() {
 
     // Oculta a tela de loading inicial
     setTimeout(() => {
-        elements.loadingScreen.addClass('fade-out');
+        if (elements.loadingScreen && elements.loadingScreen.length) {
+            elements.loadingScreen.addClass('fade-out');
+            setTimeout(() => {
+                elements.loadingScreen.hide(); // agora some de vez
+            }, 500); // espera a animação terminar
+        }
     }, 500);
-
-    // Sequência de animação da logo
-    const animate = (hideElem, showElem, message, delay) => {
-        return setTimeout(() => {
-            if (hideElem) elements[hideElem].hide();
-            if (showElem) elements[showElem].show();
-            updateWishMessage(message);
-        }, delay);
-    };
+}
 
     animate(null, 'loader', 'Inicializando J.A.R.V.I.S...', 1000);
     animate('loader', 'faceAuth', 'Autenticando...', 4000);
