@@ -473,19 +473,6 @@
             });
         }
 
-        // Hide loading screen after page load
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                const loadingScreen = document.getElementById('loadingScreen');
-                if (loadingScreen) {
-                    loadingScreen.classList.add('fade-out');
-                    setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                    }, 500);
-                }
-            }, 1500);
-        });
-
         // Mobile optimizations
         document.addEventListener('DOMContentLoaded', function() {
             // Prevent zoom on input focus (iOS)
