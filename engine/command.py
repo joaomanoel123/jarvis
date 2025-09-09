@@ -55,8 +55,8 @@ def speak(text):
         try:
             eel.DisplayMessage(text)
             eel.receiverText(text)
-        except:
-            pass  # Ignorar se interface não estiver disponível
+        except Exception as e:
+            print(f"⚠️ Erro ao atualizar a interface com EEL: {e}")
         
         # Falar o texto com tratamento de erro melhorado
         engine.say(text)
@@ -75,8 +75,8 @@ def speak(text):
         try:
             eel.DisplayMessage(text)
             eel.receiverText(text)
-        except:
-            pass
+        except Exception as e_eel:
+            print(f"⚠️ Erro ao atualizar a interface (fallback) com EEL: {e_eel}")
     finally:
         # Garantir limpeza do engine
         if engine:

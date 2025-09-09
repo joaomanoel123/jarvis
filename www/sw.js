@@ -3,7 +3,7 @@
  * Fornece funcionalidades básicas de PWA
  */
 
-const CACHE_NAME = 'jarvis-v1.0.0';
+const CACHE_NAME = 'jarvis-v1.0.1-bootstrap-fix';
 const BASE_PATH = '/jarvis';
 
 // Arquivos essenciais para cache

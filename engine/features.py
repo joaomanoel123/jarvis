@@ -419,10 +419,6 @@ def _try_gemini_library(user_input: str, api_key: str, model_name: str, max_retr
                     response_text = response.text.strip()
                     print(f"✅ {model_name} (biblioteca): Sucesso!")
                     speak(response_text)
-                    try:
-                        eel.receiverText(response_text)
-                    except:
-                        pass
                     return response_text
                 else:
                     print(f"  ⚠️ Resposta vazia do {model_name}")
@@ -485,10 +481,6 @@ def _try_gemini_rest_api(user_input: str, api_key: str, model_name: str, max_ret
                     response_text = response_data["candidates"][0]["content"]["parts"][0]["text"]
                     print(f"✅ {model_name} (REST): Sucesso!")
                     speak(response_text)
-                    try:
-                        eel.receiverText(response_text)
-                    except:
-                        pass
                     return response_text
                 else:
                     print(f"  ⚠️ Resposta vazia do {model_name}")
@@ -545,20 +537,12 @@ def _fallback_response(user_input: str):
         if key in user_lower:
             print(f"💬 Resposta local: {response}")
             speak(response)
-            try:
-                eel.receiverText(response)
-            except:
-                pass
             return response
     
     # Resposta padrão
     default_msg = "Desculpe, o serviço de IA está temporariamente indisponível. Tente novamente em alguns minutos ou use comandos específicos como 'abrir navegador' ou 'pesquisar no Google'."
     print(f"⚠️ Fallback: {default_msg}")
-    speak("Desculpe, o serviço de inteligência artificial está temporariamente indisponível. Tente novamente em alguns minutos.")
-    try:
-        eel.receiverText(default_msg)
-    except:
-        pass
+    speak(default_msg)
     return default_msg
 
 def chatBot(query: str):
