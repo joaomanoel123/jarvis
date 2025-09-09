@@ -3,7 +3,7 @@
  * Fornece funcionalidades básicas de PWA
  */
 
-const CACHE_NAME = 'jarvis-v1.0.1-bootstrap-fix';
+const CACHE_NAME = 'jarvis-v1.0.2-bootstrap-5.3.8-fix';
 const BASE_PATH = '/jarvis';
 
 // Arquivos essenciais para cache
@@ -23,7 +23,7 @@ const ESSENTIAL_FILES = [
 // Recursos externos importantes
 const EXTERNAL_RESOURCES = [
     'https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js',
-    'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css',
+    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css',
     'https://unpkg.com/siriwave/dist/siriwave.umd.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css'

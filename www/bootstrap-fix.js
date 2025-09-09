@@ -9,9 +9,9 @@
     console.log('🔧 Bootstrap Fix: Iniciando verificação...');
     
     // Configuração
-    const CORRECT_BOOTSTRAP_VERSION = '5.0.2';
+    const CORRECT_BOOTSTRAP_VERSION = '5.3.8';
     const CORRECT_BOOTSTRAP_URL = `https://cdn.jsdelivr.net/npm/bootstrap@${CORRECT_BOOTSTRAP_VERSION}/dist/css/bootstrap.min.css`;
-    const CORRECT_INTEGRITY = 'sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC';
+    const CORRECT_INTEGRITY = 'sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB';
     
     // Função para detectar problemas do Bootstrap
     function detectBootstrapIssues() {
