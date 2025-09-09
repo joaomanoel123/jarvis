@@ -3,7 +3,7 @@
  * Fornece funcionalidades básicas de PWA
  */
 
-const CACHE_NAME = 'jarvis-v1.0.3-ui-js-404-fix';
+const CACHE_NAME = 'jarvis-v1.0.4-missing-files-fix';
 const BASE_PATH = '/jarvis';
 
 // Arquivos essenciais para cache
@@ -16,6 +16,7 @@ const ESSENTIAL_FILES = [
     `${BASE_PATH}/jarvis-tts.js`,
     `${BASE_PATH}/jarvis-speech-recognition.js`,
     `${BASE_PATH}/main-github-pages-fixed.js`,
+    `${BASE_PATH}/main.js`,
     `${BASE_PATH}/controller.js`,
     `${BASE_PATH}/ui.js`,
     `${BASE_PATH}/assets/img/logo.ico`
