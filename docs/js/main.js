@@ -153,6 +153,11 @@ $(document).ready(function () {
     });
 
 
+// Configuração do particles.js sem inline
+  particlesJS.load('particles-js', 'particles.json', function() {
+  console.log('Particles.js carregado com sucesso!');
 
+ });
 
+ 
 });

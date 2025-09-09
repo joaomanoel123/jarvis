@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Tratamento de Erros TTS - Jarvis</title>
+    <style>
+        body {
+            background: #000;
+            color: #00d4ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            border: 2px solid #00d4ff;
+            border-radius: 15px;
+            background: rgba(0, 212, 255, 0.1);
+        }
+        button {
+            background: #111;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: rgba(0, 212, 255, 0.2);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #00d4ff;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .log-area {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00d4ff;
+            color: #00ff00;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(0, 212, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Teste de Tratamento de Erros TTS - Jarvis</h1>
+        
+        <div class="status" id="status">
+            ⏳ Carregando sistema TTS...
+        </div>
+        
+        <div class="test-section">
+            <h3>🔍 Diagnóstico do Sistema</h3>
+            <button onclick="runDiagnostics()">🔍 Executar Diagnóstico</button>
+            <button onclick="testRecovery()">🔄 Testar Recuperação</button>
+            <button onclick="showBrowserInfo()">🌐 Info do Navegador</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🗣️ Testes de Fala</h3>
+            <button onclick="testNormalSpeech()">✅ Fala Normal</button>
+            <button onclick="testLongText()">📝 Texto Longo</button>
+            <button onclick="testSpecialCharacters()">🔤 Caracteres Especiais</button>
+            <button onclick="testEmptyText()">🚫 Texto Vazio</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>⚠️ Simulação de Erros</h3>
+            <button onclick="testInvalidVoice()">🎤 Voz Inválida</button>
+            <button onclick="testInvalidRate()">⚡ Taxa Inválida</button>
+            <button onclick="testMultipleSpeech()">🔄 Múltiplas Falas</button>
+            <button onclick="testStopAndSpeak()">⏹️ Parar e Falar</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎛️ Controles</h3>
+            <button onclick="stopAllSpeech()">⏹️ Parar Tudo</button>
+            <button onclick="clearLog()">🧹 Limpar Log</button>
+            <button onclick="exportLog()">💾 Exportar Log</button>
+        </div>
+        
+        <div class="log-area" id="logArea">
+            === Log de Testes TTS ===
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    
+    <!-- Jarvis TTS -->
+    <script src="jarvis-tts.js"></script>
+    
+    <script>
+        let tts = null;
+        let testResults = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logArea = document.getElementById('logArea');
+            const color = type === 'error' ? '#ff4444' : type === 'success' ? '#44ff44' : type === 'warning' ? '#ffaa44' : '#00d4ff';
+            
+            logArea.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logArea.scrollTop = logArea.scrollHeight;
+            
+            console.log(`[TTS Test] ${message}`);
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+            log(`Status: ${message}`);
+        }
+        
+        $(document).ready(function() {
+            log('🚀 Iniciando testes de TTS...');
+            
+            setTimeout(() => {
+                if (window.jarvisTTS) {
+                    tts = window.jarvisTTS;
+                    updateStatus('✅ Sistema TTS carregado com sucesso!');
+                    log('✅ TTS inicializado', 'success');
+                    
+                    // Executar diagnóstico inicial
+                    setTimeout(() => {
+                        runDiagnostics();
+                    }, 1000);
+                } else {
+                    updateStatus('❌ Erro: Sistema TTS não carregou');
+                    log('❌ Falha ao carregar TTS', 'error');
+                }
+            }, 2000);
+        });
+        
+        function runDiagnostics() {
+            if (!tts) {
+                log('❌ TTS não disponível para diagnóstico', 'error');
+                return;
+            }
+            
+            log('🔍 Executando diagnóstico completo...');
+            const diagnostics = tts.diagnoseTTSIssues();
+            
+            log(`📊 Diagnóstico concluído:`, 'success');
+            log(`   - Suporte: ${diagnostics.speechSynthesisSupported ? '✅' : '❌'}`);
+            log(`   - Vozes: ${diagnostics.voicesAvailable}`);
+            log(`   - Desbloqueado: ${diagnostics.isUnlocked ? '✅' : '❌'}`);
+            log(`   - Habilitado: ${diagnostics.isEnabled ? '✅' : '❌'}`);
+            log(`   - Falando: ${diagnostics.isSpeaking ? '🗣️' : '🔇'}`);
+        }
+        
+        function testRecovery() {
+            if (!tts) {
+                log('❌ TTS não disponível para teste de recuperação', 'error');
+                return;
+            }
+            
+            log('🔄 Testando recuperação do sistema...');
+            tts.recoverFromError()
+                .then(success => {
+                    if (success) {
+                        log('✅ Recuperação bem-sucedida', 'success');
+                    } else {
+                        log('❌ Falha na recuperação', 'error');
+                    }
+                })
+                .catch(error => {
+                    log(`❌ Erro na recuperação: ${error.message}`, 'error');
+                });
+        }
+        
+        function showBrowserInfo() {
+            if (!tts || !tts.browserInfo) {
+                log('❌ Informações do navegador não disponíveis', 'error');
+                return;
+            }
+            
+            const info = tts.browserInfo;
+            log('🌐 Informações do navegador:');
+            log(`   - Chrome: ${info.isChrome ? '✅' : '❌'}`);
+            log(`   - Firefox: ${info.isFirefox ? '✅' : '❌'}`);
+            log(`   - Safari: ${info.isSafari ? '✅' : '❌'}`);
+            log(`   - Edge: ${info.isEdge ? '✅' : '❌'}`);
+            log(`   - Mobile: ${info.isMobile ? '✅' : '❌'}`);
+            log(`   - Max Retries: ${tts.maxRetries}`);
+            log(`   - Retry Delay: ${tts.retryDelay}ms`);
+        }
+        
+        function testNormalSpeech() {
+            if (!tts) return;
+            
+            log('🗣️ Testando fala normal...');
+            tts.speak('Olá! Este é um teste de fala normal do sistema Jarvis.')
+                .then(() => {
+                    log('✅ Fala normal concluída', 'success');
+                })
+                .catch(error => {
+                    log(`❌ Erro na fala normal: ${error.message}`, 'error');
+                });
+        }
+        
+        function testLongText() {
+            if (!tts) return;
+            
+            const longText = 'Este é um teste com um texto muito longo para verificar se o sistema consegue lidar adequadamente com textos extensos. O sistema deve dividir automaticamente o texto em partes menores para evitar problemas de síntese. Cada parte será falada sequencialmente com pequenas pausas entre elas. Este mecanismo garante que mesmo textos muito longos possam ser processados sem erros de síntese. O sistema Jarvis foi projetado para ser robusto e confiável em todas as situações.';
+            
+            log('📝 Testando texto longo...');
+            tts.speak(longText)
+                .then(() => {
+                    log('✅ Texto longo processado com sucesso', 'success');
+                })
+                .catch(error => {
+                    log(`❌ Erro no texto longo: ${error.message}`, 'error');
+                });
+        }
+        
+        function testSpecialCharacters() {
+            if (!tts) return;
+            
+            const specialText = 'Teste com caracteres especiais: 123, @#$%, emojis 🤖🗣️, e símbolos ★☆♪♫!';
+            
+            log('🔤 Testando caracteres especiais...');
+            tts.speak(specialText)
+                .then(() => {
+                    log('✅ Caracteres especiais processados', 'success');
+                })
+                .catch(error => {
+                    log(`❌ Erro com caracteres especiais: ${error.message}`, 'error');
+                });
+        }
+        
+        function testEmptyText() {
+            if (!tts) return;
+            
+            log('🚫 Testando texto vazio...');
+            tts.speak('')
+                .then(() => {
+                    log('✅ Texto vazio tratado corretamente', 'success');
+                })
+                .catch(error => {
+                    log(`❌ Erro com texto vazio: ${error.message}`, 'error');
+                });
+        }
+        
+        function testInvalidVoice() {
+            if (!tts) return;
+            
+            log('🎤 Testando voz inválida...');
+            const originalVoice = tts.settings.voiceIndex;
+            tts.settings.voiceIndex = 999; // Índice inválido
+            
+            tts.speak('Teste com voz inválida')
+                .then(() => {
+                    log('✅ Voz inválida tratada corretamente', 'success');
+                    tts.settings.voiceIndex = originalVoice;
+                })
+                .catch(error => {
+                    log(`❌ Erro com voz inválida: ${error.message}`, 'error');
+                    tts.settings.voiceIndex = originalVoice;
+                });
+        }
+        
+        function testInvalidRate() {
+            if (!tts) return;
+            
+            log('⚡ Testando taxa inválida...');
+            tts.speak('Teste com taxa de velocidade muito alta', { rate: 10.0 })
+                .then(() => {
+                    log('✅ Taxa inválida tratada corretamente', 'success');
+                })
+                .catch(error => {
+                    log(`❌ Erro com taxa inválida: ${error.message}`, 'error');
+                });
+        }
+        
+        function testMultipleSpeech() {
+            if (!tts) return;
+            
+            log('🔄 Testando múltiplas falas simultâneas...');
+            
+            // Disparar várias falas rapidamente
+            for (let i = 1; i <= 3; i++) {
+                tts.speak(`Esta é a fala número ${i}`)
+                    .then(() => {
+                        log(`✅ Fala ${i} concluída`, 'success');
+                    })
+                    .catch(error => {
+                        log(`❌ Erro na fala ${i}: ${error.message}`, 'error');
+                    });
+            }
+        }
+        
+        function testStopAndSpeak() {
+            if (!tts) return;
+            
+            log('⏹️ Testando parar e falar...');
+            
+            // Iniciar uma fala longa
+            tts.speak('Esta é uma fala longa que será interrompida no meio para testar a funcionalidade de parar e reiniciar a síntese de voz.')
+                .catch(error => {
+                    log(`Fala interrompida: ${error.message}`, 'warning');
+                });
+            
+            // Parar após 2 segundos e iniciar nova fala
+            setTimeout(() => {
+                tts.stop();
+                log('🛑 Fala interrompida');
+                
+                setTimeout(() => {
+                    tts.speak('Nova fala após interrupção')
+                        .then(() => {
+                            log('✅ Nova fala após interrupção concluída', 'success');
+                        })
+                        .catch(error => {
+                            log(`❌ Erro na nova fala: ${error.message}`, 'error');
+                        });
+                }, 500);
+            }, 2000);
+        }
+        
+        function stopAllSpeech() {
+            if (tts) {
+                tts.stop();
+                log('⏹️ Todas as falas interrompidas');
+            }
+        }
+        
+        function clearLog() {
+            document.getElementById('logArea').innerHTML = '=== Log de Testes TTS ===';
+            log('🧹 Log limpo');
+        }
+        
+        function exportLog() {
+            const logContent = document.getElementById('logArea').textContent;
+            const blob = new Blob([logContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `jarvis-tts-test-log-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            log('💾 Log exportado');
+        }
+        
+        // Atalhos de teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case 'd':
+                        e.preventDefault();
+                        runDiagnostics();
+                        break;
+                    case 't':
+                        e.preventDefault();
+                        testNormalSpeech();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        stopAllSpeech();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

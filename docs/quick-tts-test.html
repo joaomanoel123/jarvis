@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Rápido TTS - Jarvis</title>
+    <style>
+        body {
+            background: #000;
+            color: #00d4ff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 2px solid #00d4ff;
+            border-radius: 10px;
+            background: rgba(0, 212, 255, 0.1);
+        }
+        button {
+            background: #111;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: rgba(0, 212, 255, 0.2);
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background: rgba(0, 212, 255, 0.1);
+            font-weight: bold;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff4444; }
+        .warning { color: #ffaa44; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste Rápido TTS - Jarvis</h1>
+        <p>Teste das correções do erro "synthesis-failed"</p>
+        
+        <div class="status" id="status">
+            ⏳ Carregando sistema TTS...
+        </div>
+        
+        <div>
+            <button onclick="testBasicSpeech()">🗣️ Teste Básico</button>
+            <button onclick="testErrorHandling()">⚠️ Teste Erro</button>
+            <button onclick="testRecovery()">🔄 Teste Recuperação</button>
+        </div>
+        
+        <div>
+            <button onclick="runDiagnostics()">🔍 Diagnóstico</button>
+            <button onclick="showBrowserInfo()">🌐 Info Navegador</button>
+            <button onclick="stopAll()">⏹️ Parar Tudo</button>
+        </div>
+        
+        <div id="results" style="margin-top: 20px; text-align: left; font-size: 14px;"></div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    
+    <!-- Jarvis TTS -->
+    <script src="jarvis-tts.js"></script>
+    
+    <script>
+        let tts = null;
+        
+        function updateStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+        
+        function addResult(message, type = 'info') {
+            const resultsEl = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${timestamp}] ${message}`;
+            resultsEl.appendChild(div);
+            resultsEl.scrollTop = resultsEl.scrollHeight;
+        }
+        
+        $(document).ready(function() {
+            addResult('🚀 Iniciando teste do sistema TTS...');
+            
+            setTimeout(() => {
+                if (window.jarvisTTS) {
+                    tts = window.jarvisTTS;
+                    updateStatus('✅ Sistema TTS carregado com sucesso!', 'success');
+                    addResult('✅ TTS inicializado com sucesso', 'success');
+                    
+                    // Executar diagnóstico inicial
+                    setTimeout(runDiagnostics, 1000);
+                } else {
+                    updateStatus('❌ Erro: Sistema TTS não carregou', 'error');
+                    addResult('❌ Falha ao carregar TTS', 'error');
+                }
+            }, 2000);
+        });
+        
+        function testBasicSpeech() {
+            if (!tts) {
+                addResult('❌ TTS não disponível', 'error');
+                return;
+            }
+            
+            addResult('🗣️ Testando fala básica...');
+            tts.speak('Olá! Este é um teste básico do sistema de voz do Jarvis. Todas as correções foram implementadas com sucesso.')
+                .then(() => {
+                    addResult('✅ Teste básico concluído com sucesso', 'success');
+                    updateStatus('✅ Teste básico bem-sucedido', 'success');
+                })
+                .catch(error => {
+                    addResult(`❌ Erro no teste básico: ${error.message}`, 'error');
+                    updateStatus('❌ Falha no teste básico', 'error');
+                });
+        }
+        
+        function testErrorHandling() {
+            if (!tts) {
+                addResult('❌ TTS não disponível', 'error');
+                return;
+            }
+            
+            addResult('⚠️ Testando tratamento de erros...');
+            
+            // Simular erro com configurações extremas
+            const extremeOptions = {
+                rate: 10.0, // Taxa muito alta
+                pitch: 5.0, // Tom muito alto
+                volume: 2.0 // Volume muito alto
+            };
+            
+            tts.speak('Teste com configurações extremas para simular erros', extremeOptions)
+                .then(() => {
+                    addResult('✅ Tratamento de erro funcionou - fala normalizada', 'success');
+                    updateStatus('✅ Tratamento de erros funcionando', 'success');
+                })
+                .catch(error => {
+                    addResult(`⚠️ Erro capturado corretamente: ${error.message}`, 'warning');
+                    updateStatus('⚠️ Erro tratado adequadamente', 'warning');
+                });
+        }
+        
+        function testRecovery() {
+            if (!tts) {
+                addResult('❌ TTS não disponível', 'error');
+                return;
+            }
+            
+            addResult('🔄 Testando recuperação do sistema...');
+            tts.recoverFromError()
+                .then(success => {
+                    if (success) {
+                        addResult('✅ Recuperação bem-sucedida', 'success');
+                        updateStatus('✅ Sistema recuperado', 'success');
+                    } else {
+                        addResult('⚠️ Recuperação parcial', 'warning');
+                        updateStatus('⚠️ Recuperação parcial', 'warning');
+                    }
+                })
+                .catch(error => {
+                    addResult(`❌ Falha na recuperação: ${error.message}`, 'error');
+                    updateStatus('❌ Falha na recuperação', 'error');
+                });
+        }
+        
+        function runDiagnostics() {
+            if (!tts) {
+                addResult('❌ TTS não disponível para diagnóstico', 'error');
+                return;
+            }
+            
+            addResult('🔍 Executando diagnóstico completo...');
+            const diagnostics = tts.diagnoseTTSIssues();
+            
+            addResult(`📊 Diagnóstico concluído:`, 'success');
+            addResult(`   - Suporte: ${diagnostics.speechSynthesisSupported ? '✅' : '❌'}`);
+            addResult(`   - Vozes: ${diagnostics.voicesAvailable}`);
+            addResult(`   - Desbloqueado: ${diagnostics.isUnlocked ? '✅' : '❌'}`);
+            addResult(`   - Habilitado: ${diagnostics.isEnabled ? '✅' : '❌'}`);
+            addResult(`   - Falando: ${diagnostics.isSpeaking ? '🗣️' : '🔇'}`);
+            
+            updateStatus('📊 Diagnóstico concluído', 'success');
+        }
+        
+        function showBrowserInfo() {
+            if (!tts || !tts.browserInfo) {
+                addResult('❌ Informações do navegador não disponíveis', 'error');
+                return;
+            }
+            
+            const info = tts.browserInfo;
+            addResult('🌐 Informações do navegador:');
+            addResult(`   - Chrome: ${info.isChrome ? '✅' : '❌'}`);
+            addResult(`   - Firefox: ${info.isFirefox ? '✅' : '❌'}`);
+            addResult(`   - Safari: ${info.isSafari ? '✅' : '❌'}`);
+            addResult(`   - Edge: ${info.isEdge ? '✅' : '❌'}`);
+            addResult(`   - Mobile: ${info.isMobile ? '✅' : '❌'}`);
+            addResult(`   - Max Retries: ${tts.maxRetries}`);
+            addResult(`   - Retry Delay: ${tts.retryDelay}ms`);
+        }
+        
+        function stopAll() {
+            if (tts) {
+                tts.stop();
+                addResult('⏹️ Todas as falas interrompidas');
+                updateStatus('⏹️ Sistema parado', 'warning');
+            }
+        }
+        
+        // Atalhos de teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case 't':
+                        e.preventDefault();
+                        testBasicSpeech();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        testErrorHandling();
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        testRecovery();
+                        break;
+                    case 'd':
+                        e.preventDefault();
+                        runDiagnostics();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        stopAll();
+                        break;
+                }
+            }
+        });
+        
+        // Mostrar atalhos
+        setTimeout(() => {
+            addResult('⌨️ Atalhos disponíveis:');
+            addResult('   Ctrl+T: Teste básico');
+            addResult('   Ctrl+E: Teste erro');
+            addResult('   Ctrl+R: Recuperação');
+            addResult('   Ctrl+D: Diagnóstico');
+            addResult('   Ctrl+S: Parar tudo');
+        }, 3000);
+    </script>
+</body>
+</html>

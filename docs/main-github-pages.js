@@ -3,7 +3,7 @@ $(document).ready(function () {
     // Configuração para GitHub Pages
     const isGitHubPages = window.location.hostname.includes('github.io');
     const API_URL = isGitHubPages ? 
-        'https://jarvis-api-joao-manoel.onrender.com' : // URL da API no Render
+        'https://jarvis-tdgt.onrender.com' : // URL da API no Render
         'http://localhost:8000'; // URL local para desenvolvimento
 
     console.log('🤖 Jarvis iniciando...');

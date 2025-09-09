@@ -214,12 +214,12 @@ class JarvisGoogleTTS {
         
         return text
             // Remover emojis
-            .replace(/[�-�][�-�]/gu, '')
-            .replace(/[�-�][�-�]/gu, '')
-            .replace(/[�-�][�-�]/gu, '')
-            .replace(/[�-�][�-�]/gu, '')
-            .replace(/[☀-⛿]/gu, '')
-            .replace(/[✀-➿]/gu, '')
+            .replace(/[\u{1F600}-\u{1F64F}]/gu, '')
+            .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')
+            .replace(/[\u{1F680}-\u{1F6FF}]/gu, '')
+            .replace(/[\u{1F1E0}-\u{1F1FF}]/gu, '')
+            .replace(/[\u{2600}-\u{26FF}]/gu, '')
+            .replace(/[\u{2700}-\u{27BF}]/gu, '')
             // Remover símbolos específicos
             .replace(/[🤖🗣️📱✅❌⚠️🔄🔍🎯📡📝🌊🔙💬🚫⏱️🔌🎆💾⚙️🎤🌐🔑]/g, '')
             // Limpar espaços
@@ -515,7 +515,7 @@ class JarvisGoogleTTS {
         
         const randomPhrase = testPhrases[Math.floor(Math.random() * testPhrases.length)];
         this.speak(randomPhrase).catch(error => {
-            console.error('❌ Erro no teste:', error);
+            alert(`❌ Erro no teste: ${error.message}`);
         });
     }
 

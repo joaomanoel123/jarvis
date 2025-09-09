@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Teste de Correção - Jarvis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+        }
+        h1 {
+            color: #00AAFF;
+            margin-bottom: 20px;
+        }
+        .status {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .success { color: #4CAF50; }
+        .warning { color: #FF9800; }
+        .error { color: #F44336; }
+        button {
+            background: #00AAFF;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #0088CC;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Teste de Correção do Jarvis</h1>
+        
+        <div class="status success">✅ Página carregou corretamente!</div>
+        <div class="status" id="js-status">🔄 Verificando JavaScript...</div>
+        
+        <p>Este é um teste para verificar se as correções funcionaram.</p>
+        
+        <button onclick="testJavaScript()">🧪 Testar JavaScript</button>
+        <button onclick="window.location.href='index.html'">🏠 Ir para o Jarvis</button>
+        
+        <div class="log" id="test-log">
+Iniciando testes...
+        </div>
+    </div>
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `\n[${timestamp}] ${message}`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function testJavaScript() {
+            log('🧪 Iniciando teste de JavaScript...');
+            
+            // Teste 1: jQuery
+            if (typeof $ !== 'undefined') {
+                log('✅ jQuery carregado com sucesso');
+                document.getElementById('js-status').innerHTML = '✅ JavaScript funcionando!';
+                document.getElementById('js-status').className = 'status success';
+            } else {
+                log('❌ jQuery não encontrado');
+                document.getElementById('js-status').innerHTML = '❌ Erro no JavaScript';
+                document.getElementById('js-status').className = 'status error';
+                return;
+            }
+            
+            // Teste 2: Verificar se o DOM está pronto
+            $(document).ready(function() {
+                log('✅ DOM pronto');
+            });
+            
+            // Teste 3: Verificar APIs do navegador
+            if ('speechSynthesis' in window) {
+                log('✅ Speech Synthesis API disponível');
+            } else {
+                log('⚠️ Speech Synthesis API não disponível');
+            }
+            
+            if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+                log('✅ Speech Recognition API disponível');
+            } else {
+                log('⚠️ Speech Recognition API não disponível');
+            }
+            
+            // Teste 4: Verificar HTTPS
+            if (window.location.protocol === 'https:') {
+                log('✅ Conexão segura (HTTPS)');
+            } else {
+                log('⚠️ Conexão não segura (HTTP)');
+            }
+            
+            log('🎉 Teste concluído! Verifique os resultados acima.');
+        }
+        
+        // Executar teste automático
+        window.addEventListener('load', function() {
+            setTimeout(testJavaScript, 1000);
+        });
+    </script>
+</body>
+</html>

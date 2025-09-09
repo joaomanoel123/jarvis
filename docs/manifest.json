@@ -1,0 +1,21 @@
+{
+  "name": "Jarvis - AI Assistant",
+  "short_name": "Jarvis",
+  "description": "Intelligent Virtual Assistant with AI",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00AAFF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/img/logo.ico",
+      "sizes": "48x48 72x72 96x96 144x144 192x192 256x256 384x384 512x512",
+      "type": "image/x-icon",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "lang": "en",
+  "scope": "./"
+}

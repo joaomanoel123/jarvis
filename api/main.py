@@ -1,27 +1,43 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel
 import os
 import requests
 import json
 import traceback
+import base64
 from typing import Optional
 
 app = FastAPI(title="Jarvis API", version="1.0.0")
 
 # CORS - Configurado para GitHub Pages
-origins = os.getenv("CORS_ORIGINS", "*").split(",")
+default_origins = [
+    "https://joaomanoel123.github.io",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000"
+]
+
+# Permitir origens customizadas via env var, mas sempre incluir as padrões
+custom_origins = os.getenv("CORS_ORIGINS", "").split(",") if os.getenv("CORS_ORIGINS") else []
+origins = list(set(default_origins + [origin.strip() for origin in custom_origins if origin.strip()]))
+
+print(f"🔒 CORS Origins configuradas: {origins}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
 # Configurações
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  # Manter para compatibilidade
+MURF_API_KEY = os.getenv("MURF_API_KEY")  # Chave API do Murf AI
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
 # Priorizar Groq, fallback para Google
@@ -31,11 +47,20 @@ API_PROVIDER = "groq" if GROQ_API_KEY else "google" if GOOGLE_API_KEY else None
 class Command(BaseModel):
     message: str
 
+class TTSRequest(BaseModel):
+    text: str
+    voice_id: Optional[str] = "pt-BR-female-1"
+    speed: Optional[float] = 1.0
+    pitch: Optional[float] = 1.0
+    volume: Optional[float] = 0.8
+    format: Optional[str] = "mp3"
+
 class HealthResponse(BaseModel):
     status: str
     environment: str
     api_configured: bool
     api_provider: str
+    murf_tts_configured: bool
 
 @app.get("/health", response_model=HealthResponse)
 async def health():
@@ -43,7 +68,8 @@ async def health():
         "status": "ok",
         "environment": ENVIRONMENT,
         "api_configured": bool(API_KEY),
-        "api_provider": API_PROVIDER or "none"
+        "api_provider": API_PROVIDER or "none",
+        "murf_tts_configured": bool(MURF_API_KEY)
     }
 
 @app.post("/command")
@@ -245,17 +271,182 @@ async def call_gemini_api(message: str) -> str:
         print(f"❌ Erro de requisição: {e}")
         raise Exception(f"Erro na requisição: {e}")
 
+@app.post("/tts")
+async def text_to_speech(request: TTSRequest):
+    """Endpoint para Text-to-Speech usando Murf AI"""
+    
+    if not MURF_API_KEY:
+        raise HTTPException(
+            status_code=503, 
+            detail="Murf AI TTS não configurado. Configure MURF_API_KEY no Render Dashboard."
+        )
+    
+    if not request.text or not request.text.strip():
+        raise HTTPException(status_code=400, detail="Texto não pode estar vazio")
+    
+    print(f"🎵 TTS Request - Texto: {request.text[:50]}...")
+    print(f"🎤 Voz: {request.voice_id}, Velocidade: {request.speed}, Tom: {request.pitch}")
+    
+    try:
+        # Chamar API do Murf AI
+        audio_data = await call_murf_tts_api(
+            text=request.text,
+            voice_id=request.voice_id,
+            speed=request.speed,
+            pitch=request.pitch,
+            volume=request.volume,
+            format=request.format
+        )
+        
+        # Retornar áudio como resposta
+        return Response(
+            content=audio_data,
+            media_type=f"audio/{request.format}",
+            headers={
+                "Content-Disposition": f"attachment; filename=tts_audio.{request.format}",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*"
+            }
+        )
+        
+    except Exception as e:
+        print(f"❌ Erro no TTS: {e}")
+        raise HTTPException(status_code=500, detail=f"Erro no TTS: {str(e)}")
+
+async def call_murf_tts_api(text: str, voice_id: str, speed: float, pitch: float, volume: float, format: str) -> bytes:
+    """Chama a API do Murf AI para gerar áudio"""
+    
+    url = "https://api.murf.ai/v1/speech"
+    
+    headers = {
+        "Authorization": f"Bearer {MURF_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    # Limpar texto de emojis e caracteres especiais
+    clean_text = clean_text_for_tts(text)
+    
+    data = {
+        "text": clean_text,
+        "voice_id": voice_id,
+        "speed": speed,
+        "pitch": pitch,
+        "volume": volume,
+        "format": format
+    }
+    
+    print(f"🔗 Chamando Murf API: {url}")
+    print(f"📤 Dados: {json.dumps(data, indent=2)[:300]}...")
+    
+    try:
+        response = requests.post(url, headers=headers, json=data, timeout=60)
+        print(f"📡 Status Murf API: {response.status_code}")
+        
+        if response.status_code == 200:
+            # Verificar se a resposta é áudio direto ou JSON
+            content_type = response.headers.get('content-type', '')
+            
+            if 'audio' in content_type:
+                # Resposta direta de áudio
+                print(f"✅ Áudio recebido diretamente ({len(response.content)} bytes)")
+                return response.content
+            else:
+                # Resposta JSON com URL ou base64
+                try:
+                    result = response.json()
+                    print(f"📝 Resposta JSON Murf: {json.dumps(result, indent=2)[:200]}...")
+                    
+                    if 'audio_url' in result:
+                        # Download do áudio via URL
+                        audio_response = requests.get(result['audio_url'], timeout=30)
+                        if audio_response.status_code == 200:
+                            print(f"✅ Áudio baixado via URL ({len(audio_response.content)} bytes)")
+                            return audio_response.content
+                        else:
+                            raise Exception(f"Erro ao baixar áudio: {audio_response.status_code}")
+                    
+                    elif 'audio_data' in result:
+                        # Decodificar base64
+                        audio_bytes = base64.b64decode(result['audio_data'])
+                        print(f"✅ Áudio decodificado de base64 ({len(audio_bytes)} bytes)")
+                        return audio_bytes
+                    
+                    else:
+                        raise Exception("Formato de resposta não reconhecido")
+                        
+                except json.JSONDecodeError:
+                    # Se não for JSON, assumir que é áudio direto
+                    print(f"✅ Áudio recebido como dados brutos ({len(response.content)} bytes)")
+                    return response.content
+        
+        elif response.status_code == 401:
+            raise Exception("Chave da API do Murf AI inválida ou expirada")
+        elif response.status_code == 429:
+            raise Exception("Limite de taxa da API Murf AI excedido")
+        elif response.status_code == 400:
+            error_text = response.text
+            raise Exception(f"Erro na requisição Murf AI: {error_text}")
+        else:
+            error_text = response.text
+            raise Exception(f"Erro HTTP {response.status_code}: {error_text}")
+            
+    except requests.exceptions.Timeout:
+        raise Exception("Timeout na API do Murf AI")
+    except requests.exceptions.ConnectionError:
+        raise Exception("Erro de conexão com a API do Murf AI")
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"Erro na requisição para Murf AI: {e}")
+
+def clean_text_for_tts(text: str) -> str:
+    """Limpa o texto para TTS removendo emojis e caracteres especiais"""
+    if not text:
+        return ""
+    
+    # Remover emojis
+    import re
+    
+    # Padrões de emoji
+    emoji_pattern = re.compile(
+        "["
+        "\U0001F600-\U0001F64F"  # emoticons
+        "\U0001F300-\U0001F5FF"  # symbols & pictographs
+        "\U0001F680-\U0001F6FF"  # transport & map symbols
+        "\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        "\U00002600-\U000026FF"  # miscellaneous symbols
+        "\U00002700-\U000027BF"  # dingbats
+        "]+", flags=re.UNICODE
+    )
+    
+    # Remover emojis específicos comuns
+    text = re.sub(r'[🤖🗣️📱✅❌⚠️🔄🔍🎯📡📝🌊🔙💬🚫⏱️🔌🎆💾⚙️🎤🌐🔑🎵]', '', text)
+    
+    # Aplicar padrão geral de emoji
+    text = emoji_pattern.sub('', text)
+    
+    # Limpar espaços extras
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'\n+', ' ', text)
+    
+    return text.strip()
+
 @app.get("/")
 async def root():
     return {
         "message": "🤖 Jarvis API está funcionando!",
-        "version": "1.1.0",
+        "version": "1.2.0",
         "frontend": "https://joaomanoel123.github.io/jarvis",
         "docs": "/docs",
         "health": "/health",
+        "endpoints": {
+            "chat": "/command",
+            "tts": "/tts",
+            "health": "/health"
+        },
         "api_provider": API_PROVIDER or "none",
         "groq_api_configured": bool(GROQ_API_KEY),
-        "google_api_configured": bool(GOOGLE_API_KEY)
+        "google_api_configured": bool(GOOGLE_API_KEY),
+        "murf_tts_configured": bool(MURF_API_KEY)
     }
 
 @app.get("/debug")
@@ -271,6 +462,8 @@ async def debug():
         "groq_api_key_length": len(GROQ_API_KEY) if GROQ_API_KEY else 0,
         "google_api_key_configured": bool(GOOGLE_API_KEY),
         "google_api_key_length": len(GOOGLE_API_KEY) if GOOGLE_API_KEY else 0,
+        "murf_api_key_configured": bool(MURF_API_KEY),
+        "murf_api_key_length": len(MURF_API_KEY) if MURF_API_KEY else 0,
         "cors_origins": origins,
-        "version": "1.1.0"
+        "version": "1.2.0"
     }

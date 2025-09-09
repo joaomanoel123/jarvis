@@ -14,5 +14,7 @@ services:
         sync: false  # Esta será configurada manualmente no Render Dashboard
       - key: GOOGLE_API_KEY
         sync: false  # Fallback - Esta será configurada manualmente no Render Dashboard
+      - key: MURF_API_KEY
+        sync: false  # Chave API do Murf AI - Configure manualmente no Render Dashboard
       - key: ENVIRONMENT
         value: production

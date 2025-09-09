@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Teste Sistema Modular - Jarvis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+        }
+        h1 {
+            color: #00AAFF;
+            margin-bottom: 20px;
+        }
+        .status {
+            font-size: 18px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { 
+            color: #4CAF50; 
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4CAF50;
+        }
+        .warning { 
+            color: #FF9800; 
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid #FF9800;
+        }
+        .error { 
+            color: #F44336; 
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid #F44336;
+        }
+        button {
+            background: #00AAFF;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #0088CC;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste Sistema Modular ES6</h1>
+        
+        <div class="status" id="main-status">🔄 Verificando suporte a módulos ES6...</div>
+        
+        <div class="test-grid">
+            <div class="status" id="config-status">🔄 Config Module</div>
+            <div class="status" id="api-status">🔄 API Module</div>
+            <div class="status" id="ui-status">🔄 UI Module</div>
+            <div class="status" id="tts-status">🔄 TTS Module</div>
+            <div class="status" id="speech-status">🔄 Speech Module</div>
+            <div class="status" id="core-status">🔄 Core Module</div>
+        </div>
+        
+        <button onclick="testAPI()">🌐 Testar API Render</button>
+        <button onclick="window.location.href='index.html'">🏠 Ir para o Jarvis</button>
+        
+        <div class="log" id="test-log">
+Iniciando testes do sistema modular...
+        </div>
+    </div>
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    
+    <!-- SiriWave -->
+    <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
+    
+    <!-- Teste Modular -->
+    <script type="module">
+        import { config } from './js/config.js';
+        import * as api from './js/api.js';
+        
+        function log(message) {
+            const logDiv = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `\n[${timestamp}] ${message}`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function setStatus(id, message, type) {
+            const element = document.getElementById(id);
+            element.innerHTML = message;
+            element.className = `status ${type}`;
+        }
+        
+        // Teste de suporte a módulos ES6
+        setStatus('main-status', '✅ Módulos ES6 suportados!', 'success');
+        log('✅ Navegador suporta módulos ES6');
+        
+        // Teste do módulo config
+        try {
+            log(`🔧 Config carregado - API URL: ${config.apiUrl}`);
+            setStatus('config-status', '✅ Config Module', 'success');
+        } catch (error) {
+            log(`❌ Erro no Config: ${error.message}`);
+            setStatus('config-status', '❌ Config Module', 'error');
+        }
+        
+        // Teste do módulo API
+        try {
+            if (typeof api.sendCommand === 'function') {
+                log('✅ API Module carregado');
+                setStatus('api-status', '✅ API Module', 'success');
+            } else {
+                throw new Error('sendCommand não é uma função');
+            }
+        } catch (error) {
+            log(`❌ Erro no API: ${error.message}`);
+            setStatus('api-status', '❌ API Module', 'error');
+        }
+        
+        // Teste dos outros módulos
+        Promise.all([
+            import('./js/ui.js'),
+            import('./js/tts.js'),
+            import('./js/speech.js'),
+            import('./js/core.js')
+        ]).then(([ui, tts, speech, core]) => {
+            // UI Module
+            if (ui.initUI) {
+                setStatus('ui-status', '✅ UI Module', 'success');
+                log('✅ UI Module carregado');
+            } else {
+                setStatus('ui-status', '❌ UI Module', 'error');
+                log('❌ UI Module com problemas');
+            }
+            
+            // TTS Module
+            if (tts.speak) {
+                setStatus('tts-status', '✅ TTS Module', 'success');
+                log('✅ TTS Module carregado');
+            } else {
+                setStatus('tts-status', '❌ TTS Module', 'error');
+                log('❌ TTS Module com problemas');
+            }
+            
+            // Speech Module
+            if (speech.SpeechRecognitionService) {
+                setStatus('speech-status', '✅ Speech Module', 'success');
+                log('✅ Speech Module carregado');
+            } else {
+                setStatus('speech-status', '❌ Speech Module', 'error');
+                log('❌ Speech Module com problemas');
+            }
+            
+            // Core Module
+            if (core.init) {
+                setStatus('core-status', '✅ Core Module', 'success');
+                log('✅ Core Module carregado');
+                log('🎉 Todos os módulos carregados com sucesso!');
+            } else {
+                setStatus('core-status', '❌ Core Module', 'error');
+                log('❌ Core Module com problemas');
+            }
+            
+        }).catch(error => {
+            log(`❌ Erro ao carregar módulos: ${error.message}`);
+        });
+        
+        // Função global para testar API
+        window.testAPI = async function() {
+            try {
+                log('🌐 Testando conexão com API Render...');
+                const result = await api.testConnection();
+                log(`✅ API funcionando: ${JSON.stringify(result)}`);
+                alert('✅ API Render funcionando perfeitamente!');
+            } catch (error) {
+                log(`❌ Erro na API: ${error.message}`);
+                alert(`❌ Erro na API: ${error.message}`);
+            }
+        };
+        
+    </script>
+    
+    <!-- Fallback para navegadores sem suporte a módulos -->
+    <script nomodule>
+        document.getElementById('main-status').innerHTML = '⚠️ Navegador não suporta módulos ES6';
+        document.getElementById('main-status').className = 'status warning';
+        
+        const logDiv = document.getElementById('test-log');
+        logDiv.innerHTML += '\n⚠️ Este navegador não suporta módulos ES6';
+        logDiv.innerHTML += '\n🔄 Usando fallback main-github-pages.js';
+    </script>
+</body>
+</html>
