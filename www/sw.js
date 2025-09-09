@@ -3,7 +3,7 @@
  * Fornece funcionalidades básicas de PWA
  */
 
-const CACHE_NAME = 'jarvis-v1.0.6-siriwave-module-fix';
+const CACHE_NAME = 'jarvis-v1.0.7-cache-buster-fix';
 const BASE_PATH = '/jarvis';
 
 // Arquivos essenciais para cache
@@ -18,6 +18,7 @@ const ESSENTIAL_FILES = [
     `${BASE_PATH}/main-github-pages-fixed.js`,
     `${BASE_PATH}/controller.js`,
     `${BASE_PATH}/ui.js`,
+    `${BASE_PATH}/cache-buster.js`,
     `${BASE_PATH}/assets/img/logo.ico`
 ];
 
