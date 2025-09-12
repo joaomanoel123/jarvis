@@ -26,7 +26,7 @@ def _find_free_port(preferred=8000, max_tries=20):
 
 def start():
     
-    eel.init("www")
+    eel.init("docs")
 
     playAssistantSound()
 
