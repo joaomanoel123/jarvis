@@ -80,6 +80,35 @@
                 min-width: 44px;
             }
         }
+        
+        /* Garantir visibilidade das seções */
+        #Oval {
+            display: block !important;
+        }
+        
+        #Oval[hidden] {
+            display: none !important;
+        }
+        
+        /* Animações */
+        .animate__animated {
+            animation-duration: 1s;
+            animation-fill-mode: both;
+        }
+        
+        .animate__zoomIn {
+            animation-name: zoomIn;
+        }
+        
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale3d(0.3, 0.3, 0.3);
+            }
+            50% {
+                opacity: 1;
+            }
+        }
     </style>
 
     <!-- conexão ao core.js-->

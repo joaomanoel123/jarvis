@@ -71,10 +71,34 @@ $(document).ready(function () {
         
         setTimeout(() => {
             console.log('🎯 Carregando interface principal...');
+            
+            // Debug: verificar elementos antes da transição
+            console.log('🔍 Debug - Elementos antes da transição:');
+            console.log('Start hidden:', $("#Start").attr("hidden"));
+            console.log('Oval hidden:', $("#Oval").attr("hidden"));
+            console.log('Oval exists:', $("#Oval").length);
+            
+            // Esconder seção Start
             $("#Start").attr("hidden", true);
+            console.log('✅ Seção Start escondida');
+            
+            // Mostrar seção Oval (HUD)
+            $("#Oval").removeClass("hidden").attr("hidden", false);
             $("#Oval").addClass("animate__animated animate__zoomIn");
-            $("#Oval").attr("hidden", false);
+            console.log('✅ Seção Oval (HUD) mostrada');
+            
+            // Atualizar mensagem
             $("#WishMessage").text("Pergunte-me qualquer coisa");
+            console.log('✅ Mensagem atualizada');
+            
+            // Debug: verificar elementos após a transição
+            setTimeout(() => {
+                console.log('🔍 Debug - Elementos após a transição:');
+                console.log('Start hidden:', $("#Start").attr("hidden"));
+                console.log('Oval hidden:', $("#Oval").attr("hidden"));
+                console.log('Oval visible:', $("#Oval").is(':visible'));
+                console.log('Oval display:', $("#Oval").css('display'));
+            }, 500);
             
             // Preparar mensagem de boas-vindas
             setTimeout(() => {
