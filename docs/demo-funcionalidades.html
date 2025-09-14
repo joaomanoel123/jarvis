@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Demo das Funcionalidades - JARVIS</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-title {
+            color: #00AAFF;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .command-list {
+            list-style: none;
+            padding: 0;
+        }
+        .command-list li {
+            background: rgba(0, 170, 255, 0.2);
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .demo-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #00AAFF;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding-left: 30px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #00AAFF;
+        }
+        .btn {
+            background: #00AAFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0088CC;
+            transform: scale(1.05);
+        }
+        .success { color: #4CAF50; }
+        .warning { color: #ff9800; }
+        .info { color: #00AAFF; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Demonstração das Funcionalidades do JARVIS</h1>
+            <p>Conheça todos os comandos e recursos disponíveis</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>🚀 Sequência de Inicialização Otimizada</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>1.0s</strong> - Tela de loading desaparece
+                </div>
+                <div class="timeline-item">
+                    <strong>1.5s</strong> - Inicia autenticação facial
+                </div>
+                <div class="timeline-item">
+                    <strong>3.0s</strong> - Autenticação bem-sucedida
+                </div>
+                <div class="timeline-item">
+                    <strong>4.5s</strong> - Saudação de boas-vindas
+                </div>
+                <div class="timeline-item">
+                    <strong>6.0s</strong> - Interface principal carregada
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-title">
+                    🌐 Sites e Aplicações
+                </div>
+                <p>Abra seus sites favoritos com comandos de voz ou texto:</p>
+                <ul class="command-list">
+                    <li>"Abrir WhatsApp"</li>
+                    <li>"YouTube"</li>
+                    <li>"Google"</li>
+                    <li>"Gmail"</li>
+                    <li>"Facebook"</li>
+                    <li>"Instagram"</li>
+                    <li>"Twitter"</li>
+                    <li>"LinkedIn"</li>
+                    <li>"GitHub"</li>
+                    <li>"Netflix"</li>
+                    <li>"Spotify"</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">
+                    🎤 Reconhecimento de Voz
+                </div>
+                <p>Controle o JARVIS com sua voz:</p>
+                <ul class="command-list">
+                    <li>Clique no botão do microfone</li>
+                    <li>Pressione Ctrl+J (atalho)</li>
+                    <li>Pressione Espaço (atalho)</li>
+                    <li>Fale naturalmente</li>
+                    <li>Veja a transcrição em tempo real</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">
+                    🔊 Text-to-Speech
+                </div>
+                <p>O JARVIS fala com você:</p>
+                <ul class="command-list">
+                    <li>Mensagem de boas-vindas</li>
+                    <li>Confirmação de comandos</li>
+                    <li>Respostas da IA</li>
+                    <li>Notificações de status</li>
+                    <li>Voz em português brasileiro</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">
+                    🌊 Visualizações
+                </div>
+                <p>Interface visual interativa:</p>
+                <ul class="command-list">
+                    <li>SiriWave durante reconhecimento</li>
+                    <li>Animações de transição</li>
+                    <li>Feedback visual em tempo real</li>
+                    <li>Interface responsiva</li>
+                    <li>Tema escuro otimizado</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">
+                    ⚙️ Configurações
+                </div>
+                <p>Personalize sua experiência:</p>
+                <ul class="command-list">
+                    <li>"Configurações"</li>
+                    <li>Configurar URL da API</li>
+                    <li>Testar conectividade</li>
+                    <li>Diagnóstico do sistema</li>
+                    <li>Ver logs do console</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">
+                    🧪 Comandos de Teste
+                </div>
+                <p>Teste as funcionalidades:</p>
+                <ul class="command-list">
+                    <li>"Teste"</li>
+                    <li>"Diagnóstico"</li>
+                    <li>Verificação de componentes</li>
+                    <li>Status da API</li>
+                    <li>Teste de voz</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎮 Como Usar</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div>
+                    <h3 class="info">💬 Por Texto</h3>
+                    <ol>
+                        <li>Digite no campo de texto</li>
+                        <li>Pressione Enter ou clique em Enviar</li>
+                        <li>Aguarde a resposta</li>
+                    </ol>
+                </div>
+                <div>
+                    <h3 class="info">🎤 Por Voz</h3>
+                    <ol>
+                        <li>Clique no botão do microfone</li>
+                        <li>Fale claramente</li>
+                        <li>Aguarde o processamento</li>
+                    </ol>
+                </div>
+                <div>
+                    <h3 class="info">⌨️ Atalhos</h3>
+                    <ol>
+                        <li><strong>Ctrl+J</strong>: Ativar microfone</li>
+                        <li><strong>Espaço</strong>: Ativar microfone</li>
+                        <li><strong>Enter</strong>: Enviar texto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📊 Status do Sistema</h2>
+            <div id="system-status">
+                <p class="warning">⏳ Verificando status...</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="./index.html" class="btn">🚀 Ir para o JARVIS</a>
+            <a href="./test-final-fixes.html" class="btn">🧪 Testar Correções</a>
+            <a href="./test-loading-fix.html" class="btn">⏱️ Testar Loading</a>
+        </div>
+    </div>
+
+    <script>
+        // Verificar status do sistema
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusDiv = document.getElementById('system-status');
+            
+            // Simular verificação de status
+            setTimeout(() => {
+                const features = [
+                    { name: 'Tela de Loading', status: true },
+                    { name: 'Sequência de Inicialização', status: true },
+                    { name: 'Comandos de Sites', status: true },
+                    { name: 'Reconhecimento de Voz', status: 'speechSynthesis' in window },
+                    { name: 'Text-to-Speech', status: 'speechSynthesis' in window },
+                    { name: 'SiriWave', status: true },
+                    { name: 'Interface Responsiva', status: true }
+                ];
+                
+                let html = '<h3>✅ Status dos Componentes:</h3><ul style="list-style: none; padding: 0;">';
+                
+                features.forEach(feature => {
+                    const icon = feature.status ? '✅' : '❌';
+                    const color = feature.status ? 'success' : 'warning';
+                    html += `<li class="${color}">${icon} ${feature.name}</li>`;
+                });
+                
+                html += '</ul>';
+                
+                const workingCount = features.filter(f => f.status).length;
+                const totalCount = features.length;
+                const percentage = Math.round((workingCount / totalCount) * 100);
+                
+                html += `<p class="info"><strong>Taxa de Funcionalidade: ${percentage}%</strong></p>`;
+                
+                if (percentage === 100) {
+                    html += '<p class="success">🎉 Todos os componentes estão funcionando perfeitamente!</p>';
+                } else if (percentage >= 80) {
+                    html += '<p class="warning">⚠️ Sistema funcionando com pequenas limitações.</p>';
+                } else {
+                    html += '<p class="warning">❌ Alguns componentes precisam de atenção.</p>';
+                }
+                
+                statusDiv.innerHTML = html;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

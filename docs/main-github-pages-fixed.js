@@ -47,44 +47,43 @@ $(document).ready(function () {
     function startGitHubPagesSequence() {
         console.log('🚀 Iniciando sequência de startup...');
         
-        // Sequência de inicialização simulando o backend
+        // Sequência de inicialização mais rápida e fluida
         setTimeout(() => {
             console.log('👤 Iniciando Face Auth...');
             $("#Loader").attr("hidden", true);
             $("#FaceAuth").attr("hidden", false);
             $("#WishMessage").text("Autenticando...");
-        }, 2000);
+        }, 1500);
         
         setTimeout(() => {
             console.log('✅ Face Auth Success...');
             $("#FaceAuth").attr("hidden", true);
             $("#FaceAuthSuccess").attr("hidden", false);
             $("#WishMessage").text("Autenticação bem-sucedida!");
-        }, 4000);
+        }, 3000);
         
         setTimeout(() => {
             console.log('👋 Hello Greet...');
             $("#FaceAuthSuccess").attr("hidden", true);
             $("#HelloGreet").attr("hidden", false);
             $("#WishMessage").text("Olá, bem-vindo João Manoel!");
-        }, 6000);
+        }, 4500);
         
         setTimeout(() => {
             console.log('🎯 Carregando interface principal...');
             $("#Start").attr("hidden", true);
             $("#Oval").addClass("animate__animated animate__zoomIn");
             $("#Oval").attr("hidden", false);
-            $("#WishMessage").text("Ask me anything");
+            $("#WishMessage").text("Pergunte-me qualquer coisa");
             
-            // Aguardar um pouco e preparar para falar (só após interação)
+            // Preparar mensagem de boas-vindas
             setTimeout(() => {
                 if (window.jarvisTTS && window.jarvisTTS.speak) {
-                    // Preparar mensagem para falar após primeira interação
                     window.jarvisTTS.queueMessage = 'Olá João Manoel! Como posso ajudá-lo hoje?';
                     console.log('🎤 Mensagem preparada para falar após interação do usuário');
                 }
-            }, 2000);
-        }, 8000);
+            }, 1000);
+        }, 6000);
     }
     
     function setupTextAnimations() {
@@ -280,7 +279,7 @@ $(document).ready(function () {
             $("#WishMessage").text("Reconhecimento de voz não disponível. Use o campo de texto.");
             
             setTimeout(() => {
-                $("#WishMessage").text("Ask me anything");
+                $("#WishMessage").text("Pergunte-me qualquer coisa");
             }, 3000);
             return;
         }
@@ -341,7 +340,7 @@ $(document).ready(function () {
             setTimeout(() => {
                 $("#SiriWave").attr("hidden", true);
                 $("#Oval").attr("hidden", false);
-                $("#WishMessage").text("Ask me anything");
+                $("#WishMessage").text("Pergunte-me qualquer coisa");
             }, 3000);
         });
         
@@ -421,7 +420,7 @@ $(document).ready(function () {
                 setTimeout(() => {
                     $("#SiriWave").attr("hidden", true);
                     $("#Oval").attr("hidden", false);
-                    $("#WishMessage").text("Ask me anything");
+                    $("#WishMessage").text("Pergunte-me qualquer coisa");
                 }, 5000);
             });
     }
@@ -430,66 +429,110 @@ $(document).ready(function () {
         const msg = message.toLowerCase().trim();
         console.log('🔍 Verificando comando local:', msg);
         
-        // Comandos do WhatsApp - Detecção ampla
+        // Função auxiliar para abrir sites
+        function openSite(url, siteName, message) {
+            console.log(`✅ Comando ${siteName} detectado!`);
+            window.open(url, '_blank');
+            $("#WishMessage").text(message);
+            
+            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                window.jarvisTTS.speak(message);
+            }
+            
+            setTimeout(() => {
+                $("#WishMessage").text("Pergunte-me qualquer coisa");
+            }, 3000);
+            return true;
+        }
+        
+        // Comandos do WhatsApp
         const whatsappKeywords = [
             'whatsapp', 'whats app', 'whats', 'zap', 'zapzap',
             'abrir whatsapp', 'abra whatsapp', 'abre whatsapp',
             'abrir whats', 'abra whats', 'abre whats'
         ];
-        
         if (whatsappKeywords.some(keyword => msg.includes(keyword))) {
-            console.log('✅ Comando WhatsApp detectado!');
-            window.open('https://web.whatsapp.com', '_blank');
-            $("#WishMessage").text("Abrindo WhatsApp Web...");
-            
-            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
-                window.jarvisTTS.speak("Abrindo WhatsApp Web para você!");
-            }
-            
-            setTimeout(() => {
-                $("#WishMessage").text("Ask me anything");
-            }, 3000);
-            return true;
+            return openSite('https://web.whatsapp.com', 'WhatsApp', 'Abrindo WhatsApp Web para você!');
         }
         
         // Comandos do YouTube
         const youtubeKeywords = [
             'youtube', 'you tube', 'abrir youtube', 'abra youtube', 'abre youtube'
         ];
-        
         if (youtubeKeywords.some(keyword => msg.includes(keyword))) {
-            console.log('✅ Comando YouTube detectado!');
-            window.open('https://www.youtube.com', '_blank');
-            $("#WishMessage").text("Abrindo YouTube...");
-            
-            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
-                window.jarvisTTS.speak("Abrindo YouTube para você!");
-            }
-            
-            setTimeout(() => {
-                $("#WishMessage").text("Ask me anything");
-            }, 3000);
-            return true;
+            return openSite('https://www.youtube.com', 'YouTube', 'Abrindo YouTube para você!');
         }
         
         // Comandos do Google
         const googleKeywords = [
             'google', 'abrir google', 'abra google', 'abre google', 'pesquisar no google'
         ];
-        
         if (googleKeywords.some(keyword => msg.includes(keyword))) {
-            console.log('✅ Comando Google detectado!');
-            window.open('https://www.google.com', '_blank');
-            $("#WishMessage").text("Abrindo Google...");
-            
-            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
-                window.jarvisTTS.speak("Abrindo Google para você!");
-            }
-            
-            setTimeout(() => {
-                $("#WishMessage").text("Ask me anything");
-            }, 3000);
-            return true;
+            return openSite('https://www.google.com', 'Google', 'Abrindo Google para você!');
+        }
+        
+        // Comandos do Gmail
+        const gmailKeywords = [
+            'gmail', 'email', 'e-mail', 'abrir gmail', 'abra gmail', 'abre gmail'
+        ];
+        if (gmailKeywords.some(keyword => msg.includes(keyword))) {
+            return openSite('https://mail.google.com', 'Gmail', 'Abrindo Gmail para você!');
+        }
+        
+        // Comandos do Facebook
+        const facebookKeywords = [
+            'facebook', 'face', 'fb', 'abrir facebook', 'abra facebook', 'abre facebook'
+        ];
+        if (facebookKeywords.some(keyword => msg.includes(keyword))) {
+            return openSite('https://www.facebook.com', 'Facebook', 'Abrindo Facebook para você!');
+        }
+        
+        // Comandos do Instagram
+        const instagramKeywords = [
+            'instagram', 'insta', 'ig', 'abrir instagram', 'abra instagram', 'abre instagram'
+        ];
+        if (instagramKeywords.some(keyword => msg.includes(keyword))) {
+            return openSite('https://www.instagram.com', 'Instagram', 'Abrindo Instagram para você!');
+        }
+        
+        // Comandos do Twitter/X
+        const twitterKeywords = [
+            'twitter', 'x', 'abrir twitter', 'abra twitter', 'abre twitter', 'abrir x', 'abra x'
+        ];
+        if (twitterKeywords.some(keyword => msg.includes(keyword))) {
+            return openSite('https://twitter.com', 'Twitter', 'Abrindo Twitter para você!');
+        }
+        
+        // Comandos do LinkedIn
+        const linkedinKeywords = [
+            'linkedin', 'linked in', 'abrir linkedin', 'abra linkedin', 'abre linkedin'
+        ];
+        if (linkedinKeywords.some(keyword => msg.includes(keyword))) {
+            return openSite('https://www.linkedin.com', 'LinkedIn', 'Abrindo LinkedIn para você!');
+        }
+        
+        // Comandos do GitHub
+        const githubKeywords = [
+            'github', 'git hub', 'abrir github', 'abra github', 'abre github'
+        ];
+        if (githubKeywords.some(keyword => msg.includes(keyword))) {
+            return openSite('https://github.com', 'GitHub', 'Abrindo GitHub para você!');
+        }
+        
+        // Comandos do Netflix
+        const netflixKeywords = [
+            'netflix', 'abrir netflix', 'abra netflix', 'abre netflix'
+        ];
+        if (netflixKeywords.some(keyword => msg.includes(keyword))) {
+            return openSite('https://www.netflix.com', 'Netflix', 'Abrindo Netflix para você!');
+        }
+        
+        // Comandos do Spotify
+        const spotifyKeywords = [
+            'spotify', 'abrir spotify', 'abra spotify', 'abre spotify', 'música'
+        ];
+        if (spotifyKeywords.some(keyword => msg.includes(keyword))) {
+            return openSite('https://open.spotify.com', 'Spotify', 'Abrindo Spotify para você!');
         }
         
         // Comandos de configuração
@@ -526,7 +569,7 @@ $(document).ready(function () {
             }
             
             setTimeout(() => {
-                $("#WishMessage").text("Ask me anything");
+                $("#WishMessage").text("Pergunte-me qualquer coisa");
             }, 5000);
             return true;
         }
@@ -639,7 +682,7 @@ $(document).ready(function () {
                     window.jarvisTTS.speak("Teste: Olá! Eu sou o Jarvis funcionando no GitHub Pages!");
                 }
                 setTimeout(() => {
-                    $("#WishMessage").text("Ask me anything");
+                    $("#WishMessage").text("Pergunte-me qualquer coisa");
                 }, 5000);
                 break;
             case '6':
