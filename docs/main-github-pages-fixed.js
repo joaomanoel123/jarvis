@@ -266,6 +266,12 @@ $(document).ready(function () {
             }
         });
         
+        // Botão do chat
+        $("#ChatBtn").click(function () {
+            console.log('💬 Botão de chat clicado');
+            toggleChatCanvas();
+        });
+        
         // Atalhos de teclado
         document.addEventListener('keyup', function(e) {
             // Cmd+J (Mac) ou Ctrl+J (Windows/Linux) para ativar microfone
@@ -398,6 +404,9 @@ $(document).ready(function () {
         
         console.log('📤 Enviando mensagem:', message);
         
+        // Adicionar mensagem do usuário ao chat
+        addMessageToChat(message, 'user');
+        
         // Verificar comandos locais primeiro
         if (handleLocalCommands(message)) {
             return;
@@ -419,6 +428,9 @@ $(document).ready(function () {
             .then(response => {
                 console.log('✅ Resposta recebida:', response);
                 $("#WishMessage").text(response);
+                
+                // Adicionar resposta do JARVIS ao chat
+                addMessageToChat(response, 'jarvis');
                 
                 // Falar resposta se TTS estiver ativo
                 if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
@@ -715,6 +727,158 @@ $(document).ready(function () {
                 break;
         }
     };
+    
+    // ===== FUNÇÕES DO CHAT DINÂMICO =====
+    
+    let chatHistory = [];
+    let chatVisible = false;
+    
+    function toggleChatCanvas() {
+        const chatCanvas = document.getElementById('offcanvasScrolling');
+        if (!chatCanvas) {
+            console.warn('⚠️ Chat canvas não encontrado');
+            return;
+        }
+        
+        if (chatVisible) {
+            // Fechar chat
+            $(chatCanvas).offcanvas('hide');
+            chatVisible = false;
+            console.log('💬 Chat fechado');
+        } else {
+            // Abrir chat e carregar histórico
+            loadChatHistory();
+            $(chatCanvas).offcanvas('show');
+            chatVisible = true;
+            console.log('💬 Chat aberto');
+        }
+    }
+    
+    function addMessageToChat(message, sender) {
+        const timestamp = new Date().toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const chatMessage = {
+            id: Date.now(),
+            message: message,
+            sender: sender, // 'user' ou 'jarvis'
+            timestamp: timestamp,
+            time: new Date()
+        };
+        
+        chatHistory.push(chatMessage);
+        
+        // Limitar histórico a 50 mensagens
+        if (chatHistory.length > 50) {
+            chatHistory = chatHistory.slice(-50);
+        }
+        
+        console.log('💬 Mensagem adicionada ao chat:', chatMessage);
+        
+        // Atualizar interface se chat estiver visível
+        if (chatVisible) {
+            loadChatHistory();
+        }
+        
+        // Salvar no localStorage
+        saveChatHistory();
+    }
+    
+    function loadChatHistory() {
+        const chatBody = document.getElementById('chat-canvas-body');
+        if (!chatBody) {
+            console.warn('⚠️ Chat body não encontrado');
+            return;
+        }
+        
+        // Carregar histórico do localStorage
+        loadChatFromStorage();
+        
+        if (chatHistory.length === 0) {
+            chatBody.innerHTML = `
+                <div class="text-center text-light p-4">
+                    <i class="bi bi-chat-dots" style="font-size: 3rem; opacity: 0.5;"></i>
+                    <p class="mt-3 mb-0">Nenhuma conversa ainda</p>
+                    <small class="text-muted">Comece digitando uma mensagem</small>
+                </div>
+            `;
+            return;
+        }
+        
+        let chatHTML = '';
+        
+        chatHistory.forEach(msg => {
+            const isUser = msg.sender === 'user';
+            const messageClass = isUser ? 'sender_message' : 'receiver_message';
+            const alignClass = isUser ? 'ms-auto' : 'me-auto';
+            
+            chatHTML += `
+                <div class="d-flex mb-3 ${isUser ? 'justify-content-end' : 'justify-content-start'}">
+                    <div class="${messageClass} width-size ${alignClass}" style="max-width: 80%;">
+                        <div class="message-content">
+                            ${escapeHtml(msg.message)}
+                        </div>
+                        <div class="message-time" style="font-size: 0.75rem; opacity: 0.7; margin-top: 5px;">
+                            ${msg.timestamp}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        chatBody.innerHTML = chatHTML;
+        
+        // Scroll para a última mensagem
+        setTimeout(() => {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }, 100);
+    }
+    
+    function saveChatHistory() {
+        try {
+            localStorage.setItem('jarvis_chat_history', JSON.stringify(chatHistory));
+        } catch (error) {
+            console.warn('⚠️ Erro ao salvar histórico do chat:', error);
+        }
+    }
+    
+    function loadChatFromStorage() {
+        try {
+            const saved = localStorage.getItem('jarvis_chat_history');
+            if (saved) {
+                chatHistory = JSON.parse(saved);
+            }
+        } catch (error) {
+            console.warn('⚠️ Erro ao carregar histórico do chat:', error);
+            chatHistory = [];
+        }
+    }
+    
+    function clearChatHistory() {
+        chatHistory = [];
+        saveChatHistory();
+        loadChatHistory();
+        console.log('💬 Histórico do chat limpo');
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Expor funções globalmente para uso em outros scripts
+    window.jarvisChat = {
+        addMessage: addMessageToChat,
+        loadHistory: loadChatHistory,
+        clearHistory: clearChatHistory,
+        toggle: toggleChatCanvas
+    };
+    
+    // Carregar histórico na inicialização
+    loadChatFromStorage();
     
     console.log('🎯 Main GitHub Pages script carregado com sucesso!');
 });
