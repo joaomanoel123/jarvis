@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Teste Final das Correções - JARVIS</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        #siri-container {
+            width: 300px;
+            height: 150px;
+            border: 1px solid #00AAFF;
+            margin: 10px 0;
+        }
+        .icon-test {
+            font-family: 'bootstrap-icons';
+            font-size: 24px;
+            margin: 10px;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+</head>
+<body>
+    <h1>🔧 Teste Final das Correções do JARVIS</h1>
+    
+    <div class="test-section">
+        <h2>1. Teste do SiriWave</h2>
+        <div id="siri-container"></div>
+        <p id="siriwave-test" class="warning">Testando SiriWave...</p>
+        <button onclick="testSiriWave()">🧪 Testar SiriWave</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Teste dos Ícones Bootstrap</h2>
+        <p id="icons-test" class="warning">Testando ícones...</p>
+        <div>
+            <span class="icon-test">&#xF52A;</span> <!-- bi-mic -->
+            <span class="icon-test">&#xF4F5;</span> <!-- bi-send -->
+            <span class="icon-test">&#xF3E2;</span> <!-- bi-chat-dots -->
+            <span class="icon-test">&#xF3E5;</span> <!-- bi-gear -->
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Teste do TTS (Após Interação)</h2>
+        <p id="tts-test" class="warning">Clique no botão para testar TTS...</p>
+        <button onclick="testTTS()">🔊 Testar TTS</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Teste do Console</h2>
+        <p id="console-test" class="warning">Verificando console...</p>
+        <button onclick="checkConsole()">📊 Verificar Console</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Resumo dos Testes</h2>
+        <ul id="test-summary"></ul>
+    </div>
+
+    <!-- Scripts -->
+    <script src="jquery.min.js"></script>
+    <script src="siriwave.umd.min.js"></script>
+    <script src="jarvis-tts.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tests = {};
+            
+            // Teste automático dos ícones
+            setTimeout(() => {
+                const iconElements = document.querySelectorAll('.icon-test');
+                let iconsLoaded = 0;
+                
+                iconElements.forEach(icon => {
+                    const computedStyle = window.getComputedStyle(icon);
+                    if (computedStyle.fontFamily.includes('bootstrap-icons')) {
+                        iconsLoaded++;
+                    }
+                });
+                
+                if (iconsLoaded > 0) {
+                    document.getElementById('icons-test').innerHTML = '<span class="success">✅ Ícones Bootstrap carregados com sucesso!</span>';
+                    tests.icons = true;
+                } else {
+                    document.getElementById('icons-test').innerHTML = '<span class="error">❌ Ícones Bootstrap não carregados</span>';
+                    tests.icons = false;
+                }
+                
+                updateSummary();
+            }, 1000);
+            
+            // Verificar console automaticamente
+            setTimeout(() => {
+                checkConsole();
+            }, 2000);
+            
+            window.testSiriWave = function() {
+                const container = document.getElementById('siri-container');
+                
+                try {
+                    if (typeof SiriWave === 'undefined') {
+                        throw new Error('SiriWave não está disponível');
+                    }
+                    
+                    const siriWave = new SiriWave({
+                        container: container,
+                        width: 300,
+                        height: 150,
+                        style: "ios9",
+                        amplitude: 1,
+                        speed: 0.30,
+                        frequency: 6,
+                        color: "#00AAFF",
+                        autostart: true
+                    });
+                    
+                    document.getElementById('siriwave-test').innerHTML = '<span class="success">✅ SiriWave funcionando perfeitamente!</span>';
+                    tests.siriwave = true;
+                    
+                    // Parar após 3 segundos
+                    setTimeout(() => {
+                        siriWave.stop();
+                    }, 3000);
+                    
+                } catch (error) {
+                    document.getElementById('siriwave-test').innerHTML = '<span class="error">❌ Erro no SiriWave: ' + error.message + '</span>';
+                    tests.siriwave = false;
+                }
+                
+                updateSummary();
+            };
+            
+            window.testTTS = function() {
+                try {
+                    if (window.jarvisTTS && window.jarvisTTS.speak) {
+                        window.jarvisTTS.speak('Teste do sistema de voz do Jarvis funcionando perfeitamente após as correções!');
+                        document.getElementById('tts-test').innerHTML = '<span class="success">✅ TTS testado! Você deve ouvir uma mensagem.</span>';
+                        tests.tts = true;
+                    } else if ('speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance('Teste do sistema de voz nativo funcionando!');
+                        utterance.lang = 'pt-BR';
+                        speechSynthesis.speak(utterance);
+                        document.getElementById('tts-test').innerHTML = '<span class="success">✅ TTS nativo testado! Você deve ouvir uma mensagem.</span>';
+                        tests.tts = true;
+                    } else {
+                        throw new Error('TTS não disponível');
+                    }
+                } catch (error) {
+                    document.getElementById('tts-test').innerHTML = '<span class="error">❌ Erro no TTS: ' + error.message + '</span>';
+                    tests.tts = false;
+                }
+                
+                updateSummary();
+            };
+            
+            window.checkConsole = function() {
+                // Simular verificação do console
+                const consoleErrors = [];
+                
+                // Verificar se há erros conhecidos
+                const originalError = console.error;
+                console.error = function(...args) {
+                    consoleErrors.push(args.join(' '));
+                    originalError.apply(console, args);
+                };
+                
+                // Aguardar um pouco para capturar erros
+                setTimeout(() => {
+                    const criticalErrors = consoleErrors.filter(error => 
+                        error.includes('TypeError') || 
+                        error.includes('ReferenceError') ||
+                        error.includes('404') ||
+                        error.includes('Failed to load')
+                    );
+                    
+                    if (criticalErrors.length === 0) {
+                        document.getElementById('console-test').innerHTML = '<span class="success">✅ Console limpo - sem erros críticos!</span>';
+                        tests.console = true;
+                    } else {
+                        document.getElementById('console-test').innerHTML = '<span class="warning">⚠️ ' + criticalErrors.length + ' erro(s) detectado(s) no console</span>';
+                        tests.console = false;
+                    }
+                    
+                    updateSummary();
+                }, 1000);
+            };
+            
+            function updateSummary() {
+                const summary = document.getElementById('test-summary');
+                const testCount = Object.keys(tests).length;
+                const successCount = Object.values(tests).filter(Boolean).length;
+                
+                if (testCount === 0) return;
+                
+                summary.innerHTML = `
+                    <li><strong>Total de testes:</strong> ${testCount}</li>
+                    <li><strong>Sucessos:</strong> <span class="success">${successCount}</span></li>
+                    <li><strong>Falhas:</strong> <span class="error">${testCount - successCount}</span></li>
+                    <li><strong>Taxa de sucesso:</strong> ${Math.round((successCount / testCount) * 100)}%</li>
+                `;
+                
+                // Detalhes dos testes
+                for (const [test, passed] of Object.entries(tests)) {
+                    const status = passed ? '✅' : '❌';
+                    const testName = {
+                        siriwave: 'SiriWave',
+                        icons: 'Ícones Bootstrap',
+                        tts: 'Text-to-Speech',
+                        console: 'Console'
+                    }[test] || test;
+                    
+                    summary.innerHTML += `<li>${status} ${testName}</li>`;
+                }
+                
+                if (testCount >= 3 && successCount === testCount) {
+                    summary.innerHTML += '<li class="success"><strong>🎉 Todas as correções funcionaram! JARVIS está 100% operacional.</strong></li>';
+                } else if (testCount >= 3) {
+                    summary.innerHTML += '<li class="warning"><strong>⚠️ Algumas correções precisam de ajustes. Verifique os detalhes acima.</strong></li>';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

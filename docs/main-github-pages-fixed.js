@@ -65,13 +65,14 @@ $(document).ready(function () {
             $("#Oval").attr("hidden", false);
             $("#WishMessage").text("Ask me anything");
             
-            // Falar mensagem de boas-vindas se TTS estiver disponível
-            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
-                setTimeout(() => {
-                    window.jarvisTTS.speak("Olá João Manoel! Como posso ajudá-lo hoje?");
-                }, 1000);
+        // Aguardar um pouco e preparar para falar (só após interação)
+        setTimeout(() => {
+            if (window.jarvisTTS && window.jarvisTTS.speak) {
+                // Preparar mensagem para falar após primeira interação
+                window.jarvisTTS.queueMessage = 'Olá João Manoel! Como posso ajudá-lo hoje?';
+                console.log('🎤 Mensagem preparada para falar após interação do usuário');
             }
-        }, 8000);
+        }, 2000);
     }
     
     function setupTextAnimations() {
@@ -150,6 +151,8 @@ $(document).ready(function () {
                 style: "ios9",
                 amplitude: 1,
                 speed: 0.30,
+                frequency: 6,
+                color: "#00AAFF",
                 autostart: false // Não iniciar automaticamente
             });
             
@@ -174,6 +177,24 @@ $(document).ready(function () {
     }
     
     function setupEventListeners() {
+        // Listener para ativar TTS após primeira interação
+        let firstInteraction = true;
+        function activateTTSOnFirstInteraction() {
+            if (firstInteraction && window.jarvisTTS && window.jarvisTTS.queueMessage) {
+                firstInteraction = false;
+                setTimeout(() => {
+                    window.jarvisTTS.speak(window.jarvisTTS.queueMessage);
+                    window.jarvisTTS.queueMessage = null;
+                    console.log('🎤 Mensagem de boas-vindas ativada após interação');
+                }, 500);
+            }
+        }
+        
+        // Adicionar listeners para primeira interação
+        document.addEventListener('click', activateTTSOnFirstInteraction, { once: true });
+        document.addEventListener('keydown', activateTTSOnFirstInteraction, { once: true });
+        document.addEventListener('touchstart', activateTTSOnFirstInteraction, { once: true });
+        
         // Botão do microfone
         $("#MicBtn").click(function () {
             console.log('🎤 Botão de microfone clicado');
