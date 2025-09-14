@@ -266,10 +266,30 @@ $(document).ready(function () {
             }
         });
         
-        // Botão do chat
-        $("#ChatBtn").click(function () {
+        // Botão do chat (novo ID)
+        $("#chat-toggle-btn").click(function () {
             console.log('💬 Botão de chat clicado');
             toggleChatCanvas();
+        });
+        
+        // Botão de envio do chat
+        $("#chat-send-btn").click(function () {
+            const message = $("#chat-input").val().trim();
+            if (message) {
+                sendMessage(message);
+                $("#chat-input").val("");
+            }
+        });
+        
+        // Input do chat
+        $("#chat-input").keypress(function (e) {
+            if (e.which === 13) { // Enter
+                const message = $("#chat-input").val().trim();
+                if (message) {
+                    sendMessage(message);
+                    $("#chat-input").val("");
+                }
+            }
         });
         
         // Atalhos de teclado
