@@ -8,6 +8,17 @@ $(document).ready(function () {
     function initializeJarvis() {
         console.log('🤖 Inicializando Jarvis para GitHub Pages...');
         
+        // Esconder tela de loading inicial
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.classList.add('fade-out');
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }
+        }, 1000);
+        
         // Verificar se as configurações estão disponíveis
         if (!window.jarvisConfig) {
             console.error('❌ Configurações não carregadas!');

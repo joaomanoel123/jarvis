@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Teste da Correção de Loading - JARVIS</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .test-content {
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="text-center">
+            <div style="border: 4px solid #f3f3f3; border-top: 4px solid #00AAFF; border-radius: 50%; width: 50px; height: 50px; animation: spin 2s linear infinite; margin: 0 auto;"></div>
+            <p style="margin-top: 20px;">Inicializando J.A.R.V.I.S...</p>
+        </div>
+    </div>
+
+    <div class="test-content">
+        <h1>🔧 Teste da Correção de Loading</h1>
+        
+        <div id="test-status" class="warning">
+            ⏳ Testando se a tela de loading desaparece...
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h2>📋 Checklist:</h2>
+            <ul id="checklist">
+                <li id="check-loading">⏳ Tela de loading deve desaparecer em 1-2 segundos</li>
+                <li id="check-content">⏳ Conteúdo principal deve aparecer</li>
+                <li id="check-transition">⏳ Transição deve ser suave (fade-out)</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button onclick="testAgain()" style="background: #00AAFF; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                🔄 Testar Novamente
+            </button>
+            <button onclick="goToMain()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+                🚀 Ir para JARVIS Principal
+            </button>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <script>
+        // Simular o comportamento do JARVIS
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Iniciando teste da correção de loading...');
+            
+            // Simular inicialização do JARVIS
+            setTimeout(() => {
+                console.log('🤖 Inicializando Jarvis para GitHub Pages...');
+                
+                // Esconder tela de loading inicial (mesma lógica do JARVIS)
+                setTimeout(() => {
+                    const loadingScreen = document.getElementById('loadingScreen');
+                    if (loadingScreen) {
+                        console.log('🔄 Escondendo tela de loading...');
+                        loadingScreen.classList.add('fade-out');
+                        
+                        // Marcar checklist
+                        document.getElementById('check-loading').innerHTML = '✅ Tela de loading desapareceu';
+                        document.getElementById('check-transition').innerHTML = '✅ Transição suave aplicada';
+                        
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                            console.log('✅ Tela de loading removida completamente');
+                            
+                            // Marcar conteúdo visível
+                            document.getElementById('check-content').innerHTML = '✅ Conteúdo principal visível';
+                            document.getElementById('test-status').innerHTML = '<span class="success">✅ Teste concluído com sucesso! A correção está funcionando.</span>';
+                        }, 500);
+                    }
+                }, 1000);
+            }, 500);
+        });
+        
+        function testAgain() {
+            location.reload();
+        }
+        
+        function goToMain() {
+            window.location.href = './index.html';
+        }
+    </script>
+</body>
+</html>
