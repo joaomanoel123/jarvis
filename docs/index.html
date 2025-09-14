@@ -36,23 +36,27 @@
     <!-- Main Styles - CSS Original Mantido -->
     <link rel="stylesheet" href="style.css">
     
-    <!-- Critical CSS apenas para loading -->
+    <!-- Critical CSS para loading organizado -->
     <style>
-        /* CSS mínimo para loading inicial */
+        /* Tela de carregamento limpa e organizada */
         .loading-screen {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background: #000 !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
-            z-index: 999999 !important;
-            transition: opacity 0.5s ease;
-            color: #fff !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+            transition: opacity 0.5s ease-out;
+            color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
         }
         
         .loading-screen.fade-out {
@@ -60,9 +64,29 @@
             pointer-events: none;
         }
         
-        /* Garantir que elementos da loading fiquem acima */
-        .loading-screen * {
-            z-index: 999999 !important;
+        /* Spinner organizado */
+        .loading-screen .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.25em;
+            margin-bottom: 1rem;
+        }
+        
+        /* Texto organizado */
+        .loading-screen p {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 300;
+            text-align: center;
+            opacity: 0.9;
+        }
+        
+        /* Container centralizado */
+        .loading-screen .text-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 
