@@ -31,22 +31,12 @@
     <!-- Cache Buster - Limpeza completa de cache problemático -->
     <script src="cache-buster.js"></script>
 
-    <!-- Main Styles -->
-    <link rel="stylesheet" href="style.css">
+    <!-- Main Styles - CSS Reorganizado -->
+    <link rel="stylesheet" href="style-fixed.css">
     
-    <!-- Performance optimizations -->
+    <!-- Critical CSS apenas para loading -->
     <style>
-        /* Critical CSS for faster loading */
-        body {
-            background-color: #000;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
+        /* CSS mínimo para loading inicial */
         .loading-screen {
             position: fixed;
             top: 0;
@@ -59,55 +49,13 @@
             align-items: center;
             z-index: 9999;
             transition: opacity 0.5s ease;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         .loading-screen.fade-out {
             opacity: 0;
             pointer-events: none;
-        }
-        
-        /* Responsive improvements */
-        @media (max-width: 768px) {
-            body {
-                font-size: 14px;
-            }
-        }
-        
-        /* Touch optimizations */
-        @media (hover: none) and (pointer: coarse) {
-            button, .btn {
-                min-height: 44px;
-                min-width: 44px;
-            }
-        }
-        
-        /* Garantir visibilidade das seções */
-        #Oval {
-            display: block !important;
-        }
-        
-        #Oval[hidden] {
-            display: none !important;
-        }
-        
-        /* Animações */
-        .animate__animated {
-            animation-duration: 1s;
-            animation-fill-mode: both;
-        }
-        
-        .animate__zoomIn {
-            animation-name: zoomIn;
-        }
-        
-        @keyframes zoomIn {
-            from {
-                opacity: 0;
-                transform: scale3d(0.3, 0.3, 0.3);
-            }
-            50% {
-                opacity: 1;
-            }
         }
     </style>
 
