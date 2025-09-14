@@ -652,9 +652,14 @@ body {
 }
 
 .offcanvas-start {
-    top: 10vh; /* Posicionar 10% do topo da tela */
-    height: 80vh; /* Altura de 80% da tela */
-    max-height: 600px; /* Altura máxima */
+    top: 0 !important; /* Posicionar no topo da tela */
+    height: 100vh !important; /* Altura total da tela */
+    max-height: none !important; /* Remover altura máxima */
+    transform: translateX(-100%) !important; /* Iniciar escondido */
+}
+
+.offcanvas-start.show {
+    transform: translateX(0) !important; /* Mostrar quando ativo */
 }
 
 .offcanvas-header {
@@ -776,9 +781,10 @@ body {
 /* Responsividade do chat */
 @media (max-width: 768px) {
     .offcanvas-start {
-        top: 5vh;
-        height: 85vh;
+        top: 0 !important;
+        height: 100vh !important;
         width: 85% !important;
+        max-height: none !important;
     }
     
     .offcanvas-header {
@@ -803,9 +809,10 @@ body {
 
 @media (max-width: 480px) {
     .offcanvas-start {
-        top: 0;
-        height: 100vh;
+        top: 0 !important;
+        height: 100vh !important;
         width: 90% !important;
+        max-height: none !important;
     }
     
     .receiver_message,
@@ -820,20 +827,9 @@ body {
     }
 }
 
-/* Animação de entrada do chat */
-.offcanvas.show {
-    animation: slideInFromLeft 0.3s ease-out;
-}
-
-@keyframes slideInFromLeft {
-    from {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+/* Animação de entrada do chat - simplificada */
+.offcanvas {
+    transition: transform 0.3s ease-out;
 }
 
 /* Melhorar alinhamento das mensagens */
