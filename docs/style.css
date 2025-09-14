@@ -12,6 +12,7 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 20; /* Esfera acima dos SVGs */
 }
 
 .square span:nth-child(1){
@@ -25,6 +26,7 @@ body{
     border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
     transition: 0.5s;
     animation: animate1 6s linear infinite;
+    z-index: 21; /* Camada 1 da esfera */
 }
 
 .square span:nth-child(2){
@@ -38,6 +40,7 @@ body{
     border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
     transition: 0.5s;
     animation: animate2 4s linear infinite;
+    z-index: 22; /* Camada 2 da esfera */
 }
 
 .square span:nth-child(3){
@@ -51,6 +54,7 @@ body{
     border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
     transition: 0.5s;
     animation: animate3 8s linear infinite;
+    z-index: 23; /* Camada 3 da esfera (topo) */
 }
 
 @keyframes animate1 {
@@ -97,6 +101,8 @@ body{
     max-width: 600px;
     margin: 20px auto 0 auto; /* centralizado abaixo da esfera */
     padding: 8px 12px;
+    z-index: 30; /* Input acima de todas as animações */
+    position: relative;
 }
   
   .input-field {
@@ -118,7 +124,7 @@ body{
     background: #111;
     cursor: pointer;
     position: relative;
-    z-index: 0;
+    z-index: 31; /* Botões acima do input */
     border-radius: 10px;
     padding: 0px;
     margin-left: 10px;
@@ -229,6 +235,7 @@ body{
   align-items: center;
   animation: change-view 2s ease-in infinite;
   max-width: 90vw;
+  z-index: 10; /* Base z-index para SVG frame */
 }
 
 @keyframes change-view {
@@ -263,6 +270,7 @@ svg {
   fill: none;
   animation: change-view 5s ease-in-out infinite alternate;
   filter: drop-shadow(0 0 12px #00aaff);
+  z-index: 1; /* SVG base layer */
 }
 
 #big-centro,
@@ -353,3 +361,15 @@ svg {
 
 /* Chat container removido - mantendo apenas design original centralizado */
 /* O #TextInput já está centralizado abaixo da esfera conforme especificado */
+
+/* ===== HIERARQUIA DE Z-INDEX ===== */
+/* 
+ * Hierarquia das animações (do menor para o maior z-index):
+ * 1. SVG base layer: z-index 1
+ * 10. SVG frame: z-index 10  
+ * 20. Esfera container: z-index 20
+ * 21-23. Camadas da esfera: z-index 21, 22, 23
+ * 30. Input: z-index 30
+ * 31. Botões: z-index 31
+ * 999999. Tela de carregamento: z-index 999999
+ */
