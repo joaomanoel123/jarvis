@@ -83,14 +83,21 @@ body{
 
 #TextInput {
     background-color: #181818a8;
-    border-color: blue;
-    box-shadow: 0 0 20px rgb(25, 0, 255),
-      inset 0 0 0px rgb(25, 0, 255);
-    border-radius: 8px;
+    border: 1px solid blue;
+    box-shadow: 0 0 20px rgb(25, 0, 255), inset 0 0 0px rgb(25, 0, 255);
+    border-radius: 12px;
     color: white;
-    padding: 3px 0px 3px 20px;
-    margin: 0px 20%;
-  }
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    width: 80%;
+    max-width: 600px;
+    margin: 20px auto 0 auto; /* centralizado abaixo da esfera */
+    padding: 8px 12px;
+}
   
   .input-field {
     background-color: transparent;
@@ -343,3 +350,6 @@ svg {
     overflow: visible;
     clip: auto;
 }
+
+/* Chat container removido - mantendo apenas design original centralizado */
+/* O #TextInput já está centralizado abaixo da esfera conforme especificado */
