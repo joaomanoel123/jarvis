@@ -641,3 +641,226 @@ body {
     white-space: nowrap !important;
     border: 0 !important;
 }
+
+/* ===== CHAT LAYOUT AJUSTADO ===== */
+
+/* Offcanvas - Chat posicionado mais para cima */
+.offcanvas {
+    background-color: #191919;
+    border-right: 2px solid rgb(25, 0, 255);
+    box-shadow: 0 0 20px rgb(25, 0, 255);
+}
+
+.offcanvas-start {
+    top: 10vh; /* Posicionar 10% do topo da tela */
+    height: 80vh; /* Altura de 80% da tela */
+    max-height: 600px; /* Altura máxima */
+}
+
+.offcanvas-header {
+    background-color: #181818a8;
+    border-bottom: 1px solid rgb(25, 0, 255);
+    padding: 12px 20px;
+    min-height: 60px;
+}
+
+.offcanvas-title {
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    font-size: 1.1rem;
+    font-weight: normal;
+}
+
+.offcanvas-body {
+    padding: 15px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: #191919;
+}
+
+/* Botões do header do chat */
+.btn-outline-light {
+    border-color: rgb(25, 0, 255);
+    color: rgb(25, 0, 255);
+    background: transparent;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+}
+
+.btn-outline-light:hover {
+    background-color: rgb(25, 0, 255);
+    border-color: rgb(25, 0, 255);
+    color: #fff;
+    box-shadow: 0 0 10px rgb(25, 0, 255);
+}
+
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: 0.8;
+}
+
+.btn-close-white:hover {
+    opacity: 1;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Mensagens do chat - consistente com estilo original */
+.receiver_message {
+    padding: 10px 12px;
+    border: 2px solid cyan;
+    border-radius: 0px 15px 15px 20px;
+    width: auto;
+    color: white;
+    background-color: #0dcaf014;
+    margin-bottom: 8px;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.sender_message {
+    padding: 10px 12px;
+    border: 2px solid #0045ff;
+    border-radius: 15px 15px 0px 20px;
+    width: auto;
+    color: white;
+    background-color: #0045ff;
+    margin-bottom: 8px;
+    font-family: 'Arial', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Timestamps das mensagens */
+.message-time {
+    font-size: 0.7rem !important;
+    opacity: 0.6 !important;
+    margin-top: 4px !important;
+    font-family: 'Arial', sans-serif !important;
+    text-align: right;
+}
+
+/* Estado vazio do chat */
+.chat-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: 'Arial', sans-serif;
+}
+
+.chat-empty-state i {
+    color: rgb(25, 0, 255);
+    margin-bottom: 15px;
+}
+
+/* Scrollbar personalizada para o chat */
+.offcanvas-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.offcanvas-body::-webkit-scrollbar-track {
+    background: #111;
+    border-radius: 3px;
+}
+
+.offcanvas-body::-webkit-scrollbar-thumb {
+    background: rgb(25, 0, 255);
+    border-radius: 3px;
+}
+
+.offcanvas-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(25, 0, 255, 0.8);
+}
+
+/* Responsividade do chat */
+@media (max-width: 768px) {
+    .offcanvas-start {
+        top: 5vh;
+        height: 85vh;
+        width: 85% !important;
+    }
+    
+    .offcanvas-header {
+        padding: 10px 15px;
+        min-height: 50px;
+    }
+    
+    .offcanvas-title {
+        font-size: 1rem;
+    }
+    
+    .offcanvas-body {
+        padding: 10px;
+    }
+    
+    .receiver_message,
+    .sender_message {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .offcanvas-start {
+        top: 0;
+        height: 100vh;
+        width: 90% !important;
+    }
+    
+    .receiver_message,
+    .sender_message {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+        margin-bottom: 6px;
+    }
+    
+    .message-time {
+        font-size: 0.65rem !important;
+    }
+}
+
+/* Animação de entrada do chat */
+.offcanvas.show {
+    animation: slideInFromLeft 0.3s ease-out;
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Melhorar alinhamento das mensagens */
+.justify-content-start {
+    justify-content: flex-start !important;
+}
+
+.justify-content-end {
+    justify-content: flex-end !important;
+}
+
+.ms-auto {
+    margin-left: auto !important;
+}
+
+.me-auto {
+    margin-right: auto !important;
+}
+
+/* Garantir que o chat não interfira com o layout principal */
+.offcanvas-backdrop {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Ícones do chat */
+.bi-chat-dots,
+.bi-trash {
+    color: inherit;
+    font-size: inherit;
+}
