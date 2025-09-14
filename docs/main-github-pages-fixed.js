@@ -8,16 +8,21 @@ $(document).ready(function () {
     function initializeJarvis() {
         console.log('🤖 Inicializando Jarvis para GitHub Pages...');
         
-        // Esconder tela de loading inicial
+        // Esconder tela de loading inicial com timing melhorado
         setTimeout(() => {
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen) {
+                // Adicionar classe de fade-out
                 loadingScreen.classList.add('fade-out');
+                console.log('🎬 Iniciando transição da tela de carregamento...');
+                
+                // Remover completamente após a animação
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
-                }, 500);
+                    console.log('✅ Tela de carregamento removida');
+                }, 800); // Tempo da transição CSS
             }
-        }, 1000);
+        }, 2500); // Mostrar por 2.5 segundos
         
         // Verificar se as configurações estão disponíveis
         if (!window.jarvisConfig) {
