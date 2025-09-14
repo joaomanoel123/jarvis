@@ -120,31 +120,56 @@ $(document).ready(function () {
     
     function setupSiriWave() {
         const container = document.getElementById("siri-container");
-        if (container && typeof SiriWave !== 'undefined') {
-            try {
-                siriWave = new SiriWave({
-                    container: container,
-                    width: container.clientWidth || 320,
-                    height: 160,
-                    style: "ios9",
-                    amplitude: 1,
-                    speed: 0.30,
-                    autostart: true
-                });
-                
-                window.addEventListener('resize', function() {
-                    if (siriWave) {
-                        siriWave.setWidth(container.clientWidth || 320);
-                        siriWave.setHeight(160);
+        if (!container) {
+            console.warn('⚠️ Container siri-container não encontrado');
+            return;
+        }
+        
+        // Verificar se SiriWave está disponível
+        if (typeof SiriWave === 'undefined') {
+            console.warn('⚠️ SiriWave não disponível, tentando carregar...');
+            // Tentar carregar SiriWave via CDN como fallback
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/siriwave/dist/siriwave.umd.min.js';
+            script.onload = function() {
+                console.log('✅ SiriWave carregado via CDN, tentando configurar novamente...');
+                setTimeout(setupSiriWave, 500); // Tentar novamente após carregamento
+            };
+            script.onerror = function() {
+                console.error('❌ Falha ao carregar SiriWave via CDN');
+            };
+            document.head.appendChild(script);
+            return;
+        }
+        
+        try {
+            siriWave = new SiriWave({
+                container: container,
+                width: container.clientWidth || 320,
+                height: 160,
+                style: "ios9",
+                amplitude: 1,
+                speed: 0.30,
+                autostart: false // Não iniciar automaticamente
+            });
+            
+            // Configurar redimensionamento responsivo
+            window.addEventListener('resize', function() {
+                if (siriWave && siriWave.canvas) {
+                    try {
+                        const newWidth = container.clientWidth || 320;
+                        siriWave.canvas.style.width = newWidth + 'px';
+                    } catch (resizeError) {
+                        console.warn('⚠️ Erro ao redimensionar SiriWave:', resizeError);
                     }
-                });
-                
-                console.log('🌊 SiriWave configurado');
-            } catch (error) {
-                console.warn('⚠️ Erro ao configurar SiriWave:', error);
-            }
-        } else {
-            console.warn('⚠️ SiriWave não disponível');
+                }
+            });
+            
+            console.log('🌊 SiriWave configurado com sucesso');
+        } catch (error) {
+                console.error('⚠️ Erro ao configurar SiriWave:', error);
+            // Fallback: criar um placeholder visual simples
+            container.innerHTML = '<div style="width: 100%; height: 160px; background: linear-gradient(45deg, #00AAFF, #0066CC); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">🌊 Visualizador de Áudio</div>';
         }
     }
     

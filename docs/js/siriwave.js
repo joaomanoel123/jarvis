@@ -1,38 +1,13 @@
-/**
- * siriwave.js
- * 
- * Módulo para encapsular a inicialização da biblioteca SiriWave.
- */
-
-/**
- * Cria e retorna uma nova instância de SiriWave.
- * @param {string} containerSelector - O seletor do elemento container para a animação.
- * @returns {SiriWave | null} A instância da SiriWave ou null se o container não for encontrado.
- */
-export function initSiriWave(containerSelector) {
-    const container = document.querySelector(containerSelector);
-    if (!container) {
-        console.error('SiriWave container not found!');
-        return null;
-    }
-
-    // A classe SiriWave é injetada no escopo global pela biblioteca carregada no HTML.
-    const siriWave = new SiriWave({
-        container: container,
-        width: 800,
-        height: 200,
-        style: "ios9",
-        speed: 0.1,
-        amplitude: 1.5,
-        autostart: false,
-        curveDefinition: [
-            { color: "255, 255, 255", supportLine: true },
-            { color: "68, 214, 255" },
-            { color: "0, 170, 255" },
-            { color: "0, 102, 255" }
-        ]
-    });
-
-    console.log('✅ SiriWave Initialized');
-    return siriWave;
-}
+!function(t,i){"object"==typeof exports&&"undefined"!=typeof module?module.exports=i():"function"==typeof define&&define.amd?define(i):(t="undefined"!=typeof globalThis?globalThis:t||self).SiriWave=i()}(this,(function(){"use strict";
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */var t=function(){return t=Object.assign||function(t){for(var i,s=1,e=arguments.length;s<e;s++){i=arguments[s];for(var o in i)Object.prototype.hasOwnProperty.call(i,o)&&(t[o]=i[o])}return t},t.apply(this,arguments)},i=function(){function t(t,i){this.siriWave=t,this.color=i.color,this.attenuation=i.attenuation||1,this.lineWidth=i.lineWidth||1,this.opacity=i.opacity||1}return t.prototype.draw=function(){var t=this.siriWave.ctx;t.globalAlpha=this.opacity,t.lineWidth=this.lineWidth,t.strokeStyle=this.color,t.beginPath();for(var i=-this.siriWave.width/2,s=this.siriWave.width/2,e=i;e<=s;e+=this.siriWave.opt.pixelDepth){var o=this.siriWave.amplitude*Math.pow(Math.sin(this.siriWave.phase+e*this.siriWave.opt.frequency*this.siriWave.opt.pixelDepth),this.attenuation),n=this.siriWave.height/2+o;t.lineTo(e+this.siriWave.width/2,n)}t.stroke()},t.getDefinition=function(){return[{attenuation:-2,lineWidth:1,opacity:.1},{attenuation:-6,lineWidth:1,opacity:.2},{attenuation:4,lineWidth:1,opacity:.4},{attenuation:2,lineWidth:1,opacity:.6},{attenuation:1,lineWidth:1.5,opacity:1}]},t}(),s=function(){function t(t,i){this.siriWave=t,this.color=i.color,this.supportLine=i.supportLine||!1,this.spawnAt=0,this.noOfCurves=10,this.prevMaxY=0,this.phases=this.noOfCurves.map((function(){return Math.random()*Math.PI*2})),this.offsets=this.noOfCurves.map((function(){return Math.random()*1e3})),this.speeds=this.noOfCurves.map((function(){return Math.random()*.5+.2})),this.finalAmplitudes=this.noOfCurves.map((function(){return Math.random()*.3+.1})),this.widths=this.noOfCurves.map((function(){return Math.random()*20+10})),this.amplitudes=this.noOfCurves.map((function(){return 0}))}return t.prototype.draw=function(){var t=this.siriWave.ctx;t.globalAlpha=.7,t.lineWidth=1,t.strokeStyle="rgb(".concat(this.color,")"),t.beginPath();var i=this.siriWave.width/2,s=this.siriWave.height/2;if(this.supportLine){t.moveTo(0,s),t.lineTo(this.siriWave.width,s);for(var e=0;e<this.noOfCurves;e++){this.phases[e]+=this.speeds[e]*this.siriWave.speed;var o=this.siriWave.amplitude*this.finalAmplitudes[e]*Math.sin(this.phases[e])*Math.pow(1/Math.pow(this.offsets[e]+1,2),2);this.amplitudes[e]+=.02*(o-this.amplitudes[e])}t.stroke()}else{var n=0;t.moveTo(0,s);for(e=0;e<this.siriWave.width;e+=this.siriWave.opt.pixelDepth){n=s;for(var h=0;h<this.noOfCurves;h++){var r=this.offsets[h]+e*this.siriWave.opt.pixelDepth,a=this.siriWave.amplitude*this.finalAmplitudes[h]*Math.sin(this.phases[h]+r/this.widths[h])*Math.exp(-Math.pow(r,2)/(2*Math.pow(this.widths[h],2)));n+=a*this.amplitudes[h]}t.lineTo(e,n)}t.stroke()}var l=Math.max.apply(Math,this.amplitudes);return l<=.001&&(this.spawnAt=Date.now()),Date.now()>this.spawnAt+2e3&&l<=.001&&(this.phases=this.noOfCurves.map((function(){return Math.random()*Math.PI*2})),this.offsets=this.noOfCurves.map((function(){return Math.random()*1e3})),this.spawnAt=0),this.prevMaxY=l,null},t.getDefinition=function(){return[{color:"255,255,255",supportLine:!0},{color:"15, 82, 169"},{color:"173, 57, 76"},{color:"48, 220, 155"}]},t}();return function(){function e(e){var o=this,n=e.container,h=function(t,i){var s={};for(var e in t)Object.prototype.hasOwnProperty.call(t,e)&&i.indexOf(e)<0&&(s[e]=t[e]);if(null!=t&&"function"==typeof Object.getOwnPropertySymbols){var o=0;for(e=Object.getOwnPropertySymbols(t);o<e.length;o++)i.indexOf(e[o])<0&&Object.prototype.propertyIsEnumerable.call(t,e[o])&&(s[e[o]]=t[e[o]])}return s}(e,["container"]);this.phase=0,this.run=!1,this.curves=[];var r=window.getComputedStyle(n);this.opt=t({container:n,style:"ios",ratio:window.devicePixelRatio||1,speed:.2,amplitude:1,frequency:6,color:"#fff",cover:!1,width:parseInt(r.width.replace("px",""),10),height:parseInt(r.height.replace("px",""),10),autostart:!0,pixelDepth:.02,lerpSpeed:.1,globalCompositeOperation:"lighter"},h),this.speed=Number(this.opt.speed),this.amplitude=Number(this.opt.amplitude),this.width=Number(this.opt.ratio*this.opt.width),this.height=Number(this.opt.ratio*this.opt.height),this.heightMax=Number(this.height/2)-6,this.color="rgb(".concat(this.hex2rgb(this.opt.color),")"),this.interpolation={speed:this.speed,amplitude:this.amplitude},this.canvas=document.createElement("canvas");var a=this.canvas.getContext("2d");if(null===a)throw new Error("Unable to create 2D Context");if(this.ctx=a,this.canvas.width=this.width,this.canvas.height=this.height,!0===this.opt.cover?this.canvas.style.width=this.canvas.style.height="100%":(this.canvas.style.width="".concat(this.width/this.opt.ratio,"px"),this.canvas.style.height="".concat(this.height/this.opt.ratio,"px")),"ios9"===this.opt.style)this.curves=(this.opt.curveDefinition||s.getDefinition()).map((function(t){return new s(o,t)}));else this.curves=(this.opt.curveDefinition||i.getDefinition()).map((function(t){return new i(o,t)}));this.opt.container.appendChild(this.canvas),this.opt.autostart&&this.start()}return e.prototype.hex2rgb=function(t){t=t.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i,(function(t,i,s,e){return i+i+s+s+e+e}));var i=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(t);return i?"".concat(parseInt(i[1],16).toString(),",").concat(parseInt(i[2],16).toString(),",").concat(parseInt(i[3],16).toString()):null},e.prototype.intLerp=function(t,i,s){return t*(1-s)+i*s},e.prototype.lerp=function(t){var i=this.interpolation[t];return null!==i&&(this[t]=this.intLerp(this[t],i,this.opt.lerpSpeed),this[t]-i==0&&(this.interpolation[t]=null)),this[t]},e.prototype.clear=function(){this.ctx.globalCompositeOperation="destination-out",this.ctx.fillRect(0,0,this.width,this.height),this.ctx.globalCompositeOperation="source-over"},e.prototype.draw=function(){this.curves.forEach((function(t){return t.draw()}))},e.prototype.startDrawCycle=function(){this.clear(),this.lerp("amplitude"),this.lerp("speed"),this.draw(),this.phase=(this.phase+Math.PI/2*this.speed)%(2*Math.PI),window.requestAnimationFrame?this.animationFrameId=window.requestAnimationFrame(this.startDrawCycle.bind(this)):this.timeoutId=setTimeout(this.startDrawCycle.bind(this),20)},e.prototype.start=function(){if(!this.canvas)throw new Error("This instance of SiriWave has been disposed, please create a new instance");this.phase=0,this.run||(this.run=!0,this.startDrawCycle())},e.prototype.stop=function(){this.phase=0,this.run=!1,this.animationFrameId&&window.cancelAnimationFrame(this.animationFrameId),this.timeoutId&&clearTimeout(this.timeoutId)},e.prototype.dispose=function(){this.stop(),this.canvas&&(this.canvas.remove(),this.canvas=null)},e.prototype.set=function(t,i){this.interpolation[t]=i},e.prototype.setSpeed=function(t){this.set("speed",t)},e.prototype.setAmplitude=function(t){this.set("amplitude",t)},e}()}));

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Correções - JARVIS</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        #siri-container {
+            width: 300px;
+            height: 150px;
+            border: 1px solid #00AAFF;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Teste de Correções do JARVIS</h1>
+    
+    <div class="test-section">
+        <h2>1. Teste do Bootstrap</h2>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <p id="bootstrap-test" class="warning">Testando Bootstrap...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Teste do jQuery</h2>
+        <p id="jquery-test" class="warning">Testando jQuery...</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Teste do jQuery Lettering</h2>
+        <p id="lettering-test" class="warning">Testando Lettering...</p>
+        <div id="lettering-demo">TESTE LETTERING</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Teste do Textillate</h2>
+        <p id="textillate-test" class="warning">Testando Textillate...</p>
+        <div id="textillate-demo">TESTE TEXTILLATE</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Teste do SiriWave</h2>
+        <p id="siriwave-test" class="warning">Testando SiriWave...</p>
+        <div id="siri-container"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>6. Resumo dos Testes</h2>
+        <ul id="test-summary"></ul>
+    </div>
+
+    <!-- Scripts -->
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <script src="cache-buster.js"></script>
+    <script src="jquery.min.js"></script>
+    <script src="jquery.lettering.min.js"></script>
+    <script src="jquery.textillate.min.js"></script>
+    <script src="siriwave.umd.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tests = [];
+            
+            // Teste 1: Bootstrap
+            try {
+                const hasBootstrap = document.querySelector('.container-fluid') !== null;
+                if (hasBootstrap) {
+                    document.getElementById('bootstrap-test').innerHTML = '<span class="success">✅ Bootstrap carregado com sucesso!</span>';
+                    tests.push({name: 'Bootstrap', status: 'success'});
+                } else {
+                    throw new Error('Bootstrap não encontrado');
+                }
+            } catch (error) {
+                document.getElementById('bootstrap-test').innerHTML = '<span class="error">❌ Erro no Bootstrap: ' + error.message + '</span>';
+                tests.push({name: 'Bootstrap', status: 'error', error: error.message});
+            }
+            
+            // Teste 2: jQuery
+            try {
+                if (typeof $ !== 'undefined') {
+                    document.getElementById('jquery-test').innerHTML = '<span class="success">✅ jQuery carregado com sucesso! Versão: ' + $.fn.jquery + '</span>';
+                    tests.push({name: 'jQuery', status: 'success', version: $.fn.jquery});
+                } else {
+                    throw new Error('jQuery não encontrado');
+                }
+            } catch (error) {
+                document.getElementById('jquery-test').innerHTML = '<span class="error">❌ Erro no jQuery: ' + error.message + '</span>';
+                tests.push({name: 'jQuery', status: 'error', error: error.message});
+            }
+            
+            // Teste 3: jQuery Lettering
+            setTimeout(() => {
+                try {
+                    if (typeof $ !== 'undefined' && typeof $.fn.lettering !== 'undefined') {
+                        // Testar o método words especificamente
+                        $('#lettering-demo').lettering('words');
+                        document.getElementById('lettering-test').innerHTML = '<span class="success">✅ jQuery Lettering carregado com sucesso!</span>';
+                        tests.push({name: 'jQuery Lettering', status: 'success'});
+                    } else {
+                        throw new Error('jQuery Lettering não encontrado');
+                    }
+                } catch (error) {
+                    document.getElementById('lettering-test').innerHTML = '<span class="error">❌ Erro no jQuery Lettering: ' + error.message + '</span>';
+                    tests.push({name: 'jQuery Lettering', status: 'error', error: error.message});
+                }
+                
+                // Teste 4: Textillate
+                setTimeout(() => {
+                    try {
+                        if (typeof $ !== 'undefined' && typeof $.fn.textillate !== 'undefined') {
+                            $('#textillate-demo').textillate({
+                                in: { effect: 'fadeIn' },
+                                out: { effect: 'fadeOut' }
+                            });
+                            document.getElementById('textillate-test').innerHTML = '<span class="success">✅ Textillate carregado com sucesso!</span>';
+                            tests.push({name: 'Textillate', status: 'success'});
+                        } else {
+                            throw new Error('Textillate não encontrado');
+                        }
+                    } catch (error) {
+                        document.getElementById('textillate-test').innerHTML = '<span class="error">❌ Erro no Textillate: ' + error.message + '</span>';
+                        tests.push({name: 'Textillate', status: 'error', error: error.message});
+                    }
+                    
+                    // Teste 5: SiriWave
+                    setTimeout(() => {
+                        try {
+                            if (typeof SiriWave !== 'undefined') {
+                                const container = document.getElementById('siri-container');
+                                const siriWave = new SiriWave({
+                                    container: container,
+                                    width: 300,
+                                    height: 150,
+                                    style: "ios9",
+                                    amplitude: 1,
+                                    speed: 0.30,
+                                    autostart: true
+                                });
+                                document.getElementById('siriwave-test').innerHTML = '<span class="success">✅ SiriWave carregado com sucesso!</span>';
+                                tests.push({name: 'SiriWave', status: 'success'});
+                            } else {
+                                throw new Error('SiriWave não encontrado');
+                            }
+                        } catch (error) {
+                            document.getElementById('siriwave-test').innerHTML = '<span class="error">❌ Erro no SiriWave: ' + error.message + '</span>';
+                            tests.push({name: 'SiriWave', status: 'error', error: error.message});
+                        }
+                        
+                        // Gerar resumo
+                        generateSummary(tests);
+                    }, 500);
+                }, 500);
+            }, 500);
+            
+            function generateSummary(tests) {
+                const summary = document.getElementById('test-summary');
+                const successCount = tests.filter(t => t.status === 'success').length;
+                const totalCount = tests.length;
+                
+                summary.innerHTML = `
+                    <li><strong>Total de testes:</strong> ${totalCount}</li>
+                    <li><strong>Sucessos:</strong> <span class="success">${successCount}</span></li>
+                    <li><strong>Falhas:</strong> <span class="error">${totalCount - successCount}</span></li>
+                    <li><strong>Taxa de sucesso:</strong> ${Math.round((successCount / totalCount) * 100)}%</li>
+                `;
+                
+                if (successCount === totalCount) {
+                    summary.innerHTML += '<li class="success"><strong>🎉 Todos os testes passaram! Os erros foram corrigidos com sucesso.</strong></li>';
+                } else {
+                    summary.innerHTML += '<li class="warning"><strong>⚠️ Alguns testes falharam. Verifique os detalhes acima.</strong></li>';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
