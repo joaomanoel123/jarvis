@@ -388,22 +388,25 @@
         </section>
     </div>
 
-    <!-- Chat Offcanvas -->
-    <div class="offcanvas offcanvas-start chat-canvas" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
-        id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title text-white" id="offcanvasScrollingLabel">
-                <i class="bi bi-chat-dots me-2"></i>Conversas
-            </h5>
-            <div class="d-flex align-items-center">
-                <button type="button" class="btn btn-sm btn-outline-light me-2" onclick="window.jarvisChat.clearHistory()" title="Limpar histórico">
-                    <i class="bi bi-trash"></i>
-                </button>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+    <!-- Chat Container - Sempre acima de tudo -->
+    <div id="chat-container">
+        <!-- Chat Offcanvas -->
+        <div class="offcanvas offcanvas-start chat-canvas" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+            id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title text-white" id="offcanvasScrollingLabel">
+                    <i class="bi bi-chat-dots me-2"></i>Conversas
+                </h5>
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn btn-sm btn-outline-light me-2" onclick="window.jarvisChat.clearHistory()" title="Limpar histórico">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+                </div>
             </div>
-        </div>
-        <div id="chat-canvas-body" class="offcanvas-body">
-            <!-- Chat content will be loaded dynamically -->
+            <div id="chat-canvas-body" class="offcanvas-body">
+                <!-- Chat content will be loaded dynamically -->
+            </div>
         </div>
     </div>
 

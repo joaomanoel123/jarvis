@@ -644,11 +644,26 @@ body {
 
 /* ===== CHAT LAYOUT AJUSTADO ===== */
 
+/* Chat Container - Sempre acima de tudo */
+#chat-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    pointer-events: none; /* Permite cliques através do container */
+}
+
+#chat-container > * {
+    pointer-events: auto; /* Restaura cliques nos elementos filhos */
+}
+
 /* Offcanvas - Chat posicionado mais para cima */
 .offcanvas {
     background-color: #191919;
     border-right: 2px solid rgb(25, 0, 255);
     box-shadow: 0 0 20px rgb(25, 0, 255);
+    z-index: 10000 !important; /* Sempre acima de tudo */
 }
 
 .offcanvas-start {
@@ -859,4 +874,62 @@ body {
 .bi-trash {
     color: inherit;
     font-size: inherit;
+}
+
+/* ===== GARANTIR CHAT SEMPRE ACIMA ===== */
+
+/* Botão do chat sempre visível */
+#ChatBtn {
+    z-index: 9998 !important;
+    position: relative;
+}
+
+/* TextInput sempre acima das animações */
+#TextInput {
+    position: relative;
+    z-index: 9997 !important;
+}
+
+/* Todos os botões glow sempre visíveis */
+.glow-on-hover {
+    z-index: 9996 !important;
+    position: relative;
+}
+
+/* Garantir que o chat offcanvas tenha prioridade máxima */
+.offcanvas.show {
+    z-index: 10001 !important;
+}
+
+/* Backdrop do chat */
+.offcanvas-backdrop {
+    z-index: 10000 !important;
+}
+
+/* Elementos de interface sempre acima das animações SVG */
+#Oval {
+    z-index: 9995 !important;
+    position: relative;
+}
+
+/* SVG e animações com z-index menor */
+.svg-frame,
+svg,
+.square,
+#canvasOne {
+    z-index: 1 !important;
+    position: relative;
+}
+
+/* Garantir que mensagens e textos fiquem acima */
+#WishMessage,
+.siri-message,
+h1, h2, h3, h4, h5, h6 {
+    z-index: 9994 !important;
+    position: relative;
+}
+
+/* Loading screen com z-index alto mas menor que chat */
+.loading-screen {
+    z-index: 9990 !important;
 }
