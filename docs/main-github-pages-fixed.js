@@ -65,14 +65,15 @@ $(document).ready(function () {
             $("#Oval").attr("hidden", false);
             $("#WishMessage").text("Ask me anything");
             
-        // Aguardar um pouco e preparar para falar (só após interação)
-        setTimeout(() => {
-            if (window.jarvisTTS && window.jarvisTTS.speak) {
-                // Preparar mensagem para falar após primeira interação
-                window.jarvisTTS.queueMessage = 'Olá João Manoel! Como posso ajudá-lo hoje?';
-                console.log('🎤 Mensagem preparada para falar após interação do usuário');
-            }
-        }, 2000);
+            // Aguardar um pouco e preparar para falar (só após interação)
+            setTimeout(() => {
+                if (window.jarvisTTS && window.jarvisTTS.speak) {
+                    // Preparar mensagem para falar após primeira interação
+                    window.jarvisTTS.queueMessage = 'Olá João Manoel! Como posso ajudá-lo hoje?';
+                    console.log('🎤 Mensagem preparada para falar após interação do usuário');
+                }
+            }, 2000);
+        }, 8000);
     }
     
     function setupTextAnimations() {
