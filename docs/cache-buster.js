@@ -65,6 +65,18 @@
         });
         
         console.log('🎨 CSS cache busted');
+
+        // Cache bust para JS
+        const jsScripts = document.querySelectorAll('script[src]');
+        jsScripts.forEach(script => {
+            // Evitar adicionar a fontes externas (CDNs, etc.)
+            if (script.src && !script.src.includes('?v=') && !script.src.includes('cdn.') && !script.src.includes('lottiefiles') && !script.src.includes('unpkg')) {
+                const separator = script.src.includes('?') ? '&' : '?';
+                script.src += `${separator}v=${version}`;
+            }
+        });
+
+        console.log('🚀 JS cache busted');
     });
     
     // Detectar e corrigir problemas comuns (com limite de tentativas)
