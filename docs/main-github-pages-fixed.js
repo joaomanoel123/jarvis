@@ -15,7 +15,12 @@ $(document).ready(function () {
                 loadingScreen.classList.add('fade-out');
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
+                    // Inicia a sequência de startup após a animação da tela de carregamento
+                    startGitHubPagesSequence();
                 }, 500);
+            } else {
+                // Caso a tela de carregamento não exista, inicia a sequência diretamente
+                startGitHubPagesSequence();
             }
         }, 1000);
         
@@ -29,8 +34,7 @@ $(document).ready(function () {
         console.log('🌐 Ambiente:', config.getEnvironment());
         console.log('🔗 API URL:', config.getApiUrl());
         
-        // Inicializar sequência de startup para GitHub Pages
-        startGitHubPagesSequence();
+        // A chamada para startGitHubPagesSequence() foi movida para garantir que a tela de carregamento suma primeiro.
         
         // Configurar animações de texto (com fallback)
         setupTextAnimations();
