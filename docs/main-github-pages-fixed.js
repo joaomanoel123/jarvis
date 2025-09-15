@@ -53,26 +53,37 @@ $(document).ready(function () {
     
     function startGitHubPagesSequence() {
         console.log('🚀 Iniciando sequência de startup...');
+
+        // Z-index para garantir a ordem de empilhamento correta das animações
+        const zIndexConfig = {
+            loader: 10,
+            faceAuth: 20,
+            faceAuthSuccess: 30,
+            helloGreet: 40
+        };
+
+        // Garante que o loader esteja na camada correta
+        $('#Loader').css({'position': 'relative', 'z-index': zIndexConfig.loader});
         
-        // Sequência de inicialização mais rápida e fluida
+        // Sequência de inicialização com controle de z-index
         setTimeout(() => {
             console.log('👤 Iniciando Face Auth...');
             $("#Loader").attr("hidden", true);
-            $("#FaceAuth").attr("hidden", false);
+            $("#FaceAuth").attr("hidden", false).css({'position': 'relative', 'z-index': zIndexConfig.faceAuth});
             $("#WishMessage").text("Autenticando...");
         }, 1500);
         
         setTimeout(() => {
             console.log('✅ Face Auth Success...');
             $("#FaceAuth").attr("hidden", true);
-            $("#FaceAuthSuccess").attr("hidden", false);
+            $("#FaceAuthSuccess").attr("hidden", false).css({'position': 'relative', 'z-index': zIndexConfig.faceAuthSuccess});
             $("#WishMessage").text("Autenticação bem-sucedida!");
         }, 3000);
         
         setTimeout(() => {
             console.log('👋 Hello Greet...');
             $("#FaceAuthSuccess").attr("hidden", true);
-            $("#HelloGreet").attr("hidden", false);
+            $("#HelloGreet").attr("hidden", false).css({'position': 'relative', 'z-index': zIndexConfig.helloGreet});
             $("#WishMessage").text("Olá, bem-vindo João Manoel!");
         }, 4500);
         
