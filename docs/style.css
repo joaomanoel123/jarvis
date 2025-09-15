@@ -101,6 +101,8 @@ body{
     max-width: 600px;
     margin: 20px auto 0 auto; /* centralizado abaixo da esfera */
     padding: 8px 12px;
+    z-index: 30; /* Input acima de todas as animações */
+    position: relative;
 }
   
   .input-field {
