@@ -380,16 +380,21 @@
                     <div class="col-12 mt-4 pt-4">
                         <div class="text-center">
                             <div id="TextInput" class="d-flex flex-wrap justify-content-center">
-
                                 <input type="text" class="input-field" name="chatbox" id="chatbox"
                                     placeholder="Digite aqui..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                                <button id="SendBtn" class="glow-on-hover" hidden aria-label="Enviar mensagem"><i class="bi bi-send"></i></button>
-                                <button id="MicBtn" class="glow-on-hover" aria-label="Ativar microfone"><i class="bi bi-mic"></i></button>
+                                <button id="SendBtn" class="glow-on-hover" hidden aria-label="Enviar mensagem">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                                <button id="MicBtn" class="glow-on-hover" aria-label="Ativar microfone">
+                                    <i class="bi bi-mic"></i>
+                                </button>
                                 <button id="ChatBtn" class="glow-on-hover" data-bs-toggle="offcanvas"
-                                    data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling" aria-label="Abrir chat"><i
-                                        class="bi bi-chat-dots"></i></button>
-                                <button id="SettingsBtn" class="glow-on-hover" aria-label="Configurações"><i class="bi bi-gear"></i></button>
-
+                                    data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling" aria-label="Abrir chat">
+                                    <i class="bi bi-chat-dots"></i>
+                                </button>
+                                <button id="SettingsBtn" class="glow-on-hover" aria-label="Configurações">
+                                    <i class="bi bi-gear"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -399,6 +404,17 @@
             </div>
 
         </section>
+
+<!-- Script para remover a tela de loading -->
+<script>
+    window.addEventListener("load", function() {
+        const loadingScreen = document.getElementById("loadingScreen");
+        if (loadingScreen) {
+            loadingScreen.classList.add("fade-out");
+            setTimeout(() => loadingScreen.style.display = "none", 600);
+        }
+    });
+</script>
 
         <section id="SiriWave" class="mb-4" hidden>
 
@@ -544,24 +560,7 @@
         }
     </script>
 
-    <script>
-      // Script para esconder a tela de loading quando a página carregar
-      window.addEventListener("load", function() {
-        console.log("🚀 Página carregada, iniciando fade-out da tela de carregamento...");
-        const loadingScreen = document.getElementById("loadingScreen");
-        if (loadingScreen) {
-          console.log("✅ Elemento loadingScreen encontrado");
-          loadingScreen.classList.add("fade-out");
-          console.log("🎬 Classe fade-out adicionada");
-          setTimeout(() => {
-            loadingScreen.style.display = "none";
-            console.log("✅ Tela de carregamento removida com sucesso!");
-          }, 600); // 600ms = tempo da animação CSS
-        } else {
-          console.error("❌ Elemento loadingScreen não encontrado!");
-        }
-      });
-    </script>
+
 
 </body>
 
