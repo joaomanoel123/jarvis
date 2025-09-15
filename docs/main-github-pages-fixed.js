@@ -15,11 +15,14 @@ $(document).ready(function () {
                 loadingScreen.classList.add('fade-out');
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
-                    // Inicia a sequência de startup após a animação da tela de carregamento
+                    // Mostra a seção de início para que as animações possam começar
+                    $('#Start').attr('hidden', false);
+                    // Inicia a sequência de startup
                     startGitHubPagesSequence();
                 }, 500);
             } else {
                 // Caso a tela de carregamento não exista, inicia a sequência diretamente
+                $('#Start').attr('hidden', false);
                 startGitHubPagesSequence();
             }
         }, 1000);
