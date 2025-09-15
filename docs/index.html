@@ -60,8 +60,9 @@
         }
         
         .loading-screen.fade-out {
-            opacity: 0;
-            pointer-events: none;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.6s ease-out !important;
         }
         
         /* Spinner organizado */
@@ -544,12 +545,20 @@
     </script>
 
     <script>
+      // Script para esconder a tela de loading quando a página carregar
       window.addEventListener("load", function() {
+        console.log("🚀 Página carregada, iniciando fade-out da tela de carregamento...");
         const loadingScreen = document.getElementById("loadingScreen");
         if (loadingScreen) {
+          console.log("✅ Elemento loadingScreen encontrado");
           loadingScreen.classList.add("fade-out");
-          setTimeout(() => loadingScreen.style.display = "none", 600); 
-          // 600ms = tempo da animação CSS
+          console.log("🎬 Classe fade-out adicionada");
+          setTimeout(() => {
+            loadingScreen.style.display = "none";
+            console.log("✅ Tela de carregamento removida com sucesso!");
+          }, 600); // 600ms = tempo da animação CSS
+        } else {
+          console.error("❌ Elemento loadingScreen não encontrado!");
         }
       });
     </script>

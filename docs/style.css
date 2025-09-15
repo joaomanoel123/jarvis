@@ -362,6 +362,14 @@ svg {
 /* Chat container removido - mantendo apenas design original centralizado */
 /* O #TextInput já está centralizado abaixo da esfera conforme especificado */
 
+/* ===== TELA DE CARREGAMENTO ===== */
+/* Animação de fade-out para a tela de carregamento */
+.loading-screen.fade-out {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.6s ease-out !important;
+}
+
 /* ===== HIERARQUIA DE Z-INDEX ===== */
 /* 
  * Hierarquia das animações (do menor para o maior z-index):
