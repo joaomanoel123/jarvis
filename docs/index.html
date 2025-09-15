@@ -543,6 +543,17 @@
         }
     </script>
 
+    <script>
+      window.addEventListener("load", function() {
+        const loadingScreen = document.getElementById("loadingScreen");
+        if (loadingScreen) {
+          loadingScreen.classList.add("fade-out");
+          setTimeout(() => loadingScreen.style.display = "none", 600); 
+          // 600ms = tempo da animação CSS
+        }
+      });
+    </script>
+
 </body>
 
 </html>
