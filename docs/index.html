@@ -26,70 +26,14 @@
     
     <!-- Bootstrap CSS (Local) -->
     <link rel="stylesheet" href="bootstrap.min.css">
-    
-    <!-- Bootstrap Icons (Local) -->
-    <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
-
-    <!-- Cache Buster - Limpeza completa de cache problemático -->
-    <script src="cache-buster.js"></script>
 
     <!-- Main Styles - CSS Original Mantido -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- Cache Buster - Limpeza completa de cache problemático -->
+    <script src="cache-buster.js"></script>
     
-    <!-- Critical CSS para loading organizado -->
-    <style>
-        /* Tela de carregamento limpa e organizada */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #000000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 999999;
-            transition: opacity 0.5s ease-out;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
-        
-        .loading-screen.fade-out {
-            opacity: 0 !important;
-            pointer-events: none !important;
-            transition: opacity 0.6s ease-out !important;
-        }
-        
-        /* Spinner organizado */
-        .loading-screen .spinner-border {
-            width: 3rem;
-            height: 3rem;
-            border-width: 0.25em;
-            margin-bottom: 1rem;
-        }
-        
-        /* Texto organizado */
-        .loading-screen p {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: 300;
-            text-align: center;
-            opacity: 0.9;
-        }
-        
-        /* Container centralizado */
-        .loading-screen .text-center {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
+    
 
     <!-- conexão ao core.js-->
     <script src="./js/core-js.min.js"></script>
@@ -411,7 +355,10 @@
         const loadingScreen = document.getElementById("loadingScreen");
         if (loadingScreen) {
             loadingScreen.classList.add("fade-out");
-            setTimeout(() => loadingScreen.style.display = "none", 600);
+            // remove do DOM depois da animação
+            setTimeout(() => {
+                loadingScreen.remove();
+            }, 700); // 700ms > 600ms da animação
         }
     });
 </script>
