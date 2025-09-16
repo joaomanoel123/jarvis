@@ -82,6 +82,33 @@ body{
     }
 }
 
+/* ===== TELA DE CARREGAMENTO ===== */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+  transition: opacity 0.6s ease;
+}
+
+.loading-screen.fade-out {
+  opacity: 0;
+  visibility: hidden; /* garante que não fica "invisível mas clicável" */
+  pointer-events: none; /* previne cliques durante a transição */
+}
+
+/* Spinner organizado */
+.loading-screen .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.25em;
+}
 
 /* Input Filed Start*/
 
@@ -384,6 +411,7 @@ svg {
 .loading-screen.fade-out {
   opacity: 0;
   visibility: hidden; /* garante que não fica "invisível mas clicável" */
+  pointer-events: none; /* previne cliques durante a transição */
 }
 
 /* Spinner organizado */

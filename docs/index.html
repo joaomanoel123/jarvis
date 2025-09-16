@@ -349,20 +349,6 @@
 
         </section>
 
-<!-- Script para remover a tela de loading -->
-<script>
-    window.addEventListener("load", function() {
-        const loadingScreen = document.getElementById("loadingScreen");
-        if (loadingScreen) {
-            loadingScreen.classList.add("fade-out");
-            // remove do DOM depois da animação
-            setTimeout(() => {
-                loadingScreen.remove();
-            }, 700); // 700ms > 600ms da animação
-        }
-    });
-</script>
-
         <section id="SiriWave" class="mb-4" hidden>
 
             <div class="container-fluid">
