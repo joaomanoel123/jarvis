@@ -493,6 +493,26 @@
         }
     </script>
 
+    <!-- Script para remover a tela de loading -->
+    <script>
+    window.addEventListener("load", function() {
+        const loadingScreen = document.getElementById("loadingScreen");
+        const startSection = document.getElementById("Start");
+
+        if (loadingScreen) {
+            loadingScreen.classList.add("fade-out");
+
+            setTimeout(() => {
+                loadingScreen.remove();
+                // Exibe a seção Start quando o loading some
+                if (startSection) {
+                    startSection.hidden = false;
+                }
+            }, 700); // 700ms = tempo > transição do CSS
+        }
+    });
+    </script>
+
 
 
 </body>
