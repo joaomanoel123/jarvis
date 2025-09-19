@@ -24,6 +24,15 @@ body {
   visibility: hidden;
 }
 
+#Start {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+#Start.visible {
+  opacity: 1;
+}
+
 .square{
     position: relative;
     width: 400px;

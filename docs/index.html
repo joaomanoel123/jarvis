@@ -504,11 +504,14 @@
 
             setTimeout(() => {
                 loadingScreen.remove();
-                // Exibe a seção Start quando o loading some
                 if (startSection) {
                     startSection.hidden = false;
+                    // aplica o fade-in suavemente
+                    requestAnimationFrame(() => {
+                        startSection.classList.add("visible");
+                    });
                 }
-            }, 700); // 700ms = tempo > transição do CSS
+            }, 700);
         }
     });
     </script>
