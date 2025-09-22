@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Debug dos Botões - JARVIS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            padding: 20px;
+        }
+        .debug-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        .info { color: #00AAFF; }
+        .test-button {
+            margin: 5px;
+            padding: 10px 15px;
+            border: 1px solid #00AAFF;
+            background: rgba(0, 170, 255, 0.1);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug dos Botões do JARVIS</h1>
+    
+    <div class="debug-section">
+        <h2>📊 Status dos Elementos</h2>
+        <div id="element-status">
+            <p class="info">⏳ Verificando elementos...</p>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🎯 Teste da Seção Oval Original</h2>
+        <section id="Oval" class="mb-4">
+            <div class="row g-0">
+                <div class="col-lg-1 col-md-1"></div>
+                <div class="col-lg-10 col-md-10 col-12">
+                    <div class="d-flex justify-content-center align-items-center" style="min-height: 300px;">
+                        <div id="JarvisHood">
+                            <div class="square">
+                                <span class="circle"></span>
+                                <span class="circle"></span>
+                                <span class="circle"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5 class="text-light text-center">Pergunte-me qualquer coisa</h5>
+
+                    <div class="col-12 mt-4 pt-4">
+                        <div class="text-center">
+                            <div id="TextInput" class="d-flex flex-wrap justify-content-center">
+                                <input type="text" class="input-field" name="chatbox" id="chatbox"
+                                    placeholder="Digite aqui..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                                <button id="SendBtn" class="glow-on-hover" hidden aria-label="Enviar mensagem">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                                <button id="MicBtn" class="glow-on-hover" aria-label="Ativar microfone">
+                                    <i class="bi bi-mic"></i>
+                                </button>
+                                <button id="ChatBtn" class="glow-on-hover" aria-label="Abrir chat">
+                                    <i class="bi bi-chat-dots"></i>
+                                </button>
+                                <button id="SettingsBtn" class="glow-on-hover" aria-label="Configurações">
+                                    <i class="bi bi-gear"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-1"></div>
+            </div>
+        </section>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🔍 Informações de Debug</h2>
+        <div id="debug-info">
+            <p class="info">Clique nos botões de teste abaixo</p>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🎮 Controles de Teste</h2>
+        <button class="test-button" onclick="checkElements()">📋 Verificar Elementos</button>
+        <button class="test-button" onclick="checkCSS()">🎨 Verificar CSS</button>
+        <button class="test-button" onclick="testButtons()">🔘 Testar Botões</button>
+        <button class="test-button" onclick="showStyles()">📐 Mostrar Estilos</button>
+        <button class="test-button" onclick="forceShow()">👁️ Forçar Visibilidade</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        function checkElements() {
+            const elements = [
+                { name: 'TextInput', id: 'TextInput' },
+                { name: 'SendBtn', id: 'SendBtn' },
+                { name: 'MicBtn', id: 'MicBtn' },
+                { name: 'ChatBtn', id: 'ChatBtn' },
+                { name: 'SettingsBtn', id: 'SettingsBtn' },
+                { name: 'Oval Section', id: 'Oval' },
+                { name: 'JarvisHood', id: 'JarvisHood' }
+            ];
+            
+            let html = '<h5>Elementos Encontrados:</h5>';
+            
+            elements.forEach(element => {
+                const el = document.getElementById(element.id);
+                const exists = !!el;
+                const visible = el ? el.offsetParent !== null : false;
+                const hidden = el ? el.hasAttribute('hidden') : false;
+                const display = el ? getComputedStyle(el).display : 'N/A';
+                const visibility = el ? getComputedStyle(el).visibility : 'N/A';
+                
+                html += `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid #333; border-radius: 5px;">
+                        <strong>${element.name}:</strong><br>
+                        <span class="${exists ? 'success' : 'error'}">Existe: ${exists ? '✅' : '❌'}</span><br>
+                        <span class="${visible ? 'success' : 'warning'}">Visível: ${visible ? '✅' : '⚠️'}</span><br>
+                        <span class="${!hidden ? 'success' : 'warning'}">Hidden: ${hidden ? '⚠️' : '✅'}</span><br>
+                        <span class="info">Display: ${display}</span><br>
+                        <span class="info">Visibility: ${visibility}</span>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('element-status').innerHTML = html;
+        }
+        
+        function checkCSS() {
+            const debugInfo = document.getElementById('debug-info');
+            const textInput = document.getElementById('TextInput');
+            
+            if (!textInput) {
+                debugInfo.innerHTML = '<p class="error">❌ TextInput não encontrado</p>';
+                return;
+            }
+            
+            const styles = getComputedStyle(textInput);
+            
+            debugInfo.innerHTML = `
+                <h5>CSS do TextInput:</h5>
+                <p><strong>Display:</strong> ${styles.display}</p>
+                <p><strong>Visibility:</strong> ${styles.visibility}</p>
+                <p><strong>Position:</strong> ${styles.position}</p>
+                <p><strong>Z-Index:</strong> ${styles.zIndex}</p>
+                <p><strong>Width:</strong> ${styles.width}</p>
+                <p><strong>Height:</strong> ${styles.height}</p>
+                <p><strong>Background:</strong> ${styles.backgroundColor}</p>
+                <p><strong>Border:</strong> ${styles.border}</p>
+            `;
+        }
+        
+        function testButtons() {
+            const buttons = ['SendBtn', 'MicBtn', 'ChatBtn', 'SettingsBtn'];
+            let html = '<h5>Teste dos Botões:</h5>';
+            
+            buttons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    const rect = btn.getBoundingClientRect();
+                    const styles = getComputedStyle(btn);
+                    
+                    html += `
+                        <div style="margin: 10px 0; padding: 10px; border: 1px solid #333; border-radius: 5px;">
+                            <strong>${btnId}:</strong><br>
+                            <span class="info">Posição: ${rect.left.toFixed(0)}, ${rect.top.toFixed(0)}</span><br>
+                            <span class="info">Tamanho: ${rect.width.toFixed(0)} x ${rect.height.toFixed(0)}</span><br>
+                            <span class="info">Display: ${styles.display}</span><br>
+                            <span class="info">Visibility: ${styles.visibility}</span><br>
+                            <span class="info">Z-Index: ${styles.zIndex}</span><br>
+                            <button onclick="highlightButton('${btnId}')" style="margin-top: 5px; padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 3px;">Destacar</button>
+                        </div>
+                    `;
+                } else {
+                    html += `<p class="error">❌ ${btnId} não encontrado</p>`;
+                }
+            });
+            
+            document.getElementById('debug-info').innerHTML = html;
+        }
+        
+        function highlightButton(btnId) {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.style.border = '3px solid red';
+                btn.style.background = 'rgba(255, 0, 0, 0.3)';
+                
+                setTimeout(() => {
+                    btn.style.border = '';
+                    btn.style.background = '';
+                }, 3000);
+            }
+        }
+        
+        function showStyles() {
+            const debugInfo = document.getElementById('debug-info');
+            const glowButtons = document.querySelectorAll('.glow-on-hover');
+            
+            let html = '<h5>Estilos dos Botões Glow:</h5>';
+            
+            glowButtons.forEach((btn, index) => {
+                const styles = getComputedStyle(btn);
+                html += `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid #333; border-radius: 5px;">
+                        <strong>Botão ${index + 1} (${btn.id || 'sem ID'}):</strong><br>
+                        <span class="info">Width: ${styles.width}</span><br>
+                        <span class="info">Height: ${styles.height}</span><br>
+                        <span class="info">Background: ${styles.background}</span><br>
+                        <span class="info">Border: ${styles.border}</span><br>
+                        <span class="info">Border-radius: ${styles.borderRadius}</span><br>
+                        <span class="info">Margin: ${styles.margin}</span><br>
+                        <span class="info">Padding: ${styles.padding}</span>
+                    </div>
+                `;
+            });
+            
+            debugInfo.innerHTML = html;
+        }
+        
+        function forceShow() {
+            const buttons = ['SendBtn', 'MicBtn', 'ChatBtn', 'SettingsBtn'];
+            const textInput = document.getElementById('TextInput');
+            
+            // Forçar visibilidade
+            if (textInput) {
+                textInput.style.display = 'flex !important';
+                textInput.style.visibility = 'visible !important';
+                textInput.style.opacity = '1 !important';
+            }
+            
+            buttons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.style.display = 'block !important';
+                    btn.style.visibility = 'visible !important';
+                    btn.style.opacity = '1 !important';
+                    btn.removeAttribute('hidden');
+                }
+            });
+            
+            document.getElementById('debug-info').innerHTML = '<p class="success">✅ Visibilidade forçada para todos os elementos</p>';
+        }
+        
+        // Verificação automática na inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(checkElements, 1000);
+        });
+    </script>
+</body>
+</html>"

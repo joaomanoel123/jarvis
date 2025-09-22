@@ -30,7 +30,18 @@ $(document).ready(function () {
         // Verificar se as configurações estão disponíveis
         if (!window.jarvisConfig) {
             console.error('❌ Configurações não carregadas!');
-            return;
+            console.warn('⚠️ Continuando sem configurações - modo fallback');
+            // Criar configuração básica de fallback
+            window.jarvisConfig = {
+                getEnvironment: () => 'github-pages-fallback',
+                getApiUrl: () => 'https://jarvis-tdgt.onrender.com',
+                settings: {
+                    apiTimeout: 45000,
+                    language: 'pt-BR',
+                    debugMode: true
+                },
+                showQuickSettings: () => alert('Configurações não disponíveis no modo fallback')
+            };
         }
         
         const config = window.jarvisConfig;
@@ -101,9 +112,24 @@ $(document).ready(function () {
             console.log('✅ Seção Start escondida');
             
             // Mostrar seção Oval (HUD)
-            $("#Oval").removeClass("hidden").attr("hidden", false);
-            $("#Oval").addClass("animate__animated animate__zoomIn");
+            const ovalSection = $("#Oval");
+            ovalSection.removeClass("hidden").attr("hidden", false);
+            ovalSection.addClass("animate__animated animate__zoomIn");
             console.log('✅ Seção Oval (HUD) mostrada');
+            
+            // Debug: verificar se a seção está visível
+            setTimeout(() => {
+                const isVisible = ovalSection.is(':visible');
+                const display = ovalSection.css('display');
+                console.log(`🔍 Oval visível: ${isVisible}, display: ${display}`);
+                
+                // Forçar visibilidade se necessário
+                if (!isVisible) {
+                    console.warn('⚠️ Forçando visibilidade da seção Oval');
+                    ovalSection.show();
+                    ovalSection.css('display', 'block');
+                }
+            }, 1000);
             
             // Atualizar mensagem
             $("#WishMessage").text("Pergunte-me qualquer coisa");
@@ -230,6 +256,19 @@ $(document).ready(function () {
     }
     
     function setupEventListeners() {
+        console.log('🔌 Configurando event listeners...');
+        
+        // Debug: verificar se os botões existem
+        const buttons = ['MicBtn', 'SendBtn', 'ChatBtn', 'SettingsBtn'];
+        buttons.forEach(btnId => {
+            const btn = document.getElementById(btnId);
+            console.log(`🔍 Botão ${btnId}:`, btn ? '✅ Encontrado' : '❌ Não encontrado');
+            if (btn) {
+                const styles = getComputedStyle(btn);
+                console.log(`   - Display: ${styles.display}, Visibility: ${styles.visibility}`);
+            }
+        });
+        
         // Listener para ativar TTS após primeira interação
         let firstInteraction = true;
         function activateTTSOnFirstInteraction() {
@@ -249,18 +288,30 @@ $(document).ready(function () {
         document.addEventListener('touchstart', activateTTSOnFirstInteraction, { once: true });
         
         // Botão do microfone
-        $("#MicBtn").click(function () {
-            console.log('🎤 Botão de microfone clicado');
-            startSpeechRecognition();
-        });
+        const micBtn = $("#MicBtn");
+        if (micBtn.length > 0) {
+            micBtn.click(function () {
+                console.log('🎤 Botão de microfone clicado');
+                startSpeechRecognition();
+            });
+            console.log('✅ Event listener do MicBtn configurado');
+        } else {
+            console.error('❌ MicBtn não encontrado para configurar event listener');
+        }
         
         // Botão de envio
-        $("#SendBtn").click(function () {
-            const message = $("#chatbox").val().trim();
-            if (message) {
-                sendMessage(message);
-            }
-        });
+        const sendBtn = $("#SendBtn");
+        if (sendBtn.length > 0) {
+            sendBtn.click(function () {
+                const message = $("#chatbox").val().trim();
+                if (message) {
+                    sendMessage(message);
+                }
+            });
+            console.log('✅ Event listener do SendBtn configurado');
+        } else {
+            console.error('❌ SendBtn não encontrado para configurar event listener');
+        }
         
         // Campo de texto
         $("#chatbox").keyup(function () {
@@ -278,17 +329,29 @@ $(document).ready(function () {
         });
         
         // Botão de configurações
-        $("#SettingsBtn").click(function () {
-            if (window.jarvisConfig) {
-                window.jarvisConfig.showQuickSettings();
-            }
-        });
+        const settingsBtn = $("#SettingsBtn");
+        if (settingsBtn.length > 0) {
+            settingsBtn.click(function () {
+                if (window.jarvisConfig) {
+                    window.jarvisConfig.showQuickSettings();
+                }
+            });
+            console.log('✅ Event listener do SettingsBtn configurado');
+        } else {
+            console.error('❌ SettingsBtn não encontrado para configurar event listener');
+        }
         
         // Botão do chat (ID original)
-        $("#ChatBtn").click(function () {
-            console.log('💬 Botão de chat clicado');
-            toggleChatCanvas();
-        });
+        const chatBtn = $("#ChatBtn");
+        if (chatBtn.length > 0) {
+            chatBtn.click(function () {
+                console.log('💬 Botão de chat clicado');
+                toggleChatCanvas();
+            });
+            console.log('✅ Event listener do ChatBtn configurado');
+        } else {
+            console.error('❌ ChatBtn não encontrado para configurar event listener');
+        }
         
         // Atalhos de teclado
         document.addEventListener('keyup', function(e) {

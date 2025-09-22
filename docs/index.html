@@ -411,11 +411,14 @@
 
         // Carregar scripts customizados apenas se existirem
         Promise.all([
+            loadScriptIfExists('js/core-js.min.js'),
             loadScriptIfExists('main-github-pages-fixed.js'),
             loadScriptIfExists('jarvis-speech-recognition.js'),
             loadScriptIfExists('jarvis-tts.js')
         ]).then(results => {
             console.log('Scripts carregados:', results);
+            console.log('✅ Core JS carregado:', results[0]);
+            console.log('✅ Main script carregado:', results[1]);
         });
     </script>
 
