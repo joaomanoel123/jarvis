@@ -218,16 +218,18 @@
                 .catch(() => false);
         }
 
-        // Carregar scripts customizados
+        // Carregar scripts customizados mobile
         Promise.all([
+            loadScriptIfExists('mobile-config.js'),
             loadScriptIfExists('../docs/js/core-js.min.js'),
             loadScriptIfExists('mobile-main.js'),
             loadScriptIfExists('../docs/jarvis-speech-recognition.js'),
             loadScriptIfExists('../docs/jarvis-tts.js')
         ]).then(results => {
             console.log('📱 Scripts mobile carregados:', results);
-            console.log('✅ Core JS carregado:', results[0]);
-            console.log('✅ Mobile script carregado:', results[1]);
+            console.log('✅ Mobile Config carregado:', results[0]);
+            console.log('✅ Core JS carregado:', results[1]);
+            console.log('✅ Mobile script carregado:', results[2]);
         });
     </script>
 
