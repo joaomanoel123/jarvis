@@ -1,5 +1,0 @@
-feat(docs): Adiciona documentação e guias de configuração
-
-- Adiciona uma série de arquivos de documentação em formato Markdown, abordando tópicos como configuração de APIs (Google, Render, Groq), guias de deploy (GitHub Pages, Render), solução de problemas e instruções de uso.
-- Inclui novos scripts para facilitar o deploy, configuração de ambiente e testes de funcionalidades específicas.
-- Adiciona o diretório `Jarvis_mobile/` e arquivos de configuração relacionados.
