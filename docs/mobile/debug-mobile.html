@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug JARVIS Mobile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .debug-section {
+            border: 1px solid #00ff00;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .error { color: #ff0000; }
+        .warning { color: #ffaa00; }
+        .success { color: #00ff00; }
+        .info { color: #00aaff; }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #00aa00;
+        }
+        #log {
+            background: #111;
+            border: 1px solid #333;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug JARVIS Mobile</h1>
+    
+    <div class="debug-section">
+        <h2>📊 Status do Sistema</h2>
+        <div id="systemStatus">Carregando...</div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🔗 Teste de Scripts</h2>
+        <button onclick="testScripts()">Testar Carregamento de Scripts</button>
+        <button onclick="testPaths()">Testar Caminhos</button>
+        <div id="scriptStatus"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🌐 Teste de Conectividade</h2>
+        <button onclick="testAPI()">Testar API</button>
+        <button onclick="testCDN()">Testar CDNs</button>
+        <div id="connectivityStatus"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>📱 Informações do Dispositivo</h2>
+        <div id="deviceInfo"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>📝 Log de Debug</h2>
+        <button onclick="clearLog()">Limpar Log</button>
+        <button onclick="exportLog()">Exportar Log</button>
+        <div id="log"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🚀 Ações Rápidas</h2>
+        <button onclick="goToMobile()">Ir para Mobile</button>
+        <button onclick="goToPC()">Ir para PC</button>
+        <button onclick="reloadPage()">Recarregar Página</button>
+    </div>
+
+    <script>
+        let logEntries = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = `[${timestamp}] ${message}`;
+            logEntries.push(entry);
+            
+            const logDiv = document.getElementById('log');
+            const logLine = document.createElement('div');
+            logLine.className = type;
+            logLine.textContent = entry;
+            logDiv.appendChild(logLine);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            
+            console.log(entry);
+        }
+        
+        function clearLog() {
+            logEntries = [];
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        function exportLog() {
+            const logText = logEntries.join('\\n');
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `jarvis-mobile-debug-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        async function checkSystemStatus() {
+            const status = document.getElementById('systemStatus');
+            let html = '';
+            
+            // Verificar jQuery
+            const jqueryStatus = typeof $ !== 'undefined';
+            html += `<div class="${jqueryStatus ? 'success' : 'error'}">jQuery: ${jqueryStatus ? '✅ Carregado' : '❌ Não carregado'}</div>`;
+            
+            // Verificar Bootstrap
+            const bootstrapStatus = typeof bootstrap !== 'undefined';
+            html += `<div class="${bootstrapStatus ? 'success' : 'error'}">Bootstrap: ${bootstrapStatus ? '✅ Carregado' : '❌ Não carregado'}</div>`;
+            
+            // Verificar SiriWave
+            const siriWaveStatus = typeof SiriWave !== 'undefined';
+            html += `<div class="${siriWaveStatus ? 'success' : 'error'}">SiriWave: ${siriWaveStatus ? '✅ Carregado' : '❌ Não carregado'}</div>`;
+            
+            // Verificar Lottie
+            const lottieStatus = typeof LottiePlayer !== 'undefined';
+            html += `<div class="${lottieStatus ? 'success' : 'error'}">Lottie Player: ${lottieStatus ? '✅ Carregado' : '❌ Não carregado'}</div>`;
+            
+            // Verificar Speech Recognition
+            const speechStatus = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+            html += `<div class="${speechStatus ? 'success' : 'error'}">Speech Recognition: ${speechStatus ? '✅ Suportado' : '❌ Não suportado'}</div>`;
+            
+            // Verificar TTS
+            const ttsStatus = 'speechSynthesis' in window;
+            html += `<div class="${ttsStatus ? 'success' : 'error'}">Text-to-Speech: ${ttsStatus ? '✅ Suportado' : '❌ Não suportado'}</div>`;
+            
+            // Verificar JARVIS Config
+            const configStatus = typeof window.jarvisConfig !== 'undefined';
+            html += `<div class="${configStatus ? 'success' : 'error'}">JARVIS Config: ${configStatus ? '✅ Carregado' : '❌ Não carregado'}</div>`;
+            
+            status.innerHTML = html;
+            log('Status do sistema verificado');
+        }
+        
+        async function testScripts() {
+            const statusDiv = document.getElementById('scriptStatus');
+            statusDiv.innerHTML = '<div class="info">Testando scripts...</div>';
+            log('Iniciando teste de scripts');
+            
+            const scripts = [
+                { name: 'Mobile Config', path: 'mobile-config.js' },
+                { name: 'Core JS', path: '../docs/js/core-js.min.js' },
+                { name: 'Speech Recognition', path: '../docs/jarvis-speech-recognition.js' },
+                { name: 'TTS', path: '../docs/jarvis-tts.js' },
+                { name: 'jQuery Lettering', path: '../docs/jquery.lettering.min.js' }
+            ];
+            
+            let html = '';
+            
+            for (const script of scripts) {
+                try {
+                    const response = await fetch(script.path, { method: 'HEAD' });
+                    const status = response.ok;
+                    const statusText = status ? '✅ Acessível' : `❌ Erro ${response.status}`;
+                    const className = status ? 'success' : 'error';
+                    
+                    html += `<div class="${className}">${script.name}: ${statusText}</div>`;
+                    log(`Script ${script.name}: ${statusText}`, status ? 'success' : 'error');
+                } catch (error) {
+                    html += `<div class="error">${script.name}: ❌ Erro de rede</div>`;
+                    log(`Script ${script.name}: Erro de rede - ${error.message}`, 'error');
+                }
+            }
+            
+            statusDiv.innerHTML = html;
+        }
+        
+        async function testPaths() {
+            log('Testando caminhos relativos');
+            
+            const paths = [
+                '../docs/',
+                '../docs/js/',
+                '../docs/assets/',
+                './',
+                '../'
+            ];
+            
+            for (const path of paths) {
+                try {
+                    const response = await fetch(path);
+                    log(`Caminho ${path}: ${response.ok ? 'Acessível' : 'Inacessível'}`, response.ok ? 'success' : 'warning');
+                } catch (error) {
+                    log(`Caminho ${path}: Erro - ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function testAPI() {
+            const statusDiv = document.getElementById('connectivityStatus');
+            statusDiv.innerHTML = '<div class="info">Testando API...</div>';
+            log('Testando conectividade da API');
+            
+            const apiUrls = [
+                'https://jarvis-tdgt.onrender.com',
+                'https://jarvis-api-backup.onrender.com'
+            ];
+            
+            let html = '';
+            
+            for (const url of apiUrls) {
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch(`${url}/health`, { 
+                        method: 'GET',
+                        timeout: 10000 
+                    });
+                    const endTime = Date.now();
+                    const responseTime = endTime - startTime;
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        html += `<div class="success">${url}: ✅ Online (${responseTime}ms)</div>`;
+                        log(`API ${url}: Online em ${responseTime}ms`, 'success');
+                    } else {
+                        html += `<div class="error">${url}: ❌ Erro ${response.status}</div>`;
+                        log(`API ${url}: Erro ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    html += `<div class="error">${url}: ❌ Offline</div>`;
+                    log(`API ${url}: Offline - ${error.message}`, 'error');
+                }
+            }
+            
+            statusDiv.innerHTML = html;
+        }
+        
+        async function testCDN() {
+            log('Testando CDNs');
+            
+            const cdns = [
+                'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
+                'https://code.jquery.com/jquery-3.7.1.min.js',
+                'https://unpkg.com/siriwave/dist/siriwave.umd.min.js',
+                'https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js'
+            ];
+            
+            for (const cdn of cdns) {
+                try {
+                    const response = await fetch(cdn, { method: 'HEAD' });
+                    log(`CDN ${cdn.split('/').pop()}: ${response.ok ? 'Acessível' : 'Inacessível'}`, response.ok ? 'success' : 'error');
+                } catch (error) {
+                    log(`CDN ${cdn.split('/').pop()}: Erro - ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        function checkDeviceInfo() {
+            const deviceDiv = document.getElementById('deviceInfo');
+            
+            const info = {
+                'User Agent': navigator.userAgent,
+                'Platform': navigator.platform,
+                'Language': navigator.language,
+                'Online': navigator.onLine ? 'Sim' : 'Não',
+                'Cookies Enabled': navigator.cookieEnabled ? 'Sim' : 'Não',
+                'Screen Resolution': `${screen.width}x${screen.height}`,
+                'Viewport': `${window.innerWidth}x${window.innerHeight}`,
+                'Color Depth': `${screen.colorDepth} bits`,
+                'Timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+                'Connection': navigator.connection ? navigator.connection.effectiveType : 'Desconhecido'
+            };
+            
+            let html = '';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<div><strong>${key}:</strong> ${value}</div>`;
+            }
+            
+            deviceDiv.innerHTML = html;
+            log('Informações do dispositivo coletadas');
+        }
+        
+        function goToMobile() {
+            window.location.href = './index.html';
+        }
+        
+        function goToPC() {
+            window.location.href = '../docs/index.html';
+        }
+        
+        function reloadPage() {
+            window.location.reload();
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Debug page carregada');
+            checkSystemStatus();
+            checkDeviceInfo();
+        });
+        
+        // Capturar erros
+        window.addEventListener('error', function(e) {
+            log(`Erro JavaScript: ${e.message} em ${e.filename}:${e.lineno}`, 'error');
+        });
+        
+        // Capturar erros de recursos
+        window.addEventListener('error', function(e) {
+            if (e.target !== window) {
+                log(`Erro de recurso: ${e.target.src || e.target.href}`, 'error');
+            }
+        }, true);
+    </script>
+</body>
+</html>

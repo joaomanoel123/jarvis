@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste jQuery Lettering</title>
+    <style>
+        body {
+            background: #000;
+            color: #00ff00;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .test-text {
+            font-size: 2rem;
+            margin: 20px 0;
+        }
+        .char1 { color: #ff0000; }
+        .char2 { color: #00ff00; }
+        .char3 { color: #0000ff; }
+        .char4 { color: #ffff00; }
+        .char5 { color: #ff00ff; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Teste jQuery Lettering</h1>
+    
+    <div class="test-text" id="test1">JARVIS</div>
+    <div class="test-text" id="test2">Teste de Lettering</div>
+    
+    <div id="status">Carregando...</div>
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lettering.js/0.7.0/jquery.lettering.min.js" integrity="sha512-VJ/iYbiu1eJ6yLimfTi65t2R9TFcG5D9X8ZCfbbEFhTfPnKJh8byoKXEawi5ScJZBYL1eiirL1+MczZDx0Tz9Q==" crossorigin="anonymous"></script>
+    
+    <script>
+        $(document).ready(function() {
+            console.log('jQuery carregado:', typeof $ !== 'undefined');
+            console.log('Lettering disponível:', typeof $.fn.lettering !== 'undefined');
+            
+            if (typeof $.fn.lettering !== 'undefined') {
+                $('#test1').lettering();
+                $('#test2').lettering();
+                $('#status').html('✅ jQuery Lettering funcionando!');
+                console.log('✅ Lettering aplicado com sucesso');
+            } else {
+                $('#status').html('❌ jQuery Lettering não carregou');
+                console.error('❌ jQuery Lettering não está disponível');
+            }
+        });
+    </script>
+</body>
+</html>
