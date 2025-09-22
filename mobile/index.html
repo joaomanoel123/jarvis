@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    
+    <title>J.A.R.V.I.S Mobile - Assistente Virtual Inteligente</title>
+    <meta name="description" content="J.A.R.V.I.S Mobile - Seu assistente virtual inteligente otimizado para dispositivos móveis">
+    <meta name="keywords" content="jarvis, assistente virtual, ia, mobile, app, reconhecimento de voz">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="../docs/manifest.json">
+    <link rel="shortcut icon" href="../docs/assets/img/logo.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="../docs/assets/img/logo.ico">
+    
+    <!-- Bootstrap via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Mobile Optimized Styles -->
+    <link rel="stylesheet" href="mobile-style.css">
+
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="text-light mt-3">Inicializando J.A.R.V.I.S Mobile...</p>
+        </div>
+    </div>
+
+    <!-- Mobile Container -->
+    <div id="mobileContainer" class="mobile-container">
+        
+        <!-- Header Mobile -->
+        <header class="mobile-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mobile-title">J.A.R.V.I.S</h1>
+                <button id="SettingsBtn" class="btn-mobile-header" aria-label="Configurações">
+                    <i class="bi bi-gear"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="mobile-main">
+            
+            <!-- Startup Sequence -->
+            <section id="Start" hidden>
+                <div class="mobile-startup-container">
+                    
+                    <!-- Loader Animation -->
+                    <div id="Loader" class="mobile-loader">
+                        <div class="mobile-circle-animation">
+                            <div class="circle-pulse"></div>
+                            <div class="circle-pulse"></div>
+                            <div class="circle-pulse"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Face Auth -->
+                    <div id="FaceAuth" class="mobile-animation" hidden>
+                        <lottie-player src="https://assets2.lottiefiles.com/temp/lf20_XcJCfR.json"
+                            background="transparent" speed="1" style="width: 200px; height: 200px;" loop
+                            autoplay></lottie-player>
+                    </div>
+                    
+                    <!-- Face Auth Success -->
+                    <div id="FaceAuthSuccess" class="mobile-animation" hidden>
+                        <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_lk80fpsm.json"
+                            background="transparent" speed="1" style="width: 200px; height: 200px;" loop
+                            autoplay></lottie-player>
+                    </div>
+                    
+                    <!-- Hello Greet -->
+                    <div id="HelloGreet" class="mobile-animation" hidden>
+                        <lottie-player
+                            src="https://lottie.host/f60d18d4-5199-412c-b687-e5e63ae38f75/CoqjMcJIx0.json"
+                            background="transparent" speed="1" style="width: 200px; height: 200px;" loop
+                            autoplay></lottie-player>
+                    </div>
+                    
+                    <!-- Status Message -->
+                    <div class="mobile-status-message">
+                        <h2 id="WishMessage" class="text-center text-light">Inicializando...</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Interface (HUD) -->
+            <section id="Oval" class="mobile-hud" hidden>
+                
+                <!-- Central Animation Area -->
+                <div class="mobile-animation-area">
+                    <div id="JarvisHood" class="mobile-jarvis-hood">
+                        <div class="mobile-square">
+                            <span class="mobile-circle"></span>
+                            <span class="mobile-circle"></span>
+                            <span class="mobile-circle"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Status Message -->
+                <div class="mobile-message-area">
+                    <h3 class="text-light text-center mobile-main-message">Pergunte-me qualquer coisa</h3>
+                </div>
+                
+                <!-- SiriWave Container -->
+                <div id="siri-container" class="mobile-siri-container"></div>
+                
+            </section>
+
+            <!-- SiriWave Full Screen -->
+            <section id="SiriWave" class="mobile-siriwave-full" hidden>
+                <div class="mobile-siriwave-container">
+                    <p class="text-light mb-4 text-center mobile-siri-message">Olá, eu sou o J.A.R.V.I.S</p>
+                    <div id="siri-container-full" class="mobile-siri-full"></div>
+                </div>
+            </section>
+            
+        </main>
+
+        <!-- Mobile Input Area (Fixed Bottom) -->
+        <div class="mobile-input-container">
+            <div id="TextInput" class="mobile-text-input">
+                <input type="text" class="mobile-input-field" name="chatbox" id="chatbox"
+                    placeholder="Digite aqui..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                
+                <div class="mobile-buttons">
+                    <button id="SendBtn" class="mobile-btn mobile-btn-send" hidden aria-label="Enviar mensagem">
+                        <i class="bi bi-send"></i>
+                    </button>
+                    <button id="MicBtn" class="mobile-btn mobile-btn-mic" aria-label="Ativar microfone">
+                        <i class="bi bi-mic"></i>
+                    </button>
+                    <button id="ChatBtn" class="mobile-btn mobile-btn-chat" data-bs-toggle="offcanvas"
+                        data-bs-target="#mobileChat" aria-controls="mobileChat" aria-label="Abrir chat">
+                        <i class="bi bi-chat-dots"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Chat Offcanvas -->
+    <div class="offcanvas offcanvas-bottom mobile-chat-canvas" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+        id="mobileChat" aria-labelledby="mobileChatLabel">
+        <div class="offcanvas-header mobile-chat-header">
+            <h5 class="offcanvas-title text-white" id="mobileChatLabel">
+                <i class="bi bi-chat-dots me-2"></i>Conversas
+            </h5>
+            <div class="d-flex align-items-center">
+                <button type="button" class="btn btn-sm btn-outline-light me-2" onclick="window.jarvisChat.clearHistory()" title="Limpar histórico">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+            </div>
+        </div>
+        <div id="mobile-chat-body" class="offcanvas-body mobile-chat-body">
+            <!-- Chat content will be loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Mobile Quick Actions (Floating) -->
+    <div id="mobileQuickActions" class="mobile-quick-actions" hidden>
+        <div class="quick-action-item" onclick="window.jarvisConfig.testConnectivity()">
+            <i class="bi bi-wifi"></i>
+            <span>Testar API</span>
+        </div>
+        <div class="quick-action-item" onclick="window.jarvisConfig.testTTS()">
+            <i class="bi bi-volume-up"></i>
+            <span>Testar Voz</span>
+        </div>
+        <div class="quick-action-item" onclick="window.jarvisConfig.testMicrophone()">
+            <i class="bi bi-mic"></i>
+            <span>Testar Mic</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Bootstrap Bundle via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    
+    <!-- jQuery e libs de animação -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="../docs/jquery.lettering.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/textillate/0.4.0/jquery.textillate.min.js" integrity="sha512-0bHMhYsdpiur1bT84kDH4D7cpxFQ9O7uA5yxVAqWC87h552Xt0swX4M+ZlXMKE8oPVRIJ5lAwXWO2UWeDwJJOw==" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    
+    <!-- Scripts customizados do projeto -->
+    <script>
+        // Verificar se os scripts customizados existem antes de carregar
+        function loadScriptIfExists(src) {
+            return fetch(src, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        const script = document.createElement('script');
+                        script.src = src;
+                        document.head.appendChild(script);
+                        return true;
+                    }
+                    return false;
+                })
+                .catch(() => false);
+        }
+
+        // Carregar scripts customizados
+        Promise.all([
+            loadScriptIfExists('../docs/js/core-js.min.js'),
+            loadScriptIfExists('mobile-main.js'),
+            loadScriptIfExists('../docs/jarvis-speech-recognition.js'),
+            loadScriptIfExists('../docs/jarvis-tts.js')
+        ]).then(results => {
+            console.log('📱 Scripts mobile carregados:', results);
+            console.log('✅ Core JS carregado:', results[0]);
+            console.log('✅ Mobile script carregado:', results[1]);
+        });
+    </script>
+
+    <!-- Mobile Optimizations -->
+    <script>
+        // Mobile-specific optimizations
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 JARVIS Mobile inicializando...');
+            
+            // Prevent zoom on input focus (iOS)
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    document.querySelector('meta[name="viewport"]').setAttribute('content', 
+                        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                });
+                
+                input.addEventListener('blur', function() {
+                    document.querySelector('meta[name="viewport"]').setAttribute('content', 
+                        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+                });
+            });
+
+            // Touch feedback for buttons
+            const buttons = document.querySelectorAll('.mobile-btn, .btn-mobile-header');
+            buttons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                    this.style.opacity = '0.8';
+                });
+                
+                button.addEventListener('touchend', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.opacity = '1';
+                });
+            });
+
+            // Handle orientation change
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    window.scrollTo(0, 0);
+                    // Recalculate container heights
+                    const container = document.querySelector('.mobile-container');
+                    if (container) {
+                        container.style.height = window.innerHeight + 'px';
+                    }
+                }, 100);
+            });
+
+            // Prevent pull-to-refresh
+            document.body.addEventListener('touchstart', e => {
+                if (e.touches.length === 1 && e.touches[0].clientY <= 50) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            document.body.addEventListener('touchmove', e => {
+                if (e.touches.length === 1 && e.touches[0].clientY <= 50) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            // Set initial container height
+            const container = document.querySelector('.mobile-container');
+            if (container) {
+                container.style.height = window.innerHeight + 'px';
+            }
+        });
+
+        // Performance monitoring for mobile
+        if (window.performance && window.performance.mark) {
+            window.performance.mark('jarvis-mobile-start');
+            
+            window.addEventListener('load', function() {
+                window.performance.mark('jarvis-mobile-loaded');
+                window.performance.measure('jarvis-mobile-load-time', 'jarvis-mobile-start', 'jarvis-mobile-loaded');
+                
+                const measure = window.performance.getEntriesByName('jarvis-mobile-load-time')[0];
+                console.log('📱 J.A.R.V.I.S Mobile load time:', measure.duration + 'ms');
+            });
+        }
+    </script>
+
+    <!-- Remove loading screen -->
+    <script>
+        window.addEventListener("load", function() {
+            const loadingScreen = document.getElementById("loadingScreen");
+            const startSection = document.getElementById("Start");
+
+            if (loadingScreen) {
+                loadingScreen.classList.add("fade-out");
+
+                setTimeout(() => {
+                    loadingScreen.remove();
+                    if (startSection) {
+                        startSection.hidden = false;
+                        requestAnimationFrame(() => {
+                            startSection.classList.add("visible");
+                        });
+                    }
+                }, 700);
+            }
+        });
+    </script>
+
+</body>
+
+</html>"
