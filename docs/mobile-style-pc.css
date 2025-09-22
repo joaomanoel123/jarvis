@@ -1,0 +1,344 @@
+/* ===== JARVIS PC MOBILE STYLE ===== */
+/* Aplicando o visual mobile na versão PC */
+
+/* Reset e Base */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* ===== LOADING SCREEN ===== */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    transition: opacity 0.6s ease;
+}
+
+.loading-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.loading-screen .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.25em;
+    margin-bottom: 1rem;
+}
+
+/* ===== CONTAINER PRINCIPAL ===== */
+#visualizacao {
+    min-height: 100vh;
+    background: #000;
+    position: relative;
+}
+
+/* ===== STARTUP SEQUENCE ===== */
+#Start {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+#Start .text-center {
+    margin-bottom: 30px;
+}
+
+/* Animações de loading mobile-style */
+.svg-frame {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Lottie players com estilo mobile */
+lottie-player {
+    border-radius: 20px;
+    background: rgba(0, 170, 255, 0.05);
+    border: 1px solid rgba(0, 170, 255, 0.2);
+    padding: 20px;
+}
+
+/* Mensagens com estilo mobile */
+.siri-message,
+#WishMessage {
+    font-size: 1.3rem !important;
+    font-weight: 300 !important;
+    color: #fff !important;
+    text-shadow: 0 0 15px rgba(0, 170, 255, 0.4) !important;
+    margin: 20px 0 !important;
+}
+
+/* ===== INTERFACE PRINCIPAL (HUD) ===== */
+#Oval {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* Canvas com estilo mobile */
+#canvasOne {
+    border-radius: 20px;
+    background: rgba(0, 170, 255, 0.05);
+    border: 1px solid rgba(0, 170, 255, 0.2);
+    box-shadow: 0 0 30px rgba(0, 170, 255, 0.3);
+}
+
+/* Jarvis Hood com animações mobile */
+#JarvisHood {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.square {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(#6b72ff00 50%, #000dff3b 40%);
+    box-shadow: 0 0 40px rgb(25, 0, 255), inset 0 0 40px rgb(25, 0, 255);
+    border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
+    transition: 0.5s;
+    animation: mobileRotate 6s linear infinite;
+}
+
+.circle:nth-child(2) {
+    animation-duration: 4s;
+    animation-direction: reverse;
+}
+
+.circle:nth-child(3) {
+    animation-duration: 8s;
+}
+
+@keyframes mobileRotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Mensagem principal com estilo mobile */
+#Oval h5 {
+    font-size: 1.4rem !important;
+    font-weight: 300 !important;
+    color: #fff !important;
+    text-shadow: 0 0 15px rgba(0, 170, 255, 0.4) !important;
+    margin: 30px 0 !important;
+}
+
+/* ===== ÁREA DE INPUT MOBILE-STYLE ===== */
+#TextInput {
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(15px);
+    border: 2px solid #00AAFF;
+    border-radius: 30px;
+    padding: 15px 25px;
+    margin: 30px 0;
+    box-shadow: 0 0 30px rgba(25, 0, 255, 0.4);
+    display: flex !important;
+    align-items: center;
+    gap: 15px;
+    max-width: 600px;
+    width: 100%;
+}
+
+/* Input field com estilo mobile */
+.input-field {
+    flex: 1;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: #fff !important;
+    font-size: 1.1rem !important;
+    font-family: inherit !important;
+    padding: 12px 0 !important;
+}
+
+.input-field::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Botões com estilo mobile */
+.glow-on-hover {
+    width: 50px !important;
+    height: 50px !important;
+    border: none !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.2rem !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+    margin: 0 5px !important;
+}
+
+#SendBtn {
+    background: linear-gradient(45deg, #00AAFF, #0088CC) !important;
+    color: #fff !important;
+}
+
+#MicBtn {
+    background: linear-gradient(45deg, #FF4444, #CC3333) !important;
+    color: #fff !important;
+}
+
+#ChatBtn {
+    background: linear-gradient(45deg, #44FF44, #33CC33) !important;
+    color: #fff !important;
+}
+
+#SettingsBtn {
+    background: linear-gradient(45deg, #FFAA00, #CC8800) !important;
+    color: #fff !important;
+}
+
+.glow-on-hover:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 20px rgba(0, 170, 255, 0.6) !important;
+}
+
+.glow-on-hover:active {
+    transform: scale(0.95) !important;
+}
+
+.glow-on-hover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.3s ease;
+}
+
+.glow-on-hover:active::before {
+    transform: scale(1);
+}
+
+/* ===== SIRIWAVE SECTION ===== */
+#SiriWave {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+#SiriWave .siri-message {
+    font-size: 1.5rem !important;
+    font-weight: 300 !important;
+    text-shadow: 0 0 15px rgba(0, 170, 255, 0.4) !important;
+    margin-bottom: 40px !important;
+}
+
+#siri-container {
+    width: 100%;
+    max-width: 500px;
+    height: 120px;
+    background: rgba(0, 170, 255, 0.1);
+    border: 2px solid rgba(0, 170, 255, 0.3);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 30px rgba(0, 170, 255, 0.3);
+}
+
+/* ===== CHAT OFFCANVAS MOBILE-STYLE ===== */
+.chat-canvas {
+    background: #191919 !important;
+    border-right: 3px solid #00AAFF !important;
+    backdrop-filter: blur(15px);
+}
+
+.chat-canvas .offcanvas-header {
+    background: rgba(0, 0, 0, 0.9) !important;
+    border-bottom: 2px solid rgba(0, 170, 255, 0.3) !important;
+    padding: 20px !important;
+}
+
+.chat-canvas .offcanvas-title {
+    font-size: 1.3rem !important;
+    font-weight: 500 !important;
+    text-shadow: 0 0 10px rgba(0, 170, 255, 0.4) !important;
+}
+
+.chat-canvas .offcanvas-body {
+    background: #191919 !important;
+    padding: 20px !important;
+}
+
+/* Chat Messages Mobile Style */
+.receiver_message {
+    padding: 15px 20px !important;
+    border: 2px solid cyan !important;
+    border-radius: 0px 20px 20px 20px !important;
+    background-color: rgba(13, 202, 240, 0.15) !important;
+    color: white !important;
+    margin-bottom: 15px !important;
+    max-width: 85% !important;
+    word-wrap: break-word !important;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2) !important;
+}
+
+.sender_message {
+    padding: 15px 20px !important;
+    border: 2px solid #0045ff !important;
+    border-radius: 20px 20px 0px 20px !important;
+    background-color: #0045ff !important;
+    color: white !important;
+    margin-bottom: 15px !important;
+    margin-left: auto !important;
+    max-width: 85% !important;
+    word-wrap: break-word !important;
+    box-shadow: 0 0 15px rgba(0, 69, 255, 0.3) !important;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {\n    .square {\n        width: 200px;\n        height: 200px;\n    }\n    \n    #TextInput {\n        margin: 20px;\n        padding: 12px 20px;\n    }\n    \n    .glow-on-hover {\n        width: 45px !important;\n        height: 45px !important;\n        font-size: 1.1rem !important;\n    }\n    \n    .siri-message,\n    #WishMessage {\n        font-size: 1.1rem !important;\n    }\n}\n\n@media (max-width: 480px) {\n    .square {\n        width: 150px;\n        height: 150px;\n    }\n    \n    #TextInput {\n        margin: 15px;\n        padding: 10px 15px;\n        gap: 10px;\n    }\n    \n    .glow-on-hover {\n        width: 40px !important;\n        height: 40px !important;\n        font-size: 1rem !important;\n    }\n}\n\n/* ===== ANIMAÇÕES MOBILE ===== */\n.animate__animated {\n    animation-duration: 1s;\n    animation-fill-mode: both;\n}\n\n.animate__zoomIn {\n    animation-name: zoomIn;\n}\n\n@keyframes zoomIn {\n    from {\n        opacity: 0;\n        transform: scale3d(0.3, 0.3, 0.3);\n    }\n    50% {\n        opacity: 1;\n    }\n}\n\n.fade-out {\n    opacity: 0;\n    transition: opacity 0.6s ease;\n}\n\n.visible {\n    opacity: 1;\n    transition: opacity 0.8s ease;\n}\n\n/* ===== PERFORMANCE OPTIMIZATIONS ===== */\n.circle {\n    will-change: transform;\n    transform: translateZ(0);\n}\n\n.glow-on-hover {\n    will-change: transform;\n}\n\n/* ===== ACCESSIBILITY ===== */\n@media (prefers-reduced-motion: reduce) {\n    .circle {\n        animation: none;\n    }\n    \n    .glow-on-hover::before {\n        transition: none;\n    }\n}\n\n/* High contrast mode */\n@media (prefers-contrast: high) {\n    #TextInput {\n        border-width: 3px;\n    }\n    \n    .glow-on-hover {\n        border: 2px solid #fff !important;\n    }\n    \n    .chat-canvas {\n        border-right-width: 4px !important;\n    }\n}"

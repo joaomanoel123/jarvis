@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    
+    <title>J.A.R.V.I.S - Assistente Virtual Inteligente (Mobile Style)</title>
+    <meta name="description" content="J.A.R.V.I.S - Seu assistente virtual inteligente com reconhecimento de voz e IA avançada - Versão com visual mobile">
+    <meta name="keywords" content="jarvis, assistente virtual, ia, inteligencia artificial, reconhecimento de voz">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="shortcut icon" href="assets/img/logo.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="assets/img/logo.ico">
+    
+    <!-- Bootstrap via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Mobile Style for PC -->
+    <link rel="stylesheet" href="mobile-style-pc.css">
+
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="text-light mt-3">Inicializando J.A.R.V.I.S Mobile Style...</p>
+        </div>
+    </div>
+
+    <!-- Visualização - Área principal com animações -->
+    <div id="visualizacao">
+        <div class="container-fluid px-0">
+
+            <section id="Start" hidden>
+                <div class="row g-0">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-center align-items-center min-vh-100">
+                            <div class="text-center">
+                                <div id="Loader" class="svg-frame mb-4">
+                                    <!-- Círculos animados estilo mobile -->
+                                    <div class="mobile-circle-animation">
+                                        <div class="circle-pulse"></div>
+                                        <div class="circle-pulse"></div>
+                                        <div class="circle-pulse"></div>
+                                    </div>
+                                </div>
+                                <div id="FaceAuth" class="mb-4" hidden>
+                                    <lottie-player src="https://assets2.lottiefiles.com/temp/lf20_XcJCfR.json"
+                                        background="transparent" speed="1" style="width: 300px; height: 300px;" loop
+                                        autoplay></lottie-player>
+                                </div>
+                                <div id="FaceAuthSuccess" class="mb-4" hidden>
+                                    <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_lk80fpsm.json"
+                                        background="transparent" speed="1" style="width: 300px; height: 300px;" loop
+                                        autoplay></lottie-player>
+                                </div>
+                                <div id="HelloGreet" class="mb-4" hidden>
+                                    <lottie-player
+                                        src="https://lottie.host/f60d18d4-5199-412c-b687-e5e63ae38f75/CoqjMcJIx0.json"
+                                        background="transparent" speed="1" style="width: 300px; height: 300px;" loop
+                                        autoplay></lottie-player>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <h1 id="WishMessage" class="text-center text-light mt-4 siri-message">Inicializando...</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="Oval" class="mb-4" hidden>
+                <div class="row g-0">
+                    <div class="col-lg-1 col-md-1"></div>
+                    <div class="col-lg-10 col-md-10 col-12">
+                        <div class="d-flex justify-content-center align-items-center min-vh-100">
+
+                            <canvas id="canvasOne" width="700" height="420" style="position: absolute;"></canvas>
+
+                            <div id="JarvisHood">
+                                <div class="square">
+                                    <span class="circle"></span>
+                                    <span class="circle"></span>
+                                    <span class="circle"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <h5 class="text-light text-center">Pergunte-me qualquer coisa</h5>
+
+                        <div class="col-12 mt-4 pt-4">
+                            <div class="text-center">
+                                <div id="TextInput" class="d-flex flex-wrap justify-content-center">
+                                    <input type="text" class="input-field" name="chatbox" id="chatbox"
+                                        placeholder="Digite aqui..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                                    <button id="SendBtn" class="glow-on-hover" hidden aria-label="Enviar mensagem">
+                                        <i class="bi bi-send"></i>
+                                    </button>
+                                    <button id="MicBtn" class="glow-on-hover" aria-label="Ativar microfone">
+                                        <i class="bi bi-mic"></i>
+                                    </button>
+                                    <button id="ChatBtn" class="glow-on-hover" data-bs-toggle="offcanvas"
+                                        data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling" aria-label="Abrir chat">
+                                        <i class="bi bi-chat-dots"></i>
+                                    </button>
+                                    <button id="SettingsBtn" class="glow-on-hover" aria-label="Configurações">
+                                        <i class="bi bi-gear"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-1 col-md-1"></div>
+                </div>
+            </section>
+
+            <section id="SiriWave" class="mb-4" hidden>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-center align-items-center min-vh-100">
+                                <div class="text-center">
+                                    <p class="text-start text-light mb-4 siri-message" style="font-size: clamp(1.2rem, 4vw, 2rem);">Olá, eu sou o
+                                        J.A.R.V.I.S</p>
+                                    <div id="siri-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Chat Offcanvas - Histórico -->
+    <div class="offcanvas offcanvas-start chat-canvas" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+        id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title text-white" id="offcanvasScrollingLabel">
+                <i class="bi bi-chat-dots me-2"></i>Conversas
+            </h5>
+            <div class="d-flex align-items-center">
+                <button type="button" class="btn btn-sm btn-outline-light me-2" onclick="window.jarvisChat.clearHistory()" title="Limpar histórico">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+            </div>
+        </div>
+        <div id="chat-canvas-body" class="offcanvas-body">
+            <!-- Chat content will be loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Bootstrap Bundle via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    
+    <!-- jQuery e libs de animação via CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lettering.js/0.7.0/jquery.lettering.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/textillate/0.4.0/jquery.textillate.min.js" integrity="sha512-0bHMhYsdpiur1bT84kDH4D7cpxFQ9O7uA5yxVAqWC87h552Xt0swX4M+ZlXMKE8oPVRIJ5lAwXWO2UWeDwJJOw==" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    
+    <!-- Scripts customizados do projeto -->
+    <script>
+        console.log('🚀 Carregando scripts JARVIS Mobile Style...');
+        
+        // Função melhorada para carregar scripts com timeout
+        function loadScriptWithTimeout(src, timeout = 5000) {
+            return new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = src;
+                
+                const timeoutId = setTimeout(() => {
+                    console.warn(`⏰ Timeout ao carregar: ${src}`);
+                    resolve(false);
+                }, timeout);
+                
+                script.onload = () => {
+                    clearTimeout(timeoutId);
+                    console.log(`✅ Script carregado: ${src}`);
+                    resolve(true);
+                };
+                
+                script.onerror = () => {
+                    clearTimeout(timeoutId);
+                    console.warn(`⚠️ Script não encontrado: ${src}`);
+                    resolve(false);
+                };
+                
+                document.head.appendChild(script);
+            });
+        }
+
+        // Carregar apenas scripts que existem
+        async function loadJarvisScripts() {
+            const scripts = [
+                { src: 'js/core-js.min.js', name: 'Core JS' },
+                { src: 'main-github-pages-fixed.js', name: 'Main Script' },
+                { src: 'jarvis-speech-recognition.js', name: 'Speech Recognition' },
+                { src: 'jarvis-tts.js', name: 'Text-to-Speech' }
+            ];
+            
+            console.log('📦 Carregando scripts JARVIS Mobile Style...');
+            
+            for (const script of scripts) {
+                const loaded = await loadScriptWithTimeout(script.src, 3000);
+                console.log(`${loaded ? '✅' : '⚠️'} ${script.name}: ${loaded ? 'Carregado' : 'Não encontrado'}`);
+            }
+            
+            console.log('🎯 Carregamento de scripts concluído');
+        }
+        
+        // Iniciar carregamento
+        loadJarvisScripts();
+    </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Mobile optimizations
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎨 JARVIS Mobile Style inicializando...');
+            
+            // Prevent zoom on input focus (iOS)
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    if (window.innerWidth < 768) {
+                        document.querySelector('meta[name="viewport"]').setAttribute('content', 
+                            'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                    }
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (window.innerWidth < 768) {
+                        document.querySelector('meta[name="viewport"]').setAttribute('content', 
+                            'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+                    }
+                });
+            });
+
+            // Touch feedback for buttons
+            const buttons = document.querySelectorAll('.glow-on-hover');
+            buttons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                });
+                
+                button.addEventListener('touchend', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // Handle orientation change
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    window.scrollTo(0, 0);
+                }, 100);
+            });
+        });
+
+        // Performance monitoring
+        if (window.performance && window.performance.mark) {
+            window.performance.mark('jarvis-mobile-style-start');
+            
+            window.addEventListener('load', function() {
+                window.performance.mark('jarvis-mobile-style-loaded');
+                window.performance.measure('jarvis-mobile-style-load-time', 'jarvis-mobile-style-start', 'jarvis-mobile-style-loaded');
+                
+                const measure = window.performance.getEntriesByName('jarvis-mobile-style-load-time')[0];
+                console.log('🎨 J.A.R.V.I.S Mobile Style load time:', measure.duration + 'ms');
+            });
+        }
+    </script>
+
+    <!-- Script para remover a tela de loading -->
+    <script>
+    window.addEventListener("load", function() {
+        const loadingScreen = document.getElementById("loadingScreen");
+        const startSection = document.getElementById("Start");
+
+        if (loadingScreen) {
+            loadingScreen.classList.add("fade-out");
+
+            setTimeout(() => {
+                loadingScreen.remove();
+                if (startSection) {
+                    startSection.hidden = false;
+                    // aplica o fade-in suavemente
+                    requestAnimationFrame(() => {
+                        startSection.classList.add("visible");
+                    });
+                }
+            }, 700);
+        }
+    });
+    </script>
+
+</body>
+
+</html>

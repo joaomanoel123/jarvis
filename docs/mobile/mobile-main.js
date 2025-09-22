@@ -170,23 +170,23 @@ $(document).ready(function () {
         // Sequência de inicialização mobile otimizada
         setTimeout(() => {
             console.log('👤 Iniciando Face Auth Mobile...');
-            $(\"#Loader\").attr(\"hidden\", true);
-            $(\"#FaceAuth\").attr(\"hidden\", false);
-            $(\"#WishMessage\").text(\"Autenticando...\");
+            $("#Loader").attr("hidden", true);
+            $("#FaceAuth").attr("hidden", false);
+            $("#WishMessage").text("Autenticando...");
         }, 1000);
         
         setTimeout(() => {
             console.log('✅ Face Auth Success Mobile...');
-            $(\"#FaceAuth\").attr(\"hidden\", true);
-            $(\"#FaceAuthSuccess\").attr(\"hidden\", false);
-            $(\"#WishMessage\").text(\"Autenticação bem-sucedida!\");
+            $("#FaceAuth").attr("hidden", true);
+            $("#FaceAuthSuccess").attr("hidden", false);
+            $("#WishMessage").text("Autenticação bem-sucedida!");
         }, 2500);
         
         setTimeout(() => {
             console.log('👋 Hello Greet Mobile...');
-            $(\"#FaceAuthSuccess\").attr(\"hidden\", true);
-            $(\"#HelloGreet\").attr(\"hidden\", false);
-            $(\"#WishMessage\").text(\"Olá, bem-vindo!\");
+            $("#FaceAuthSuccess").attr("hidden", true);
+            $("#HelloGreet").attr("hidden", false);
+            $("#WishMessage").text("Olá, bem-vindo!");
         }, 4000);
         
         setTimeout(() => {
@@ -199,13 +199,13 @@ $(document).ready(function () {
     
     function showMobileMainInterface() {
         // Esconder seção Start
-        $(\"#Start\").attr(\"hidden\", true);
+        $("#Start").attr("hidden", true);
         console.log('✅ Seção Start escondida');
         
         // Mostrar seção Oval (HUD Mobile)
-        const ovalSection = $(\"#Oval\");
-        ovalSection.removeClass(\"hidden\").attr(\"hidden\", false);
-        ovalSection.addClass(\"animate__animated animate__zoomIn\");
+        const ovalSection = $("#Oval");
+        ovalSection.removeClass("hidden").attr("hidden", false);
+        ovalSection.addClass("animate__animated animate__zoomIn");
         ovalSection.show();
         ovalSection.css('display', 'flex');
         console.log('✅ Seção Oval Mobile (HUD) mostrada');
@@ -224,7 +224,7 @@ $(document).ready(function () {
         }, 1000);
         
         // Atualizar mensagem
-        $('.mobile-main-message').text(\"Pergunte-me qualquer coisa\");
+        $('.mobile-main-message').text("Pergunte-me qualquer coisa");
         console.log('✅ Mensagem mobile atualizada');
         
         // Preparar mensagem de boas-vindas mobile
