@@ -1,4 +1,4 @@
-e aqui estão os erroaquiaq$(document).ready(function () {
+erroaquiaq$(document).ready(function () {
 
     // Configuração para GitHub Pages
     const isGitHubPages = window.location.hostname.includes('github.io');
