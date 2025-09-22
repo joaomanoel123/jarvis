@@ -387,39 +387,63 @@
     
     <!-- jQuery e libs de animação via CDN -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <script src="jquery.lettering.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lettering.js/0.7.0/jquery.lettering.min.js" integrity="sha512-VJ/iYbiu1eJ6yLimfTi65t2R9TFcG5D9X8ZCfbbEFhTfPnKJh8byoKXEawi5ScJZBYL1eiirL1+MczZDx0Tz9Q==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/textillate/0.4.0/jquery.textillate.min.js" integrity="sha512-0bHMhYsdpiur1bT84kDH4D7cpxFQ9O7uA5yxVAqWC87h552Xt0swX4M+ZlXMKE8oPVRIJ5lAwXWO2UWeDwJJOw==" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/siriwave/dist/siriwave.umd.min.js"></script>
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     
-    <!-- Scripts customizados do projeto (apenas se existirem) -->
+    <!-- Scripts customizados do projeto -->
     <script>
-        // Verificar se os scripts customizados existem antes de carregar
-        function loadScriptIfExists(src) {
-            return fetch(src, { method: 'HEAD' })
-                .then(response => {
-                    if (response.ok) {
-                        const script = document.createElement('script');
-                        script.src = src;
-                        document.head.appendChild(script);
-                        return true;
-                    }
-                    return false;
-                })
-                .catch(() => false);
+        console.log('🚀 Carregando scripts JARVIS...');
+        
+        // Função melhorada para carregar scripts com timeout
+        function loadScriptWithTimeout(src, timeout = 5000) {
+            return new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = src;
+                
+                const timeoutId = setTimeout(() => {
+                    console.warn(`⏰ Timeout ao carregar: ${src}`);
+                    resolve(false);
+                }, timeout);
+                
+                script.onload = () => {
+                    clearTimeout(timeoutId);
+                    console.log(`✅ Script carregado: ${src}`);
+                    resolve(true);
+                };
+                
+                script.onerror = () => {
+                    clearTimeout(timeoutId);
+                    console.warn(`⚠️ Script não encontrado: ${src}`);
+                    resolve(false);
+                };
+                
+                document.head.appendChild(script);
+            });
         }
 
-        // Carregar scripts customizados apenas se existirem
-        Promise.all([
-            loadScriptIfExists('js/core-js.min.js'),
-            loadScriptIfExists('main-github-pages-fixed.js'),
-            loadScriptIfExists('jarvis-speech-recognition.js'),
-            loadScriptIfExists('jarvis-tts.js')
-        ]).then(results => {
-            console.log('Scripts carregados:', results);
-            console.log('✅ Core JS carregado:', results[0]);
-            console.log('✅ Main script carregado:', results[1]);
-        });
+        // Carregar apenas scripts que existem
+        async function loadJarvisScripts() {
+            const scripts = [
+                { src: 'js/core-js.min.js', name: 'Core JS' },
+                { src: 'main-github-pages-fixed.js', name: 'Main Script' },
+                { src: 'jarvis-speech-recognition.js', name: 'Speech Recognition' },
+                { src: 'jarvis-tts.js', name: 'Text-to-Speech' }
+            ];
+            
+            console.log('📦 Carregando scripts JARVIS...');
+            
+            for (const script of scripts) {
+                const loaded = await loadScriptWithTimeout(script.src, 3000);
+                console.log(`${loaded ? '✅' : '⚠️'} ${script.name}: ${loaded ? 'Carregado' : 'Não encontrado'}`);
+            }
+            
+            console.log('🎯 Carregamento de scripts concluído');
+        }
+        
+        // Iniciar carregamento
+        loadJarvisScripts();
     </script>
 
     <!-- Service Worker Registration -->
