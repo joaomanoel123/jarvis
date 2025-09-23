@@ -147,7 +147,7 @@ body {
     border-radius: 12px;
     color: white;
 
-    display: flex;
+    display: flex !important; /* Forçar exibição */
     align-items: center;
     justify-content: center;
     gap: 10px;
@@ -156,8 +156,12 @@ body {
     max-width: 600px;
     margin: 20px auto 0 auto; /* centralizado abaixo da esfera */
     padding: 8px 12px;
-    z-index: 30; /* Input acima de todas as animações */
-    position: relative;
+    z-index: 1000 !important; /* Input sempre visível acima de tudo */
+    position: relative !important;
+    
+    /* Garantir visibilidade em todos os dispositivos */
+    visibility: visible !important;
+    opacity: 1 !important;
 }
   
   .input-field {
@@ -179,10 +183,21 @@ body {
     background: #111;
     cursor: pointer;
     position: relative;
-    z-index: 31; /* Botões acima do input */
+    z-index: 1001 !important; /* Botões sempre visíveis */
     border-radius: 10px;
     padding: 0px;
     margin-left: 10px;
+    
+    /* Garantir visibilidade */
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    visibility: visible !important;
+    opacity: 1 !important;
+    
+    /* Melhorar touch no mobile */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   
   .glow-on-hover:before {
@@ -306,12 +321,57 @@ body {
   }
 }
 
+/* ===== MOBILE PEQUENO (até 576px) ===== */
 @media (max-width: 576px) {
-  .square { width: 280px; height: 280px; }
-  .svg-frame { width: 320px; height: 320px; }
-  #TextInput { margin: 10px; padding: 6px 8px; }
-  .glow-on-hover { width: 40px; height: 40px; }
-  .siri-message { font-size: 20px !important; }
+    /* Animações menores para telas pequenas */
+    .square { 
+        width: 220px !important; 
+        height: 220px !important; 
+    }
+    
+    .svg-frame { 
+        width: 250px !important; 
+        height: 250px !important; 
+        margin-bottom: 15px;
+    }
+    
+    /* Input otimizado para telas pequenas */
+    #TextInput { 
+        width: 98% !important;
+        margin: 10px auto !important; 
+        padding: 10px 12px !important;
+        gap: 8px;
+    }
+    
+    /* Botões menores mas ainda tocáveis */
+    .glow-on-hover { 
+        min-width: 44px !important;
+        min-height: 44px !important;
+        font-size: 1rem;
+    }
+    
+    /* Texto menor para caber na tela */
+    .siri-message { 
+        font-size: 1rem !important;
+        line-height: 1.3;
+    }
+    
+    #WishMessage {
+        font-size: 1.1rem !important;
+    }
+    
+    h5.text-light.text-center {
+        font-size: 1rem;
+    }
+    
+    /* Reduzir padding geral */
+    .container-fluid {
+        padding: 0 5px;
+    }
+    
+    .min-vh-100 {
+        padding: 15px 0;
+    }
 }
 
 svg {
@@ -370,32 +430,86 @@ svg {
   }
 }
 
-/* Melhorias para mobile */
+/* ===== MELHORIAS PARA MOBILE ===== */
 @media (max-width: 768px) {
+    /* Ajustar tamanhos das animações */
     .svg-frame {
+        width: 280px !important;
+        height: 280px !important;
+        margin-bottom: 20px;
+    }
+    
+    .square {
         width: 250px !important;
         height: 250px !important;
     }
     
+    /* Container SiriWave responsivo */
     #siri-container {
         height: 80px;
+        max-width: 90%;
+        margin: 0 auto;
     }
     
+    /* Botões com touch targets adequados */
     .glow-on-hover {
-        min-width: 44px; /* Touch target mínimo */
-        min-height: 44px;
-        margin: 2px;
+        min-width: 48px; /* Touch target mínimo recomendado */
+        min-height: 48px;
+        margin: 3px;
+        font-size: 1.1rem;
     }
     
+    /* Input field otimizado para mobile */
     .input-field {
         font-size: 16px; /* Previne zoom no iOS */
+        padding: 12px 8px;
     }
-
-    /* 🔽 Esconder elementos desnecessários no mobile */
-    h5.text-light.text-center,  /* Pergunte-me qualquer coisa */
-    #siri-container,
+    
+    /* Garantir que o input seja sempre visível */
+    #TextInput {
+        width: 95% !important;
+        max-width: 95% !important;
+        margin: 15px auto !important;
+        padding: 12px 15px !important;
+        position: relative !important;
+        z-index: 1000 !important;
+        display: flex !important;
+    }
+    
+    /* Mensagens responsivas */
+    h5.text-light.text-center {
+        font-size: 1.1rem;
+        margin: 10px 0;
+        padding: 0 20px;
+    }
+    
     #WishMessage {
-        display: none !important;
+        font-size: 1.2rem !important;
+        padding: 0 15px;
+        text-align: center;
+    }
+    
+    /* Melhorar legibilidade das mensagens */
+    .siri-message {
+        font-size: 1.1rem !important;
+        line-height: 1.4;
+        padding: 0 15px;
+    }
+    
+    /* Ajustar seções para mobile */
+    section {
+        padding: 10px 0;
+    }
+    
+    /* Container principal responsivo */
+    .container-fluid {
+        padding: 0 10px;
+    }
+    
+    /* Melhorar espaçamento vertical */
+    .min-vh-100 {
+        min-height: calc(100vh - 100px);
+        padding: 20px 0;
     }
 }
 
