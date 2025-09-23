@@ -1,5 +1,16 @@
 $(document).ready(function () {
-
+    console.log('✅ Main.js carregado - GitHub Pages Mode');
+    
+    // Verificar se estamos no GitHub Pages (sem eel)
+    const isGitHubPages = typeof eel === 'undefined';
+    
+    if (isGitHubPages) {
+        console.log('🌐 Modo GitHub Pages detectado - usando main-github-pages-fixed.js');
+        // Não fazer nada aqui, deixar o main-github-pages-fixed.js assumir
+        return;
+    }
+    
+    // Código original para desktop (com eel)
     eel.init()()
 
     $('.text').textillate({
@@ -47,11 +58,15 @@ $(document).ready(function () {
 
     // mic button click event
 
-    $("#MicBtn").click(function () { 
-        eel.playAssistantSound()
-        $("#Oval").attr("hidden", true);
-        $("#SiriWave").attr("hidden", false);
-        eel.allCommands()()
+    $("#MicBtn").click(function () {
+        if (typeof eel !== 'undefined') {
+            eel.playAssistantSound()
+            $("#Oval").attr("hidden", true);
+            $("#SiriWave").attr("hidden", false);
+            eel.allCommands()()
+        } else {
+            console.log('🌐 GitHub Pages: Microfone clicado');
+        }
     });
 
 
@@ -59,10 +74,14 @@ $(document).ready(function () {
         // this would test for whichever key is 40 (down arrow) and the ctrl key at the same time
 
         if (e.key === 'j' && e.metaKey) {
-            eel.playAssistantSound()
-            $("#Oval").attr("hidden", true);
-            $("#SiriWave").attr("hidden", false);
-            eel.allCommands()()
+            if (typeof eel !== 'undefined') {
+                eel.playAssistantSound()
+                $("#Oval").attr("hidden", true);
+                $("#SiriWave").attr("hidden", false);
+                eel.allCommands()()
+            } else {
+                console.log('🌐 GitHub Pages: Atalho de voz ativado');
+            }
         }
     }
     document.addEventListener('keyup', doc_keyUp, false);
@@ -88,8 +107,10 @@ $(document).ready(function () {
                         }
                     }
                 }).catch(console.error);
-            } else {
+            } else if (typeof eel !== 'undefined') {
                 eel.allCommands(message);
+            } else {
+                console.log('🌐 GitHub Pages: Mensagem enviada:', message);
             }
             $("#chatbox").val("")
             $("#MicBtn").attr('hidden', false);

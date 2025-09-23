@@ -421,28 +421,28 @@
     
     <!-- Scripts customizados do projeto -->
     <script>
-        console.log('🚀 Carregando scripts JARVIS...');
+        console.log('📱 JARVIS Mobile: Inicializando...');
         
-        // Função melhorada para carregar scripts com timeout
-        function loadScriptWithTimeout(src, timeout = 5000) {
-            return new Promise((resolve, reject) => {
+        // Função para carregar scripts com melhor tratamento de erro
+        function loadScript(src, timeout = 5000) {
+            return new Promise((resolve) => {
                 const script = document.createElement('script');
                 script.src = src;
                 
                 const timeoutId = setTimeout(() => {
-                    console.warn(`⏰ Timeout ao carregar: ${src}`);
+                    console.warn(`⏰ Timeout: ${src}`);
                     resolve(false);
                 }, timeout);
                 
                 script.onload = () => {
                     clearTimeout(timeoutId);
-                    console.log(`✅ Script carregado: ${src}`);
+                    console.log(`✅ Carregado: ${src}`);
                     resolve(true);
                 };
                 
                 script.onerror = () => {
                     clearTimeout(timeoutId);
-                    console.error(`❌ Erro ao carregar: ${src}`);
+                    console.error(`❌ Erro: ${src}`);
                     resolve(false);
                 };
                 
@@ -450,146 +450,104 @@
             });
         }
 
-        // Carregar scripts essenciais primeiro
-        async function loadJarvisScripts() {
-            console.log('🔄 Carregando scripts JARVIS...');
+        // Carregar scripts essenciais
+        async function initializeJarvisMobile() {
+            console.log('🔄 Carregando dependências...');
             
-            const scripts = [
-                { src: '../cache-buster.js', name: 'Cache Buster' },
-                { src: '../js/config.js', name: 'Config' },
-                { src: '../js/core-js.min.js', name: 'Core JS' },
-                { src: '../jarvis-speech-recognition.js', name: 'Speech Recognition' },
-                { src: '../jarvis-tts.js', name: 'Text-to-Speech' },
-                { src: '../js/main.js', name: 'Main' }
+            // Scripts essenciais em ordem
+            const essentialScripts = [
+                '../cache-buster.js',
+                '../js/config.js',
+                '../jarvis-speech-recognition.js',
+                '../jarvis-tts.js'
             ];
             
-            const results = [];
-            
-            for (const script of scripts) {
-                const loaded = await loadScriptWithTimeout(script.src, 3000);
-                results.push({ name: script.name, loaded });
-                console.log(`${loaded ? '✅' : '❌'} ${script.name}: ${loaded ? 'Carregado' : 'Falhou'}`);
+            // Carregar scripts essenciais
+            for (const src of essentialScripts) {
+                await loadScript(src, 3000);
             }
             
-            console.log('📊 Resumo do carregamento:', results);
+            // Carregar script principal baseado no ambiente
+            const isGitHubPages = window.location.hostname.includes('github.io') || typeof eel === 'undefined';
+            const mainScript = isGitHubPages ? '../main-github-pages-fixed.js' : '../js/main.js';
             
-            // Garantir que a inicialização aconteça mesmo com falhas
+            console.log(`🎯 Carregando script principal: ${mainScript}`);
+            const mainLoaded = await loadScript(mainScript, 5000);
+            
+            if (!mainLoaded) {
+                console.warn('⚠️ Script principal falhou, ativando modo básico');
+                activateBasicMode();
+            }
+        }
+        
+        // Modo básico de funcionamento
+        function activateBasicMode() {
+            console.log('🔧 Ativando modo básico...');
+            
+            // Configurar interface básica
             setTimeout(() => {
-                if (typeof initializeJarvis === 'function') {
-                    console.log('🚀 Inicializando JARVIS...');
-                    initializeJarvis();
-                } else {
-                    console.warn('⚠️ Função de inicialização não encontrada, usando fallback');
-                    initializeFallback();
-                }
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) loadingScreen.style.display = 'none';
+                
+                const ovalSection = document.getElementById('Oval');
+                if (ovalSection) ovalSection.hidden = false;
+                
+                setupBasicInteractions();
+                console.log('✅ Modo básico ativo');
             }, 1000);
         }
         
-        // Função de fallback caso os scripts principais não carreguem
-        function initializeFallback() {
-            console.log('🔄 Inicializando modo fallback...');
-            
-            // Remover tela de loading
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen) {
-                loadingScreen.style.display = 'none';
-            }
-            
-            // Mostrar interface principal
-            const startSection = document.getElementById('Start');
-            const ovalSection = document.getElementById('Oval');
-            
-            if (startSection) startSection.hidden = true;
-            if (ovalSection) {
-                ovalSection.hidden = false;
-                ovalSection.style.display = 'flex';
-            }
-            
-            // Configurar botões básicos
-            setupBasicControls();
-            
-            console.log('✅ Modo fallback ativo');
-        }
-        
-        function setupBasicControls() {
-            // Configurar botão de microfone básico
+        function setupBasicInteractions() {
             const micBtn = document.getElementById('MicBtn');
-            if (micBtn) {
-                micBtn.onclick = () => {
-                    alert('🎤 Funcionalidade de voz não disponível no modo fallback.\n\nUse o campo de texto para interagir.');
-                };
-            }
-            
-            // Configurar botão de envio
             const sendBtn = document.getElementById('SendBtn');
             const chatbox = document.getElementById('chatbox');
             
+            if (micBtn) {
+                micBtn.onclick = () => alert('🎤 Voz indisponível. Use texto.');
+            }
+            
             if (sendBtn && chatbox) {
                 sendBtn.onclick = () => {
-                    const message = chatbox.value.trim();
-                    if (message) {
-                        alert(`📝 Mensagem recebida: "${message}"\n\nModo fallback ativo - funcionalidade limitada.`);
+                    const msg = chatbox.value.trim();
+                    if (msg) {
+                        alert(`Mensagem: "${msg}"`);
                         chatbox.value = '';
+                        toggleButtons();
                     }
                 };
                 
-                chatbox.oninput = () => {
-                    const hasText = chatbox.value.trim().length > 0;
-                    micBtn.hidden = hasText;
-                    sendBtn.hidden = !hasText;
-                };
+                chatbox.oninput = toggleButtons;
+                chatbox.onkeypress = (e) => e.key === 'Enter' && sendBtn.click();
+            }
+            
+            function toggleButtons() {
+                const hasText = chatbox.value.trim().length > 0;
+                if (micBtn) micBtn.hidden = hasText;
+                if (sendBtn) sendBtn.hidden = !hasText;
             }
         }
         
-        // Iniciar carregamento
-        loadJarvisScripts();
+        // Iniciar
+        initializeJarvisMobile();
     </script>
 
-    <!-- Remove loading screen com timeout de segurança -->
+    <!-- Timeout de segurança para loading -->
     <script>
-        let loadingRemoved = false;
-        
-        function removeLoadingScreen() {
-            if (loadingRemoved) return;
-            loadingRemoved = true;
-            
-            console.log('🔄 Removendo tela de loading...');
-            
-            const loadingScreen = document.getElementById("loadingScreen");
-            const startSection = document.getElementById("Start");
-
-            if (loadingScreen) {
-                loadingScreen.classList.add("fade-out");
-
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                    console.log('✅ Tela de loading removida');
-                    
-                    if (startSection) {
-                        startSection.hidden = false;
-                        requestAnimationFrame(() => {
-                            startSection.classList.add("visible");
-                        });
-                    }
-                }, 700);
-            }
-        }
-        
-        // Remover loading quando a página carregar
-        window.addEventListener("load", removeLoadingScreen);
-        
-        // Timeout de segurança - remover loading após 10 segundos independentemente
+        // Timeout de segurança - garantir que a interface apareça
         setTimeout(() => {
-            if (!loadingRemoved) {
-                console.warn('⚠️ Timeout de segurança - removendo tela de loading');
-                removeLoadingScreen();
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen && loadingScreen.style.display !== 'none') {
+                console.warn('⚠️ Timeout de segurança - removendo loading');
+                loadingScreen.style.display = 'none';
+                
+                const ovalSection = document.getElementById('Oval');
+                if (ovalSection) ovalSection.hidden = false;
             }
-        }, 10000);
+        }, 15000);
         
-        // Remover loading se houver erro crítico
+        // Capturar erros e garantir que a interface funcione
         window.addEventListener('error', (e) => {
-            console.error('❌ Erro detectado:', e.error);
-            setTimeout(removeLoadingScreen, 2000);
+            console.error('❌ Erro capturado:', e.error?.message || e.message);
         });
     </script>
 
