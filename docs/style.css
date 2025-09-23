@@ -481,6 +481,7 @@ svg {
         font-size: 1.1rem;
         margin: 10px 0;
         padding: 0 20px;
+        display: none !important; /* Esconder no mobile */
     }
     
     #WishMessage {
@@ -511,11 +512,7 @@ svg {
         min-height: calc(100vh - 100px);
         padding: 20px 0;
     }
-    
-    /* 🔽 Esconde o texto "Pergunte-me qualquer coisa" no mobile */
-    h5.text-light.text-center {
-        display: none !important;
-    }
+
 }
 
 /* Melhorar visibilidade do sr-only */

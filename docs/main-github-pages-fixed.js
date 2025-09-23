@@ -1,11 +1,15 @@
-document.addEventListener("DOMContentLoaded", () => {
+$(document).ready(function () {
     console.log("✅ J.A.R.V.I.S iniciado com sucesso");
     
     // 🔽 Fallback: remove "Pergunte-me qualquer coisa" no mobile
     if (window.innerWidth < 768) {
         const askText = document.querySelector("h5.text-light.text-center");
-        if (askText) askText.style.display = "none";
+        if (askText) {
+            askText.style.display = "none";
+            console.log('🔽 Texto "Pergunte-me qualquer coisa" escondido no mobile');
+        }
     }
+    
     // Aguardar configurações serem carregadas
     setTimeout(() => {
         initializeJarvis();
@@ -13,6 +17,23 @@ document.addEventListener("DOMContentLoaded", () => {
     
     function initializeJarvis() {
         console.log('🤖 Inicializando Jarvis para GitHub Pages...');
+        
+        // 🔽 Garantir que o texto seja escondido no mobile (verificação adicional)
+        if (window.innerWidth < 768) {
+            const hideAskText = () => {
+                const askText = document.querySelector("h5.text-light.text-center");
+                if (askText && askText.textContent.includes("Pergunte-me qualquer coisa")) {
+                    askText.style.display = "none";
+                    console.log('🔽 Texto "Pergunte-me qualquer coisa" escondido (verificação adicional)');
+                }
+            };
+            
+            // Executar imediatamente e depois de intervalos
+            hideAskText();
+            setTimeout(hideAskText, 1000);
+            setTimeout(hideAskText, 3000);
+            setTimeout(hideAskText, 5000);
+        }
         
         // Esconder tela de loading inicial
         setTimeout(() => {
@@ -968,8 +989,4 @@ document.addEventListener("DOMContentLoaded", () => {
     loadChatFromStorage();
     
     console.log('🎯 Main GitHub Pages script carregado com sucesso!');
-});
-
-$(document).ready(function () {
-    // Código jQuery existente mantido para compatibilidade
 });
