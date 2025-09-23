@@ -1,5 +1,11 @@
-$(document).ready(function () {
-
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("✅ J.A.R.V.I.S iniciado com sucesso");
+    
+    // 🔽 Fallback: remove "Pergunte-me qualquer coisa" no mobile
+    if (window.innerWidth < 768) {
+        const askText = document.querySelector("h5.text-light.text-center");
+        if (askText) askText.style.display = "none";
+    }
     // Aguardar configurações serem carregadas
     setTimeout(() => {
         initializeJarvis();
@@ -962,4 +968,8 @@ $(document).ready(function () {
     loadChatFromStorage();
     
     console.log('🎯 Main GitHub Pages script carregado com sucesso!');
+});
+
+$(document).ready(function () {
+    // Código jQuery existente mantido para compatibilidade
 });

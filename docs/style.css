@@ -434,8 +434,8 @@ svg {
 @media (max-width: 768px) {
     /* Ajustar tamanhos das animações */
     .svg-frame {
-        width: 280px !important;
-        height: 280px !important;
+        width: 250px !important;
+        height: 250px !important;
         margin-bottom: 20px;
     }
     
@@ -453,9 +453,9 @@ svg {
     
     /* Botões com touch targets adequados */
     .glow-on-hover {
-        min-width: 48px; /* Touch target mínimo recomendado */
-        min-height: 48px;
-        margin: 3px;
+        min-width: 44px; /* Touch target mínimo */
+        min-height: 44px;
+        margin: 2px;
         font-size: 1.1rem;
     }
     
@@ -510,6 +510,11 @@ svg {
     .min-vh-100 {
         min-height: calc(100vh - 100px);
         padding: 20px 0;
+    }
+    
+    /* 🔽 Esconde o texto "Pergunte-me qualquer coisa" no mobile */
+    h5.text-light.text-center {
+        display: none !important;
     }
 }
 
