@@ -390,6 +390,13 @@ svg {
     .input-field {
         font-size: 16px; /* Previne zoom no iOS */
     }
+
+    /* 🔽 Esconder elementos desnecessários no mobile */
+    h5.text-light.text-center,  /* Pergunte-me qualquer coisa */
+    #siri-container,
+    #WishMessage {
+        display: none !important;
+    }
 }
 
 /* Melhorar visibilidade do sr-only */
