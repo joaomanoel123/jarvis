@@ -1,14 +1,60 @@
 $(document).ready(function () {
     console.log("✅ J.A.R.V.I.S iniciado com sucesso");
     
-    // 🔽 Fallback: remove "Pergunte-me qualquer coisa" no mobile
-    if (window.innerWidth < 768) {
-        const askText = document.querySelector("h5.text-light.text-center");
-        if (askText) {
-            askText.style.display = "none";
-            console.log('🔽 Texto "Pergunte-me qualquer coisa" escondido no mobile');
+    // 🔽 Fallback + robust hide: remove "Pergunte-me qualquer coisa" no mobile
+    (function mobileAskTextHider(){
+        function isMobileView() {
+            return (window.matchMedia && window.matchMedia("(max-width: 900px)").matches) || window.innerWidth < 900;
         }
-    }
+
+        // frases que queremos ocultar (puedes ampliar)
+        const phrases = [
+            "Pergunte-me qualquer coisa",
+            "Pergunte me qualquer coisa",
+            "Pergunte-me qualquer coisa!"
+        ];
+
+        function hideAskTextElements() {
+            if (!isMobileView()) return;
+            // verifica elementos comuns
+            const candidates = document.querySelectorAll("h1,h2,h3,h4,h5,h6,p,span,div");
+            candidates.forEach(el => {
+                const txt = (el.textContent || "").trim();
+                if (!txt) return;
+                for (const p of phrases) {
+                    if (txt.indexOf(p) !== -1) {
+                        try {
+                            el.style.setProperty("display", "none", "important");
+                            el.classList.add("ask-text-hidden");
+                        } catch (e) {
+                            el.style.display = "none";
+                        }
+                        console.log("📱 Ocultando texto detectado (mobile):", p, el);
+                        break;
+                    }
+                }
+            });
+        }
+
+        // roda uma primeira vez
+        hideAskTextElements();
+
+        // observa adições dinâmicas ao DOM (caso o texto seja injetado depois)
+        const observer = new MutationObserver((mutations) => {
+            if (!isMobileView()) return;
+            for (const m of mutations) {
+                if (m.addedNodes && m.addedNodes.length) {
+                    hideAskTextElements();
+                    break;
+                }
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // rerun em resize/orientationchange
+        window.addEventListener("resize", () => { setTimeout(hideAskTextElements, 120); });
+        window.addEventListener("orientationchange", () => { setTimeout(hideAskTextElements, 200); });
+    })();
     
     // Aguardar configurações serem carregadas
     setTimeout(() => {

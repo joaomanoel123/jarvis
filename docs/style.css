@@ -432,88 +432,17 @@ svg {
 
 /* ===== MELHORIAS PARA MOBILE ===== */
 @media (max-width: 768px) {
-    /* Ajustar tamanhos das animações */
-    .svg-frame {
-        width: 250px !important;
-        height: 250px !important;
-        margin-bottom: 20px;
-    }
-    
-    .square {
-        width: 250px !important;
-        height: 250px !important;
-    }
-    
-    /* Container SiriWave responsivo */
-    #siri-container {
-        height: 80px;
-        max-width: 90%;
-        margin: 0 auto;
-    }
-    
-    /* Botões com touch targets adequados */
-    .glow-on-hover {
-        min-width: 44px; /* Touch target mínimo */
-        min-height: 44px;
-        margin: 2px;
-        font-size: 1.1rem;
-    }
-    
-    /* Input field otimizado para mobile */
-    .input-field {
-        font-size: 16px; /* Previne zoom no iOS */
-        padding: 12px 8px;
-    }
-    
-    /* Garantir que o input seja sempre visível */
-    #TextInput {
-        width: 95% !important;
-        max-width: 95% !important;
-        margin: 15px auto !important;
-        padding: 12px 15px !important;
-        position: relative !important;
-        z-index: 1000 !important;
-        display: flex !important;
-    }
-    
-    /* Mensagens responsivas */
-    h5.text-light.text-center {
-        font-size: 1.1rem;
-        margin: 10px 0;
-        padding: 0 20px;
-        display: none !important; /* Esconder no mobile */
-    }
-    
-    #WishMessage {
-        font-size: 1.2rem !important;
-        padding: 0 15px;
-        text-align: center;
-    }
-    
-    /* Melhorar legibilidade das mensagens */
-    .siri-message {
-        font-size: 1.1rem !important;
-        line-height: 1.4;
-        padding: 0 15px;
-    }
-    
-    /* Ajustar seções para mobile */
-    section {
-        padding: 10px 0;
-    }
-    
-    /* Container principal responsivo */
-    .container-fluid {
-        padding: 0 10px;
-    }
-    
-    /* Melhorar espaçamento vertical */
-    .min-vh-100 {
-        min-height: calc(100vh - 100px);
-        padding: 20px 0;
-    }
+    .svg-frame { width: 250px !important; height: 250px !important; }
+    #siri-container { height: 80px; }
+    .glow-on-hover { min-width: 44px; min-height: 44px; margin: 2px; }
+    .input-field { font-size: 16px; }
 
+    /* 🔽 Esconde o texto "Pergunte-me qualquer coisa" no mobile */
+    h5.text-light.text-center { display: none !important; }
 }
+
+/* Classe utilitária para JS: forçar ocultação */
+.ask-text-hidden { display: none !important; }
 
 /* Melhorar visibilidade do sr-only */
 .sr-only {
