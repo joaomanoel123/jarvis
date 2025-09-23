@@ -3,6 +3,29 @@
  * Versão mobile adaptada mantendo todas as funcionalidades da versão PC
  */
 
+// Funções auxiliares definidas globalmente
+function basicMobileInit() {
+    console.log('🔄 Inicialização básica mobile...');
+    
+    // Remover loading screen
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen) {
+        loadingScreen.style.display = 'none';
+    }
+    
+    // Mostrar interface principal
+    const startSection = document.getElementById('Start');
+    const ovalSection = document.getElementById('Oval');
+    
+    if (startSection) startSection.hidden = true;
+    if (ovalSection) {
+        ovalSection.hidden = false;
+        ovalSection.style.display = 'flex';
+    }
+    
+    console.log('✅ Inicialização básica mobile concluída');
+}
+
 // Tornar a função disponível globalmente
 window.initializeJarvisMobile = function() {
     console.log('🤖 Inicializando Jarvis Mobile...');
@@ -15,7 +38,12 @@ window.initializeJarvisMobile = function() {
     
     // Inicializar com tratamento de erro
     try {
-        startJarvisMobileInit();
+        if (typeof window.initializeJarvisMobileComplete === 'function') {
+            window.initializeJarvisMobileComplete();
+        } else {
+            console.warn('⚠️ Função de inicialização completa não encontrada, usando fallback');
+            basicMobileInit();
+        }
     } catch (error) {
         console.error('❌ Erro na inicialização mobile:', error);
         // Tentar inicialização básica
@@ -33,33 +61,8 @@ $(document).ready(function () {
         }
     }, 500);
     
-    function startJarvisMobileInit() {
-        initializeJarvisMobile();
-    }
-    
-    function basicMobileInit() {
-        console.log('🔄 Inicialização básica mobile...');
-        
-        // Remover loading screen
-        const loadingScreen = document.getElementById('loadingScreen');
-        if (loadingScreen) {
-            loadingScreen.style.display = 'none';
-        }
-        
-        // Mostrar interface principal
-        const startSection = document.getElementById('Start');
-        const ovalSection = document.getElementById('Oval');
-        
-        if (startSection) startSection.hidden = true;
-        if (ovalSection) {
-            ovalSection.hidden = false;
-            ovalSection.style.display = 'flex';
-        }
-        
-        console.log('✅ Inicialização básica mobile concluída');
-    }
-    
-    function initializeJarvisMobile() {
+    // Definir a função de inicialização completa
+    window.initializeJarvisMobileComplete = function() {
         console.log('🤖 Executando inicialização completa mobile...');
         
         // Timeout de segurança para remover loading
@@ -156,7 +159,7 @@ $(document).ready(function () {
                 forceShowMobileInterface();
             }
         }, 10000);
-    }
+    };
     
     function startMobileSequence() {
         console.log('🚀 Iniciando sequência mobile...');
