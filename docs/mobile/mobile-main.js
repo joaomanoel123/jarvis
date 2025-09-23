@@ -261,4 +261,830 @@ $(document).ready(function () {
         $('.mobile-input-container').show();
         
         console.log('✅ Interface mobile forçada com sucesso');
-    }\n    \n    function setupMobileTextAnimations() {\n        // Verificar se textillate está disponível\n        if (typeof $.fn.textillate === 'function') {\n            try {\n                $('.mobile-main-message').textillate({\n                    loop: false,\n                    sync: true,\n                    in: {\n                        effect: \"fadeInUp\",\n                        delay: 50\n                    }\n                });\n\n                $('.mobile-siri-message').textillate({\n                    loop: false,\n                    sync: true,\n                    in: {\n                        effect: \"fadeInUp\",\n                        delay: 30\n                    }\n                });\n                console.log('🎨 Animações de texto mobile configuradas com textillate');\n            } catch (error) {\n                console.warn('⚠️ Erro ao configurar textillate mobile:', error);\n                setupMobileFallbackAnimations();\n            }\n        } else {\n            console.warn('⚠️ Textillate não disponível, usando animações CSS mobile');\n            setupMobileFallbackAnimations();\n        }\n    }\n    \n    function setupMobileFallbackAnimations() {\n        // Fallback para animações CSS simples mobile\n        $('.mobile-main-message, .mobile-siri-message').addClass('animate__animated animate__fadeInUp');\n        console.log('🎨 Animações CSS mobile básicas configuradas');\n    }\n    \n    let mobileSiriWave = null;\n    \n    function setupMobileSiriWave() {\n        const container = document.getElementById(\"siri-container\");\n        if (!container) {\n            console.warn('⚠️ Container siri-container mobile não encontrado');\n            return;\n        }\n        \n        // Verificar se SiriWave está disponível\n        if (typeof SiriWave === 'undefined') {\n            console.warn('⚠️ SiriWave não disponível para mobile');\n            // Criar placeholder visual simples para mobile\n            container.innerHTML = '<div style=\"width: 100%; height: 80px; background: linear-gradient(45deg, #00AAFF, #0066CC); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;\">🌊 Visualizador Mobile</div>';\n            return;\n        }\n        \n        try {\n            mobileSiriWave = new SiriWave({\n                container: container,\n                width: container.clientWidth || 280,\n                height: 80,\n                style: \"ios9\",\n                amplitude: 0.8,\n                speed: 0.25,\n                frequency: 4,\n                color: \"#00AAFF\",\n                autostart: false\n            });\n            \n            // Configurar redimensionamento responsivo mobile\n            window.addEventListener('resize', function() {\n                if (mobileSiriWave && mobileSiriWave.canvas) {\n                    try {\n                        const newWidth = container.clientWidth || 280;\n                        mobileSiriWave.canvas.style.width = newWidth + 'px';\n                    } catch (resizeError) {\n                        console.warn('⚠️ Erro ao redimensionar SiriWave mobile:', resizeError);\n                    }\n                }\n            });\n            \n            console.log('🌊 SiriWave mobile configurado com sucesso');\n        } catch (error) {\n            console.error('⚠️ Erro ao configurar SiriWave mobile:', error);\n            // Fallback: criar um placeholder visual simples\n            container.innerHTML = '<div style=\"width: 100%; height: 80px; background: linear-gradient(45deg, #00AAFF, #0066CC); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;\">🌊 Visualizador Mobile</div>';\n        }\n    }\n    \n    function setupMobileEventListeners() {\n        console.log('🔌 Configurando event listeners mobile...');\n        \n        // Debug: verificar se os botões existem\n        const buttons = ['MicBtn', 'SendBtn', 'ChatBtn', 'SettingsBtn'];\n        buttons.forEach(btnId => {\n            const btn = document.getElementById(btnId);\n            console.log(`🔍 Botão Mobile ${btnId}:`, btn ? '✅ Encontrado' : '❌ Não encontrado');\n            if (btn) {\n                const styles = getComputedStyle(btn);\n                console.log(`   - Display: ${styles.display}, Visibility: ${styles.visibility}`);\n            }\n        });\n        \n        // Listener para ativar TTS após primeira interação mobile\n        let firstInteraction = true;\n        function activateMobileTTSOnFirstInteraction() {\n            if (firstInteraction && window.jarvisTTS && window.jarvisTTS.queueMessage) {\n                firstInteraction = false;\n                setTimeout(() => {\n                    window.jarvisTTS.speak(window.jarvisTTS.queueMessage);\n                    window.jarvisTTS.queueMessage = null;\n                    console.log('🎤 Mensagem mobile de boas-vindas ativada após interação');\n                }, 500);\n            }\n        }\n        \n        // Adicionar listeners para primeira interação mobile\n        document.addEventListener('click', activateMobileTTSOnFirstInteraction, { once: true });\n        document.addEventListener('touchstart', activateMobileTTSOnFirstInteraction, { once: true });\n        \n        // Botão do microfone mobile\n        const micBtn = $(\"#MicBtn\");\n        if (micBtn.length > 0) {\n            micBtn.on('click touchend', function (e) {\n                e.preventDefault();\n                console.log('🎤 Botão de microfone mobile clicado');\n                startMobileSpeechRecognition();\n            });\n            console.log('✅ Event listener do MicBtn mobile configurado');\n        } else {\n            console.error('❌ MicBtn mobile não encontrado para configurar event listener');\n        }\n        \n        // Botão de envio mobile\n        const sendBtn = $(\"#SendBtn\");\n        if (sendBtn.length > 0) {\n            sendBtn.on('click touchend', function (e) {\n                e.preventDefault();\n                const message = $(\"#chatbox\").val().trim();\n                if (message) {\n                    sendMobileMessage(message);\n                }\n            });\n            console.log('✅ Event listener do SendBtn mobile configurado');\n        } else {\n            console.error('❌ SendBtn mobile não encontrado para configurar event listener');\n        }\n        \n        // Campo de texto mobile\n        $(\"#chatbox\").on('input', function () {\n            const message = $(\"#chatbox\").val();\n            toggleMobileSendButton(message);\n        });\n        \n        $(\"#chatbox\").on('keypress', function (e) {\n            if (e.which === 13) { // Enter\n                e.preventDefault();\n                const message = $(\"#chatbox\").val().trim();\n                if (message) {\n                    sendMobileMessage(message);\n                }\n            }\n        });\n        \n        // Botão de configurações mobile\n        const settingsBtn = $(\"#SettingsBtn\");\n        if (settingsBtn.length > 0) {\n            settingsBtn.on('click touchend', function (e) {\n                e.preventDefault();\n                if (window.jarvisConfig) {\n                    window.jarvisConfig.showQuickSettings();\n                }\n            });\n            console.log('✅ Event listener do SettingsBtn mobile configurado');\n        } else {\n            console.error('❌ SettingsBtn mobile não encontrado para configurar event listener');\n        }\n        \n        // Botão do chat mobile\n        const chatBtn = $(\"#ChatBtn\");\n        if (chatBtn.length > 0) {\n            chatBtn.on('click touchend', function (e) {\n                e.preventDefault();\n                console.log('💬 Botão de chat mobile clicado');\n                toggleMobileChatCanvas();\n            });\n            console.log('✅ Event listener do ChatBtn mobile configurado');\n        } else {\n            console.error('❌ ChatBtn mobile não encontrado para configurar event listener');\n        }\n    }\n    \n    function setupMobileGestures() {\n        console.log('👆 Configurando gestos mobile...');\n        \n        let touchStartY = 0;\n        let touchStartX = 0;\n        \n        // Swipe gestures\n        document.addEventListener('touchstart', function(e) {\n            touchStartY = e.touches[0].clientY;\n            touchStartX = e.touches[0].clientX;\n        }, { passive: true });\n        \n        document.addEventListener('touchend', function(e) {\n            if (!touchStartY || !touchStartX) return;\n            \n            const touchEndY = e.changedTouches[0].clientY;\n            const touchEndX = e.changedTouches[0].clientX;\n            \n            const diffY = touchStartY - touchEndY;\n            const diffX = touchStartX - touchEndX;\n            \n            // Swipe up para ativar microfone\n            if (Math.abs(diffY) > Math.abs(diffX) && diffY > 50) {\n                console.log('👆 Swipe up detectado - ativando microfone');\n                startMobileSpeechRecognition();\n            }\n            \n            // Swipe down para abrir chat\n            if (Math.abs(diffY) > Math.abs(diffX) && diffY < -50) {\n                console.log('👇 Swipe down detectado - abrindo chat');\n                toggleMobileChatCanvas();\n            }\n            \n            touchStartY = 0;\n            touchStartX = 0;\n        }, { passive: true });\n        \n        // Long press para configurações\n        let longPressTimer;\n        document.addEventListener('touchstart', function(e) {\n            longPressTimer = setTimeout(() => {\n                console.log('👆 Long press detectado - abrindo configurações');\n                if (window.jarvisConfig) {\n                    window.jarvisConfig.showQuickSettings();\n                }\n                // Vibração se disponível\n                if (navigator.vibrate) {\n                    navigator.vibrate(100);\n                }\n            }, 1000);\n        }, { passive: true });\n        \n        document.addEventListener('touchend', function() {\n            clearTimeout(longPressTimer);\n        }, { passive: true });\n        \n        console.log('✅ Gestos mobile configurados');\n    }\n    \n    function toggleMobileSendButton(message) {\n        if (message.length === 0) {\n            $(\"#MicBtn\").attr('hidden', false);\n            $(\"#SendBtn\").attr('hidden', true);\n        } else {\n            $(\"#MicBtn\").attr('hidden', true);\n            $(\"#SendBtn\").attr('hidden', false);\n        }\n    }\n    \n    function startMobileSpeechRecognition() {\n        console.log('🎤 Iniciando reconhecimento de voz mobile...');\n        \n        // Verificar se o sistema de reconhecimento está disponível\n        if (!window.jarvisSpeechRecognition || !window.jarvisSpeechRecognition.isAvailable()) {\n            console.warn('⚠️ Sistema de reconhecimento de voz não disponível no mobile');\n            showMobileToast(\"Reconhecimento de voz não disponível. Use o campo de texto.\");\n            return;\n        }\n        \n        const speechRecognition = window.jarvisSpeechRecognition;\n        \n        // Se já está ativo, parar\n        if (speechRecognition.isActive()) {\n            console.log('🛑 Parando reconhecimento mobile ativo...');\n            speechRecognition.stop();\n            resetMobileInterface();\n            return;\n        }\n        \n        // Mostrar interface de escuta mobile\n        $(\"#Oval\").attr(\"hidden\", true);\n        $(\"#SiriWave\").attr(\"hidden\", false);\n        \n        // Configurar callbacks mobile\n        speechRecognition.onStart(() => {\n            console.log('🎤 Reconhecimento mobile iniciado');\n            \n            // Ativar SiriWave mobile\n            if (mobileSiriWave) {\n                mobileSiriWave.start();\n            }\n            \n            // Atualizar visual do botão mobile\n            $('#MicBtn').addClass('recording');\n            $('.mobile-siri-message').text(\"Escutando... Fale agora!\");\n            \n            // Vibração se disponível\n            if (navigator.vibrate) {\n                navigator.vibrate(50);\n            }\n        });\n        \n        speechRecognition.onInterim((transcript) => {\n            console.log('⏳ Transcrição mobile parcial:', transcript);\n            $('.mobile-siri-message').text(`Ouvindo: \"${transcript}\"`);\n        });\n        \n        speechRecognition.onResult((transcript, confidence) => {\n            console.log('✅ Transcrição mobile final:', transcript);\n            console.log('🎯 Confiança:', (confidence * 100).toFixed(1) + '%');\n            \n            if (transcript.trim()) {\n                $(\"#chatbox\").val(transcript);\n                $('.mobile-siri-message').text(`Processando: \"${transcript}\"`);\n                \n                // Vibração de sucesso\n                if (navigator.vibrate) {\n                    navigator.vibrate([50, 100, 50]);\n                }\n                \n                // Processar comando automaticamente\n                setTimeout(() => {\n                    sendMobileMessage(transcript);\n                }, 500);\n            }\n        });\n        \n        speechRecognition.onError((error, message) => {\n            console.error('❌ Erro no reconhecimento mobile:', error, message);\n            showMobileToast(`Erro: ${message}`);\n            resetMobileInterface();\n            \n            // Voltar para interface principal após erro\n            setTimeout(() => {\n                $(\"#SiriWave\").attr(\"hidden\", true);\n                $(\"#Oval\").attr(\"hidden\", false);\n                $('.mobile-main-message').text(\"Pergunte-me qualquer coisa\");\n            }, 3000);\n        });\n        \n        speechRecognition.onEnd(() => {\n            console.log('🛑 Reconhecimento mobile finalizado');\n            resetMobileInterface();\n        });\n        \n        // Iniciar reconhecimento\n        const started = speechRecognition.start();\n        if (!started) {\n            console.error('❌ Falha ao iniciar reconhecimento mobile');\n            resetMobileInterface();\n        }\n    }\n    \n    function resetMobileInterface() {\n        $('#MicBtn').removeClass('recording');\n        \n        // Parar SiriWave mobile\n        if (mobileSiriWave) {\n            mobileSiriWave.stop();\n        }\n    }\n    \n    function sendMobileMessage(message) {\n        if (!message || !message.trim()) {\n            return;\n        }\n        \n        console.log('📤 Enviando mensagem mobile:', message);\n        \n        // Adicionar mensagem do usuário ao chat mobile\n        addMobileMessageToChat(message, 'user');\n        \n        // Verificar comandos locais primeiro\n        if (handleMobileLocalCommands(message)) {\n            return;\n        }\n        \n        // Mostrar interface de processamento mobile\n        $(\"#Oval\").attr(\"hidden\", true);\n        $(\"#SiriWave\").attr(\"hidden\", false);\n        \n        // Ativar SiriWave mobile\n        if (mobileSiriWave) {\n            mobileSiriWave.start();\n        }\n        \n        $('.mobile-siri-message').text(\"Processando sua mensagem...\");\n        \n        // Enviar para API\n        sendMobileToAPI(message)\n            .then(response => {\n                console.log('✅ Resposta mobile recebida:', response);\n                $('.mobile-siri-message').text(response);\n                \n                // Adicionar resposta do JARVIS ao chat mobile\n                addMobileMessageToChat(response, 'jarvis');\n                \n                // Falar resposta se TTS estiver ativo\n                if (window.jarvisTTS && window.jarvisTTS.isEnabled) {\n                    window.jarvisTTS.speak(response);\n                }\n                \n                // Vibração de sucesso\n                if (navigator.vibrate) {\n                    navigator.vibrate([100, 50, 100]);\n                }\n            })\n            .catch(error => {\n                console.error('❌ Erro na API mobile:', error);\n                $('.mobile-siri-message').text(`Erro: ${error.message}`);\n                showMobileToast(`Erro: ${error.message}`);\n            })\n            .finally(() => {\n                // Parar SiriWave mobile\n                if (mobileSiriWave) {\n                    mobileSiriWave.stop();\n                }\n                \n                // Limpar input e resetar botões\n                $(\"#chatbox\").val(\"\");\n                $(\"#MicBtn\").attr('hidden', false);\n                $(\"#SendBtn\").attr('hidden', true);\n                \n                // Voltar para a tela principal após 4 segundos\n                setTimeout(() => {\n                    $(\"#SiriWave\").attr(\"hidden\", true);\n                    $(\"#Oval\").attr(\"hidden\", false);\n                    $('.mobile-main-message').text(\"Pergunte-me qualquer coisa\");\n                }, 4000);\n            });\n    }\n    \n    function handleMobileLocalCommands(message) {\n        const msg = message.toLowerCase().trim();\n        console.log('🔍 Verificando comando local mobile:', msg);\n        \n        // Função auxiliar para abrir sites mobile\n        function openMobileSite(url, siteName, message) {\n            console.log(`✅ Comando mobile ${siteName} detectado!`);\n            window.open(url, '_blank');\n            showMobileToast(message);\n            \n            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {\n                window.jarvisTTS.speak(message);\n            }\n            \n            return true;\n        }\n        \n        // Comandos específicos mobile\n        const mobileCommands = {\n            whatsapp: () => openMobileSite('https://web.whatsapp.com', 'WhatsApp', 'Abrindo WhatsApp!'),\n            youtube: () => openMobileSite('https://m.youtube.com', 'YouTube', 'Abrindo YouTube Mobile!'),\n            google: () => openMobileSite('https://www.google.com', 'Google', 'Abrindo Google!'),\n            gmail: () => openMobileSite('https://mail.google.com', 'Gmail', 'Abrindo Gmail!'),\n            facebook: () => openMobileSite('https://m.facebook.com', 'Facebook', 'Abrindo Facebook Mobile!'),\n            instagram: () => openMobileSite('https://www.instagram.com', 'Instagram', 'Abrindo Instagram!'),\n            twitter: () => openMobileSite('https://mobile.twitter.com', 'Twitter', 'Abrindo Twitter Mobile!'),\n            configurações: () => {\n                console.log('✅ Comando de configurações mobile detectado!');\n                if (window.jarvisConfig) {\n                    window.jarvisConfig.showQuickSettings();\n                }\n                return true;\n            },\n            teste: () => {\n                console.log('✅ Comando de teste mobile detectado!');\n                showMobileToast(\"Executando diagnóstico mobile...\");\n                \n                if (window.jarvisConfig) {\n                    window.jarvisConfig.diagnose().then(diagnosis => {\n                        const status = diagnosis.apiConnectivity ? 'Sistema mobile funcionando normalmente' : 'Problemas de conectividade detectados';\n                        showMobileToast(status);\n                        \n                        if (window.jarvisTTS && window.jarvisTTS.isEnabled) {\n                            window.jarvisTTS.speak(status);\n                        }\n                    });\n                }\n                return true;\n            }\n        };\n        \n        // Verificar comandos\n        for (const [keyword, action] of Object.entries(mobileCommands)) {\n            if (msg.includes(keyword)) {\n                return action();\n            }\n        }\n        \n        return false;\n    }\n    \n    async function sendMobileToAPI(message) {\n        const config = window.jarvisConfig;\n        const apiUrl = config.getApiUrl();\n        \n        console.log('🌐 Enviando para API mobile:', apiUrl);\n        \n        try {\n            const response = await fetch(`${apiUrl}/chat`, {\n                method: 'POST',\n                headers: {\n                    'Content-Type': 'application/json',\n                },\n                body: JSON.stringify({\n                    message: message,\n                    user_id: 'mobile_user',\n                    session_id: 'mobile_session',\n                    platform: 'mobile'\n                }),\n                timeout: config.settings.apiTimeout\n            });\n            \n            if (!response.ok) {\n                throw new Error(`API Error: ${response.status} ${response.statusText}`);\n            }\n            \n            const data = await response.json();\n            \n            if (data.response) {\n                return data.response;\n            } else if (data.error) {\n                throw new Error(data.error);\n            } else {\n                throw new Error('Resposta inválida da API');\n            }\n            \n        } catch (error) {\n            console.error('❌ Erro na API mobile:', error);\n            \n            // Respostas de fallback para mobile\n            const mobileFallbackResponses = [\n                \"Desculpe, estou com problemas de conectividade no momento. Tente novamente.\",\n                \"Não consegui processar sua solicitação agora. Verifique sua conexão.\",\n                \"Sistema temporariamente indisponível. Tente novamente mais tarde.\",\n                \"Erro de comunicação com o servidor mobile.\"\n            ];\n            \n            const randomResponse = mobileFallbackResponses[Math.floor(Math.random() * mobileFallbackResponses.length)];\n            throw new Error(randomResponse);\n        }\n    }\n    \n    // ===== FUNÇÕES DO CHAT MOBILE =====\n    \n    let mobileChatHistory = [];\n    let mobileChatVisible = false;\n    \n    function toggleMobileChatCanvas() {\n        const chatCanvas = document.getElementById('mobileChat');\n        if (!chatCanvas) {\n            console.warn('⚠️ Chat canvas mobile não encontrado');\n            return;\n        }\n        \n        if (mobileChatVisible) {\n            // Fechar chat mobile\n            $(chatCanvas).offcanvas('hide');\n            mobileChatVisible = false;\n            console.log('💬 Chat mobile fechado');\n        } else {\n            // Abrir chat mobile e carregar histórico\n            loadMobileChatHistory();\n            $(chatCanvas).offcanvas('show');\n            mobileChatVisible = true;\n            console.log('💬 Chat mobile aberto');\n        }\n    }\n    \n    function addMobileMessageToChat(message, sender) {\n        const timestamp = new Date().toLocaleTimeString('pt-BR', {\n            hour: '2-digit',\n            minute: '2-digit'\n        });\n        \n        const chatMessage = {\n            id: Date.now(),\n            message: message,\n            sender: sender, // 'user' ou 'jarvis'\n            timestamp: timestamp,\n            time: new Date()\n        };\n        \n        mobileChatHistory.push(chatMessage);\n        \n        // Limitar histórico a 50 mensagens\n        if (mobileChatHistory.length > 50) {\n            mobileChatHistory = mobileChatHistory.slice(-50);\n        }\n        \n        console.log('💬 Mensagem mobile adicionada ao chat:', chatMessage);\n        \n        // Atualizar interface se chat estiver visível\n        if (mobileChatVisible) {\n            loadMobileChatHistory();\n        }\n        \n        // Salvar no localStorage\n        saveMobileChatHistory();\n    }\n    \n    function loadMobileChatHistory() {\n        const chatBody = document.getElementById('mobile-chat-body');\n        if (!chatBody) {\n            console.warn('⚠️ Chat body mobile não encontrado');\n            return;\n        }\n        \n        // Carregar histórico do localStorage\n        loadMobileChatFromStorage();\n        \n        if (mobileChatHistory.length === 0) {\n            chatBody.innerHTML = `\n                <div class=\"text-center text-light p-4\">\n                    <i class=\"bi bi-chat-dots\" style=\"font-size: 3rem; opacity: 0.5;\"></i>\n                    <p class=\"mt-3 mb-0\">Nenhuma conversa ainda</p>\n                    <small class=\"text-muted\">Comece digitando uma mensagem</small>\n                </div>\n            `;\n            return;\n        }\n        \n        let chatHTML = '';\n        \n        mobileChatHistory.forEach(msg => {\n            const isUser = msg.sender === 'user';\n            const messageClass = isUser ? 'sender_message' : 'receiver_message';\n            const alignClass = isUser ? 'ms-auto' : 'me-auto';\n            \n            chatHTML += `\n                <div class=\"d-flex mb-3 ${isUser ? 'justify-content-end' : 'justify-content-start'}\">\n                    <div class=\"${messageClass}\" style=\"max-width: 85%;\">\n                        <div class=\"message-content\">\n                            ${escapeHtml(msg.message)}\n                        </div>\n                        <div class=\"message-time\">\n                            ${msg.timestamp}\n                        </div>\n                    </div>\n                </div>\n            `;\n        });\n        \n        chatBody.innerHTML = chatHTML;\n        \n        // Scroll para a última mensagem\n        setTimeout(() => {\n            chatBody.scrollTop = chatBody.scrollHeight;\n        }, 100);\n    }\n    \n    function saveMobileChatHistory() {\n        try {\n            localStorage.setItem('jarvis_mobile_chat_history', JSON.stringify(mobileChatHistory));\n        } catch (error) {\n            console.warn('⚠️ Erro ao salvar histórico do chat mobile:', error);\n        }\n    }\n    \n    function loadMobileChatFromStorage() {\n        try {\n            const saved = localStorage.getItem('jarvis_mobile_chat_history');\n            if (saved) {\n                mobileChatHistory = JSON.parse(saved);\n            }\n        } catch (error) {\n            console.warn('⚠️ Erro ao carregar histórico do chat mobile:', error);\n            mobileChatHistory = [];\n        }\n    }\n    \n    function clearMobileChatHistory() {\n        mobileChatHistory = [];\n        saveMobileChatHistory();\n        loadMobileChatHistory();\n        console.log('💬 Histórico do chat mobile limpo');\n        showMobileToast('Histórico limpo');\n    }\n    \n    function escapeHtml(text) {\n        const div = document.createElement('div');\n        div.textContent = text;\n        return div.innerHTML;\n    }\n    \n    // ===== FUNÇÕES AUXILIARES MOBILE =====\n    \n    function showMobileToast(message, duration = 3000) {\n        // Criar toast mobile\n        const toast = document.createElement('div');\n        toast.className = 'mobile-toast';\n        toast.textContent = message;\n        toast.style.cssText = `\n            position: fixed;\n            top: 20px;\n            left: 50%;\n            transform: translateX(-50%);\n            background: rgba(0, 170, 255, 0.9);\n            color: white;\n            padding: 12px 20px;\n            border-radius: 25px;\n            z-index: 10000;\n            font-size: 14px;\n            backdrop-filter: blur(10px);\n            border: 1px solid rgba(255, 255, 255, 0.2);\n            animation: mobileToastIn 0.3s ease;\n        `;\n        \n        document.body.appendChild(toast);\n        \n        setTimeout(() => {\n            toast.style.animation = 'mobileToastOut 0.3s ease';\n            setTimeout(() => {\n                document.body.removeChild(toast);\n            }, 300);\n        }, duration);\n    }\n    \n    function showMobileQuickActions() {\n        const quickActions = document.getElementById('mobileQuickActions');\n        if (quickActions) {\n            quickActions.hidden = !quickActions.hidden;\n            console.log('⚡ Quick actions mobile toggled');\n        }\n    }\n    \n    function testMobileConnectivity() {\n        showMobileToast('Testando conectividade mobile...');\n        if (window.jarvisConfig && window.jarvisConfig.testConnectivity) {\n            window.jarvisConfig.testConnectivity();\n        }\n    }\n    \n    function testMobileTTS() {\n        showMobileToast('Testando voz mobile...');\n        if (window.jarvisConfig && window.jarvisConfig.testTTS) {\n            window.jarvisConfig.testTTS();\n        }\n    }\n    \n    function testMobileMicrophone() {\n        showMobileToast('Testando microfone mobile...');\n        if (window.jarvisConfig && window.jarvisConfig.testMicrophone) {\n            window.jarvisConfig.testMicrophone();\n        }\n    }\n    \n    async function mobileDiagnose() {\n        showMobileToast('Executando diagnóstico mobile...');\n        \n        const diagnosis = {\n            environment: 'mobile',\n            platform: navigator.platform,\n            userAgent: navigator.userAgent,\n            online: navigator.onLine,\n            connection: navigator.connection ? navigator.connection.effectiveType : 'unknown',\n            battery: navigator.getBattery ? await navigator.getBattery() : null,\n            timestamp: new Date().toISOString()\n        };\n        \n        console.log('📊 Diagnóstico mobile completo:', diagnosis);\n        return diagnosis;\n    }\n    \n    // Expor funções globalmente para uso em outros scripts mobile\n    window.jarvisMobileChat = {\n        addMessage: addMobileMessageToChat,\n        loadHistory: loadMobileChatHistory,\n        clearHistory: clearMobileChatHistory,\n        toggle: toggleMobileChatCanvas\n    };\n    \n    window.jarvisMobile = {\n        showToast: showMobileToast,\n        showQuickActions: showMobileQuickActions,\n        testConnectivity: testMobileConnectivity,\n        testTTS: testMobileTTS,\n        testMicrophone: testMobileMicrophone,\n        diagnose: mobileDiagnose\n    };\n    \n    // Carregar histórico mobile na inicialização\n    loadMobileChatFromStorage();\n    \n    console.log('🎯 JARVIS Mobile script carregado com sucesso!');\n});\n\n// Adicionar estilos de animação para toasts\nconst mobileToastStyles = document.createElement('style');\nmobileToastStyles.textContent = `\n    @keyframes mobileToastIn {\n        from {\n            opacity: 0;\n            transform: translateX(-50%) translateY(-20px);\n        }\n        to {\n            opacity: 1;\n            transform: translateX(-50%) translateY(0);\n        }\n    }\n    \n    @keyframes mobileToastOut {\n        from {\n            opacity: 1;\n            transform: translateX(-50%) translateY(0);\n        }\n        to {\n            opacity: 0;\n            transform: translateX(-50%) translateY(-20px);\n        }\n    }\n    \n    .mobile-btn.recording {\n        background: linear-gradient(45deg, #FF0000, #FF4444) !important;\n        animation: recordingPulse 1s infinite;\n    }\n    \n    @keyframes recordingPulse {\n        0%, 100% { transform: scale(1); }\n        50% { transform: scale(1.1); }\n    }\n`;\ndocument.head.appendChild(mobileToastStyles);"
+    }
+    
+    function setupMobileTextAnimations() {
+        // Verificar se textillate está disponível
+        if (typeof $.fn.textillate === 'function') {
+            try {
+                $('.mobile-main-message').textillate({
+                    loop: false,
+                    sync: true,
+                    in: {
+                        effect: "fadeInUp",
+                        delay: 50
+                    }
+                });
+
+                $('.mobile-siri-message').textillate({
+                    loop: false,
+                    sync: true,
+                    in: {
+                        effect: "fadeInUp",
+                        delay: 30
+                    }
+                });
+                console.log('🎨 Animações de texto mobile configuradas com textillate');
+            } catch (error) {
+                console.warn('⚠️ Erro ao configurar textillate mobile:', error);
+                setupMobileFallbackAnimations();
+            }
+        } else {
+            console.warn('⚠️ Textillate não disponível, usando animações CSS mobile');
+            setupMobileFallbackAnimations();
+        }
+    }
+    
+    function setupMobileFallbackAnimations() {
+        // Fallback para animações CSS simples mobile
+        $('.mobile-main-message, .mobile-siri-message').addClass('animate__animated animate__fadeInUp');
+        console.log('🎨 Animações CSS mobile básicas configuradas');
+    }
+    
+    let mobileSiriWave = null;
+    
+    function setupMobileSiriWave() {
+        const container = document.getElementById("siri-container");
+        if (!container) {
+            console.warn('⚠️ Container siri-container mobile não encontrado');
+            return;
+        }
+        
+        // Verificar se SiriWave está disponível
+        if (typeof SiriWave === 'undefined') {
+            console.warn('⚠️ SiriWave não disponível para mobile');
+            // Criar placeholder visual simples para mobile
+            container.innerHTML = '<div style="width: 100%; height: 80px; background: linear-gradient(45deg, #00AAFF, #0066CC); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">🌊 Visualizador Mobile</div>';
+            return;
+        }
+        
+        try {
+            mobileSiriWave = new SiriWave({
+                container: container,
+                width: container.clientWidth || 280,
+                height: 80,
+                style: "ios9",
+                amplitude: 0.8,
+                speed: 0.25,
+                frequency: 4,
+                color: "#00AAFF",
+                autostart: false
+            });
+            
+            // Configurar redimensionamento responsivo mobile
+            window.addEventListener('resize', function() {
+                if (mobileSiriWave && mobileSiriWave.canvas) {
+                    try {
+                        const newWidth = container.clientWidth || 280;
+                        mobileSiriWave.canvas.style.width = newWidth + 'px';
+                    } catch (resizeError) {
+                        console.warn('⚠️ Erro ao redimensionar SiriWave mobile:', resizeError);
+                    }
+                }
+            });
+            
+            console.log('🌊 SiriWave mobile configurado com sucesso');
+        } catch (error) {
+            console.error('⚠️ Erro ao configurar SiriWave mobile:', error);
+            // Fallback: criar um placeholder visual simples
+            container.innerHTML = '<div style="width: 100%; height: 80px; background: linear-gradient(45deg, #00AAFF, #0066CC); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">🌊 Visualizador Mobile</div>';
+        }
+    }
+    
+    function setupMobileEventListeners() {
+        console.log('🔌 Configurando event listeners mobile...');
+        
+        // Debug: verificar se os botões existem
+        const buttons = ['MicBtn', 'SendBtn', 'ChatBtn', 'SettingsBtn'];
+        buttons.forEach(btnId => {
+            const btn = document.getElementById(btnId);
+            console.log(`🔍 Botão Mobile ${btnId}:`, btn ? '✅ Encontrado' : '❌ Não encontrado');
+            if (btn) {
+                const styles = getComputedStyle(btn);
+                console.log(`   - Display: ${styles.display}, Visibility: ${styles.visibility}`);
+            }
+        });
+        
+        // Listener para ativar TTS após primeira interação mobile
+        let firstInteraction = true;
+        function activateMobileTTSOnFirstInteraction() {
+            if (firstInteraction && window.jarvisTTS && window.jarvisTTS.queueMessage) {
+                firstInteraction = false;
+                setTimeout(() => {
+                    window.jarvisTTS.speak(window.jarvisTTS.queueMessage);
+                    window.jarvisTTS.queueMessage = null;
+                    console.log('🎤 Mensagem mobile de boas-vindas ativada após interação');
+                }, 500);
+            }
+        }
+        
+        // Adicionar listeners para primeira interação mobile
+        document.addEventListener('click', activateMobileTTSOnFirstInteraction, { once: true });
+        document.addEventListener('touchstart', activateMobileTTSOnFirstInteraction, { once: true });
+        
+        // Botão do microfone mobile
+        const micBtn = $("#MicBtn");
+        if (micBtn.length > 0) {
+            micBtn.on('click touchend', function (e) {
+                e.preventDefault();
+                console.log('🎤 Botão de microfone mobile clicado');
+                startMobileSpeechRecognition();
+            });
+            console.log('✅ Event listener do MicBtn mobile configurado');
+        } else {
+            console.error('❌ MicBtn mobile não encontrado para configurar event listener');
+        }
+        
+        // Botão de envio mobile
+        const sendBtn = $("#SendBtn");
+        if (sendBtn.length > 0) {
+            sendBtn.on('click touchend', function (e) {
+                e.preventDefault();
+                const message = $("#chatbox").val().trim();
+                if (message) {
+                    sendMobileMessage(message);
+                }
+            });
+            console.log('✅ Event listener do SendBtn mobile configurado');
+        } else {
+            console.error('❌ SendBtn mobile não encontrado para configurar event listener');
+        }
+        
+        // Campo de texto mobile
+        $("#chatbox").on('input', function () {
+            const message = $("#chatbox").val();
+            toggleMobileSendButton(message);
+        });
+        
+        $("#chatbox").on('keypress', function (e) {
+            if (e.which === 13) { // Enter
+                e.preventDefault();
+                const message = $("#chatbox").val().trim();
+                if (message) {
+                    sendMobileMessage(message);
+                }
+            }
+        });
+        
+        // Botão de configurações mobile
+        const settingsBtn = $("#SettingsBtn");
+        if (settingsBtn.length > 0) {
+            settingsBtn.on('click touchend', function (e) {
+                e.preventDefault();
+                if (window.jarvisConfig) {
+                    window.jarvisConfig.showQuickSettings();
+                }
+            });
+            console.log('✅ Event listener do SettingsBtn mobile configurado');
+        } else {
+            console.error('❌ SettingsBtn mobile não encontrado para configurar event listener');
+        }
+        
+        // Botão do chat mobile
+        const chatBtn = $("#ChatBtn");
+        if (chatBtn.length > 0) {
+            chatBtn.on('click touchend', function (e) {
+                e.preventDefault();
+                console.log('💬 Botão de chat mobile clicado');
+                toggleMobileChatCanvas();
+            });
+            console.log('✅ Event listener do ChatBtn mobile configurado');
+        } else {
+            console.error('❌ ChatBtn mobile não encontrado para configurar event listener');
+        }
+    }
+    
+    function setupMobileGestures() {
+        console.log('👆 Configurando gestos mobile...');
+        
+        let touchStartY = 0;
+        let touchStartX = 0;
+        
+        // Swipe gestures
+        document.addEventListener('touchstart', function(e) {
+            touchStartY = e.touches[0].clientY;
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+        
+        document.addEventListener('touchend', function(e) {
+            if (!touchStartY || !touchStartX) return;
+            
+            const touchEndY = e.changedTouches[0].clientY;
+            const touchEndX = e.changedTouches[0].clientX;
+            
+            const diffY = touchStartY - touchEndY;
+            const diffX = touchStartX - touchEndX;
+            
+            // Swipe up para ativar microfone
+            if (Math.abs(diffY) > Math.abs(diffX) && diffY > 50) {
+                console.log('👆 Swipe up detectado - ativando microfone');
+                startMobileSpeechRecognition();
+            }
+            
+            // Swipe down para abrir chat
+            if (Math.abs(diffY) > Math.abs(diffX) && diffY < -50) {
+                console.log('👇 Swipe down detectado - abrindo chat');
+                toggleMobileChatCanvas();
+            }
+            
+            touchStartY = 0;
+            touchStartX = 0;
+        }, { passive: true });
+        
+        // Long press para configurações
+        let longPressTimer;
+        document.addEventListener('touchstart', function(e) {
+            longPressTimer = setTimeout(() => {
+                console.log('👆 Long press detectado - abrindo configurações');
+                if (window.jarvisConfig) {
+                    window.jarvisConfig.showQuickSettings();
+                }
+                // Vibração se disponível
+                if (navigator.vibrate) {
+                    navigator.vibrate(100);
+                }
+            }, 1000);
+        }, { passive: true });
+        
+        document.addEventListener('touchend', function() {
+            clearTimeout(longPressTimer);
+        }, { passive: true });
+        
+        console.log('✅ Gestos mobile configurados');
+    }
+    
+    function toggleMobileSendButton(message) {
+        if (message.length === 0) {
+            $("#MicBtn").attr('hidden', false);
+            $("#SendBtn").attr('hidden', true);
+        } else {
+            $("#MicBtn").attr('hidden', true);
+            $("#SendBtn").attr('hidden', false);
+        }
+    }
+    
+    function startMobileSpeechRecognition() {
+        console.log('🎤 Iniciando reconhecimento de voz mobile...');
+        
+        // Verificar se o sistema de reconhecimento está disponível
+        if (!window.jarvisSpeechRecognition || !window.jarvisSpeechRecognition.isAvailable()) {
+            console.warn('⚠️ Sistema de reconhecimento de voz não disponível no mobile');
+            showMobileToast("Reconhecimento de voz não disponível. Use o campo de texto.");
+            return;
+        }
+        
+        const speechRecognition = window.jarvisSpeechRecognition;
+        
+        // Se já está ativo, parar
+        if (speechRecognition.isActive()) {
+            console.log('🛑 Parando reconhecimento mobile ativo...');
+            speechRecognition.stop();
+            resetMobileInterface();
+            return;
+        }
+        
+        // Mostrar interface de escuta mobile
+        $("#Oval").attr("hidden", true);
+        $("#SiriWave").attr("hidden", false);
+        
+        // Configurar callbacks mobile
+        speechRecognition.onStart(() => {
+            console.log('🎤 Reconhecimento mobile iniciado');
+            
+            // Ativar SiriWave mobile
+            if (mobileSiriWave) {
+                mobileSiriWave.start();
+            }
+            
+            // Atualizar visual do botão mobile
+            $('#MicBtn').addClass('recording');
+            $('.mobile-siri-message').text("Escutando... Fale agora!");
+            
+            // Vibração se disponível
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        });
+        
+        speechRecognition.onInterim((transcript) => {
+            console.log('⏳ Transcrição mobile parcial:', transcript);
+            $('.mobile-siri-message').text(`Ouvindo: "${transcript}"`);
+        });
+        
+        speechRecognition.onResult((transcript, confidence) => {
+            console.log('✅ Transcrição mobile final:', transcript);
+            console.log('🎯 Confiança:', (confidence * 100).toFixed(1) + '%');
+            
+            if (transcript.trim()) {
+                $("#chatbox").val(transcript);
+                $('.mobile-siri-message').text(`Processando: "${transcript}"`);
+                
+                // Vibração de sucesso
+                if (navigator.vibrate) {
+                    navigator.vibrate([50, 100, 50]);
+                }
+                
+                // Processar comando automaticamente
+                setTimeout(() => {
+                    sendMobileMessage(transcript);
+                }, 500);
+            }
+        });
+        
+        speechRecognition.onError((error, message) => {
+            console.error('❌ Erro no reconhecimento mobile:', error, message);
+            showMobileToast(`Erro: ${message}`);
+            resetMobileInterface();
+            
+            // Voltar para interface principal após erro
+            setTimeout(() => {
+                $("#SiriWave").attr("hidden", true);
+                $("#Oval").attr("hidden", false);
+                $('.mobile-main-message').text("Pergunte-me qualquer coisa");
+            }, 3000);
+        });
+        
+        speechRecognition.onEnd(() => {
+            console.log('🛑 Reconhecimento mobile finalizado');
+            resetMobileInterface();
+        });
+        
+        // Iniciar reconhecimento
+        const started = speechRecognition.start();
+        if (!started) {
+            console.error('❌ Falha ao iniciar reconhecimento mobile');
+            resetMobileInterface();
+        }
+    }
+    
+    function resetMobileInterface() {
+        $('#MicBtn').removeClass('recording');
+        
+        // Parar SiriWave mobile
+        if (mobileSiriWave) {
+            mobileSiriWave.stop();
+        }
+    }
+    
+    function sendMobileMessage(message) {
+        if (!message || !message.trim()) {
+            return;
+        }
+        
+        console.log('📤 Enviando mensagem mobile:', message);
+        
+        // Adicionar mensagem do usuário ao chat mobile
+        addMobileMessageToChat(message, 'user');
+        
+        // Verificar comandos locais primeiro
+        if (handleMobileLocalCommands(message)) {
+            return;
+        }
+        
+        // Mostrar interface de processamento mobile
+        $("#Oval").attr("hidden", true);
+        $("#SiriWave").attr("hidden", false);
+        
+        // Ativar SiriWave mobile
+        if (mobileSiriWave) {
+            mobileSiriWave.start();
+        }
+        
+        $('.mobile-siri-message').text("Processando sua mensagem...");
+        
+        // Enviar para API
+        sendMobileToAPI(message)
+            .then(response => {
+                console.log('✅ Resposta mobile recebida:', response);
+                $('.mobile-siri-message').text(response);
+                
+                // Adicionar resposta do JARVIS ao chat mobile
+                addMobileMessageToChat(response, 'jarvis');
+                
+                // Falar resposta se TTS estiver ativo
+                if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                    window.jarvisTTS.speak(response);
+                }
+                
+                // Vibração de sucesso
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 50, 100]);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Erro na API mobile:', error);
+                $('.mobile-siri-message').text(`Erro: ${error.message}`);
+                showMobileToast(`Erro: ${error.message}`);
+            })
+            .finally(() => {
+                // Parar SiriWave mobile
+                if (mobileSiriWave) {
+                    mobileSiriWave.stop();
+                }
+                
+                // Limpar input e resetar botões
+                $("#chatbox").val("");
+                $("#MicBtn").attr('hidden', false);
+                $("#SendBtn").attr('hidden', true);
+                
+                // Voltar para a tela principal após 4 segundos
+                setTimeout(() => {
+                    $("#SiriWave").attr("hidden", true);
+                    $("#Oval").attr("hidden", false);
+                    $('.mobile-main-message').text("Pergunte-me qualquer coisa");
+                }, 4000);
+            });
+    }
+    
+    function handleMobileLocalCommands(message) {
+        const msg = message.toLowerCase().trim();
+        console.log('🔍 Verificando comando local mobile:', msg);
+        
+        // Função auxiliar para abrir sites mobile
+        function openMobileSite(url, siteName, message) {
+            console.log(`✅ Comando mobile ${siteName} detectado!`);
+            window.open(url, '_blank');
+            showMobileToast(message);
+            
+            if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                window.jarvisTTS.speak(message);
+            }
+            
+            return true;
+        }
+        
+        // Comandos específicos mobile
+        const mobileCommands = {
+            whatsapp: () => openMobileSite('https://web.whatsapp.com', 'WhatsApp', 'Abrindo WhatsApp!'),
+            youtube: () => openMobileSite('https://m.youtube.com', 'YouTube', 'Abrindo YouTube Mobile!'),
+            google: () => openMobileSite('https://www.google.com', 'Google', 'Abrindo Google!'),
+            gmail: () => openMobileSite('https://mail.google.com', 'Gmail', 'Abrindo Gmail!'),
+            facebook: () => openMobileSite('https://m.facebook.com', 'Facebook', 'Abrindo Facebook Mobile!'),
+            instagram: () => openMobileSite('https://www.instagram.com', 'Instagram', 'Abrindo Instagram!'),
+            twitter: () => openMobileSite('https://mobile.twitter.com', 'Twitter', 'Abrindo Twitter Mobile!'),
+            configurações: () => {
+                console.log('✅ Comando de configurações mobile detectado!');
+                if (window.jarvisConfig) {
+                    window.jarvisConfig.showQuickSettings();
+                }
+                return true;
+            },
+            teste: () => {
+                console.log('✅ Comando de teste mobile detectado!');
+                showMobileToast("Executando diagnóstico mobile...");
+                
+                if (window.jarvisConfig) {
+                    window.jarvisConfig.diagnose().then(diagnosis => {
+                        const status = diagnosis.apiConnectivity ? 'Sistema mobile funcionando normalmente' : 'Problemas de conectividade detectados';
+                        showMobileToast(status);
+                        
+                        if (window.jarvisTTS && window.jarvisTTS.isEnabled) {
+                            window.jarvisTTS.speak(status);
+                        }
+                    });
+                }
+                return true;
+            }
+        };
+        
+        // Verificar comandos
+        for (const [keyword, action] of Object.entries(mobileCommands)) {
+            if (msg.includes(keyword)) {
+                return action();
+            }
+        }
+        
+        return false;
+    }
+    
+    async function sendMobileToAPI(message) {
+        const config = window.jarvisConfig;
+        const apiUrl = config.getApiUrl();
+        
+        console.log('🌐 Enviando para API mobile:', apiUrl);
+        
+        try {
+            const response = await fetch(`${apiUrl}/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    user_id: 'mobile_user',
+                    session_id: 'mobile_session',
+                    platform: 'mobile'
+                }),
+                timeout: config.settings.apiTimeout
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.response) {
+                return data.response;
+            } else if (data.error) {
+                throw new Error(data.error);
+            } else {
+                throw new Error('Resposta inválida da API');
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro na API mobile:', error);
+            
+            // Respostas de fallback para mobile
+            const mobileFallbackResponses = [
+                "Desculpe, estou com problemas de conectividade no momento. Tente novamente.",
+                "Não consegui processar sua solicitação agora. Verifique sua conexão.",
+                "Sistema temporariamente indisponível. Tente novamente mais tarde.",
+                "Erro de comunicação com o servidor mobile."
+            ];
+            
+            const randomResponse = mobileFallbackResponses[Math.floor(Math.random() * mobileFallbackResponses.length)];
+            throw new Error(randomResponse);
+        }
+    }
+    
+    // ===== FUNÇÕES DO CHAT MOBILE =====
+    
+    let mobileChatHistory = [];
+    let mobileChatVisible = false;
+    
+    function toggleMobileChatCanvas() {
+        const chatCanvas = document.getElementById('mobileChat');
+        if (!chatCanvas) {
+            console.warn('⚠️ Chat canvas mobile não encontrado');
+            return;
+        }
+        
+        if (mobileChatVisible) {
+            // Fechar chat mobile
+            $(chatCanvas).offcanvas('hide');
+            mobileChatVisible = false;
+            console.log('💬 Chat mobile fechado');
+        } else {
+            // Abrir chat mobile e carregar histórico
+            loadMobileChatHistory();
+            $(chatCanvas).offcanvas('show');
+            mobileChatVisible = true;
+            console.log('💬 Chat mobile aberto');
+        }
+    }
+    
+    function addMobileMessageToChat(message, sender) {
+        const timestamp = new Date().toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const chatMessage = {
+            id: Date.now(),
+            message: message,
+            sender: sender, // 'user' ou 'jarvis'
+            timestamp: timestamp,
+            time: new Date()
+        };
+        
+        mobileChatHistory.push(chatMessage);
+        
+        // Limitar histórico a 50 mensagens
+        if (mobileChatHistory.length > 50) {
+            mobileChatHistory = mobileChatHistory.slice(-50);
+        }
+        
+        console.log('💬 Mensagem mobile adicionada ao chat:', chatMessage);
+        
+        // Atualizar interface se chat estiver visível
+        if (mobileChatVisible) {
+            loadMobileChatHistory();
+        }
+        
+        // Salvar no localStorage
+        saveMobileChatHistory();
+    }
+    
+    function loadMobileChatHistory() {
+        const chatBody = document.getElementById('mobile-chat-body');
+        if (!chatBody) {
+            console.warn('⚠️ Chat body mobile não encontrado');
+            return;
+        }
+        
+        // Carregar histórico do localStorage
+        loadMobileChatFromStorage();
+        
+        if (mobileChatHistory.length === 0) {
+            chatBody.innerHTML = `
+                <div class="text-center text-light p-4">
+                    <i class="bi bi-chat-dots" style="font-size: 3rem; opacity: 0.5;"></i>
+                    <p class="mt-3 mb-0">Nenhuma conversa ainda</p>
+                    <small class="text-muted">Comece digitando uma mensagem</small>
+                </div>
+            `;
+            return;
+        }
+        
+        let chatHTML = '';
+        
+        mobileChatHistory.forEach(msg => {
+            const isUser = msg.sender === 'user';
+            const messageClass = isUser ? 'sender_message' : 'receiver_message';
+            const alignClass = isUser ? 'ms-auto' : 'me-auto';
+            
+            chatHTML += `
+                <div class="d-flex mb-3 ${isUser ? 'justify-content-end' : 'justify-content-start'}">
+                    <div class="${messageClass}" style="max-width: 85%;">
+                        <div class="message-content">
+                            ${escapeHtml(msg.message)}
+                        </div>
+                        <div class="message-time">
+                            ${msg.timestamp}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        chatBody.innerHTML = chatHTML;
+        
+        // Scroll para a última mensagem
+        setTimeout(() => {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }, 100);
+    }
+    
+    function saveMobileChatHistory() {
+        try {
+            localStorage.setItem('jarvis_mobile_chat_history', JSON.stringify(mobileChatHistory));
+        } catch (error) {
+            console.warn('⚠️ Erro ao salvar histórico do chat mobile:', error);
+        }
+    }
+    
+    function loadMobileChatFromStorage() {
+        try {
+            const saved = localStorage.getItem('jarvis_mobile_chat_history');
+            if (saved) {
+                mobileChatHistory = JSON.parse(saved);
+            }
+        } catch (error) {
+            console.warn('⚠️ Erro ao carregar histórico do chat mobile:', error);
+            mobileChatHistory = [];
+        }
+    }
+    
+    function clearMobileChatHistory() {
+        mobileChatHistory = [];
+        saveMobileChatHistory();
+        loadMobileChatHistory();
+        console.log('💬 Histórico do chat mobile limpo');
+        showMobileToast('Histórico limpo');
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // ===== FUNÇÕES AUXILIARES MOBILE =====
+    
+    function showMobileToast(message, duration = 3000) {
+        // Criar toast mobile
+        const toast = document.createElement('div');
+        toast.className = 'mobile-toast';
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 170, 255, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            z-index: 10000;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: mobileToastIn 0.3s ease;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'mobileToastOut 0.3s ease';
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, duration);
+    }
+    
+    function showMobileQuickActions() {
+        const quickActions = document.getElementById('mobileQuickActions');
+        if (quickActions) {
+            quickActions.hidden = !quickActions.hidden;
+            console.log('⚡ Quick actions mobile toggled');
+        }
+    }
+    
+    function testMobileConnectivity() {
+        showMobileToast('Testando conectividade mobile...');
+        if (window.jarvisConfig && window.jarvisConfig.testConnectivity) {
+            window.jarvisConfig.testConnectivity();
+        }
+    }
+    
+    function testMobileTTS() {
+        showMobileToast('Testando voz mobile...');
+        if (window.jarvisConfig && window.jarvisConfig.testTTS) {
+            window.jarvisConfig.testTTS();
+        }
+    }
+    
+    function testMobileMicrophone() {
+        showMobileToast('Testando microfone mobile...');
+        if (window.jarvisConfig && window.jarvisConfig.testMicrophone) {
+            window.jarvisConfig.testMicrophone();
+        }
+    }
+    
+    async function mobileDiagnose() {
+        showMobileToast('Executando diagnóstico mobile...');
+        
+        const diagnosis = {
+            environment: 'mobile',
+            platform: navigator.platform,
+            userAgent: navigator.userAgent,
+            online: navigator.onLine,
+            connection: navigator.connection ? navigator.connection.effectiveType : 'unknown',
+            battery: navigator.getBattery ? await navigator.getBattery() : null,
+            timestamp: new Date().toISOString()
+        };
+        
+        console.log('📊 Diagnóstico mobile completo:', diagnosis);
+        return diagnosis;
+    }
+    
+    // Expor funções globalmente para uso em outros scripts mobile
+    window.jarvisMobileChat = {
+        addMessage: addMobileMessageToChat,
+        loadHistory: loadMobileChatHistory,
+        clearHistory: clearMobileChatHistory,
+        toggle: toggleMobileChatCanvas
+    };
+    
+    window.jarvisMobile = {
+        showToast: showMobileToast,
+        showQuickActions: showMobileQuickActions,
+        testConnectivity: testMobileConnectivity,
+        testTTS: testMobileTTS,
+        testMicrophone: testMobileMicrophone,
+        diagnose: mobileDiagnose
+    };
+    
+    // Carregar histórico mobile na inicialização
+    loadMobileChatFromStorage();
+    
+    console.log('🎯 JARVIS Mobile script carregado com sucesso!');
+});
+
+// Adicionar estilos de animação para toasts
+const mobileToastStyles = document.createElement('style');
+mobileToastStyles.textContent = `
+    @keyframes mobileToastIn {
+        from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+    
+    @keyframes mobileToastOut {
+        from {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+        }
+    }
+    
+    .mobile-btn.recording {
+        background: linear-gradient(45deg, #FF0000, #FF4444) !important;
+        animation: recordingPulse 1s infinite;
+    }
+    
+    @keyframes recordingPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+`;
+document.head.appendChild(mobileToastStyles);
