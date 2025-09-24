@@ -47,9 +47,30 @@
                         const msg = input.value.trim();
                         if (msg) {
                             console.log("📩 Usuário disse:", msg, "| tempo:", Date.now() - startTime, "ms");
+
+                            // 🔽 Exibir mensagem do usuário no chat
+                            const chatBox = document.getElementById("siri-container");
+                            if (chatBox) {
+                                const userMsg = document.createElement("div");
+                                userMsg.className = "sender_message width-size";
+                                userMsg.innerText = msg;
+                                chatBox.appendChild(userMsg);
+                                chatBox.scrollTop = chatBox.scrollHeight;
+                            }
+
                             input.value = "";
-                            // aqui chamaria a IA Jarvis responder
-                            console.log("🤖 J.A.R.V.I.S responde:", "Simulação de resposta para '" + msg + "'");
+
+                            // 🔽 Simulação de resposta do J.A.R.V.I.S
+                            const resposta = "Entendido! Resposta para: " + msg;
+                            console.log("🤖 J.A.R.V.I.S responde:", resposta);
+
+                            if (chatBox) {
+                                const botMsg = document.createElement("div");
+                                botMsg.className = "receiver_message width-size";
+                                botMsg.innerText = resposta;
+                                chatBox.appendChild(botMsg);
+                                chatBox.scrollTop = chatBox.scrollHeight;
+                            }
                         }
                     });
                 }
