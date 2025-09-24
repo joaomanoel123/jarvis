@@ -10,35 +10,7 @@ const getApiUrl = () => {
     return localStorage.getItem('FRONT_API_URL') || 'https://jarvis-tdgt.onrender.com';
 };
 
-// Expor globalmente para compatibilidade
-window.jarvisConfig = {
-    ...config,
-    updateApiUrl: updateApiUrl,
-    getEnvironment: () => 'github-pages',
-    getApiUrl: () => config.apiUrl,
-    settings: {
-        apiTimeout: config.apiTimeout,
-        language: config.language,
-        debugMode: config.debugMode
-    },
-    showQuickSettings: () => {
-        const current = localStorage.getItem('FRONT_API_URL') || config.apiUrl;
-        const input = prompt('URL da API do JARVIS:', current);
-        if (input !== null && input.trim()) {
-            updateApiUrl(input.trim());
-            alert('✅ API URL atualizada: ' + input.trim());
-        }
-    },
-    diagnose: async () => {
-        try {
-            const response = await fetch(config.apiUrl + '/health', { timeout: 5000 });
-            return { apiConnectivity: response.ok };
-        } catch {
-            return { apiConnectivity: false };
-        }
-    }
-};
-
+// Configurações centrais da aplicação
 const config = {
     debugMode: true, // Ativa logs detalhados no console
     language: 'pt-BR', // Idioma padrão para reconhecimento e síntese de voz
@@ -71,3 +43,35 @@ function updateApiUrl(newUrl) {
     }
     return false;
 }
+
+// Expor globalmente para compatibilidade
+window.jarvisConfig = {
+    ...config,
+    updateApiUrl: updateApiUrl,
+    getEnvironment: () => 'github-pages',
+    getApiUrl: () => config.apiUrl,
+    settings: {
+        apiTimeout: config.apiTimeout,
+        language: config.language,
+        debugMode: config.debugMode
+    },
+    showQuickSettings: () => {
+        const current = localStorage.getItem('FRONT_API_URL') || config.apiUrl;
+        const input = prompt('URL da API do JARVIS:', current);
+        if (input !== null && input.trim()) {
+            updateApiUrl(input.trim());
+            alert('✅ API URL atualizada: ' + input.trim());
+        }
+    },
+    diagnose: async () => {
+        try {
+            const response = await fetch(config.apiUrl + '/health', { timeout: 5000 });
+            return { apiConnectivity: response.ok };
+        } catch {
+            return { apiConnectivity: false };
+        }
+    }
+};
+
+// Exports para compatibilidade com ES6 modules
+export { config, updateApiUrl };
