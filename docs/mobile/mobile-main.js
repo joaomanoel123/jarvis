@@ -723,7 +723,7 @@ $(document).ready(function () {
             google: () => openMobileSite('https://www.google.com', 'Google', 'Abrindo Google!'),
             gmail: () => openMobileSite('https://mail.google.com', 'Gmail', 'Abrindo Gmail!'),
             facebook: () => openMobileSite('https://m.facebook.com', 'Facebook', 'Abrindo Facebook Mobile!'),
-            instagram: () => openMobileSite('https://www.instagram.com', 'Instagram', 'Abrindo Instagram!'),
+            // instagram: () => openMobileSite('https://www.instagram.com', 'Instagram', 'Abrindo Instagram!'), // COMENTADO - estava abrindo automaticamente
             twitter: () => openMobileSite('https://mobile.twitter.com', 'Twitter', 'Abrindo Twitter Mobile!'),
             configurações: () => {
                 console.log('✅ Comando de configurações mobile detectado!');
