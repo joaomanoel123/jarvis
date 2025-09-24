@@ -73,5 +73,5 @@ window.jarvisConfig = {
     }
 };
 
-// Exports para compatibilidade com ES6 modules
-export { config, updateApiUrl };
+// Configurações disponíveis globalmente via window.jarvisConfig
+// Para compatibilidade com scripts que não usam ES6 modules
