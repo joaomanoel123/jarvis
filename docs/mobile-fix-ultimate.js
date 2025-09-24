@@ -1,1 +1,190 @@
-/*\n * MOBILE FIX ULTIMATE - JAVASCRIPT AGRESSIVO PARA ESCONDER TEXTO NO MOBILE\n * Este script deve ser carregado e executado múltiplas vezes\n */\n\n(function() {\n    'use strict';\n    \n    console.log('🔧 Mobile Fix Ultimate carregado');\n    \n    // Função para esconder o elemento de forma agressiva\n    function hideAskTextAggressive() {\n        const isMobile = window.innerWidth < 768;\n        \n        if (!isMobile) {\n            console.log('🖥️ Desktop detectado - não aplicando fix mobile');\n            return false;\n        }\n        \n        console.log('📱 Mobile detectado - aplicando fix agressivo');\n        \n        // Múltiplos seletores para garantir que encontremos o elemento\n        const selectors = [\n            'h5.text-light.text-center',\n            '.text-light.text-center',\n            'h5[class*=\"text-light\"][class*=\"text-center\"]',\n            'h5:contains(\"Pergunte-me qualquer coisa\")',\n            '*:contains(\"Pergunte-me qualquer coisa\")'\n        ];\n        \n        let elementsHidden = 0;\n        \n        selectors.forEach(selector => {\n            try {\n                const elements = document.querySelectorAll(selector);\n                elements.forEach(element => {\n                    if (element && element.textContent && element.textContent.includes('Pergunte-me qualquer coisa')) {\n                        // Aplicar múltiplas técnicas de ocultação\n                        element.style.display = 'none';\n                        element.style.visibility = 'hidden';\n                        element.style.opacity = '0';\n                        element.style.height = '0';\n                        element.style.margin = '0';\n                        element.style.padding = '0';\n                        element.style.overflow = 'hidden';\n                        element.style.position = 'absolute';\n                        element.style.left = '-9999px';\n                        element.style.top = '-9999px';\n                        element.style.zIndex = '-1';\n                        \n                        // Adicionar classes de ocultação\n                        element.classList.add('mobile-hide', 'hide-mobile', 'd-none');\n                        \n                        // Remover do DOM como último recurso\n                        element.setAttribute('hidden', 'true');\n                        element.setAttribute('aria-hidden', 'true');\n                        \n                        elementsHidden++;\n                        console.log(`✅ Elemento escondido: ${selector}`);\n                    }\n                });\n            } catch (e) {\n                console.warn(`⚠️ Erro com seletor ${selector}:`, e.message);\n            }\n        });\n        \n        // Busca por texto específico\n        const allElements = document.querySelectorAll('*');\n        allElements.forEach(element => {\n            if (element.textContent && element.textContent.trim() === 'Pergunte-me qualquer coisa') {\n                element.style.display = 'none';\n                element.classList.add('mobile-hide');\n                elementsHidden++;\n                console.log('✅ Elemento escondido por texto específico');\n            }\n        });\n        \n        console.log(`📊 Total de elementos escondidos: ${elementsHidden}`);\n        return elementsHidden > 0;\n    }\n    \n    // Função para aplicar CSS dinâmico\n    function applyCSSFix() {\n        const style = document.createElement('style');\n        style.id = 'mobile-fix-ultimate-css';\n        style.innerHTML = `\n            @media screen and (max-width: 768px) {\n                h5.text-light.text-center,\n                .text-light.text-center {\n                    display: none !important;\n                    visibility: hidden !important;\n                    opacity: 0 !important;\n                    height: 0 !important;\n                    position: absolute !important;\n                    left: -9999px !important;\n                }\n            }\n        `;\n        \n        // Remover estilo anterior se existir\n        const existingStyle = document.getElementById('mobile-fix-ultimate-css');\n        if (existingStyle) {\n            existingStyle.remove();\n        }\n        \n        document.head.appendChild(style);\n        console.log('🎨 CSS dinâmico aplicado');\n    }\n    \n    // Função principal\n    function executeMobileFix() {\n        console.log('🚀 Executando Mobile Fix Ultimate...');\n        \n        // 1. Aplicar CSS dinâmico\n        applyCSSFix();\n        \n        // 2. Esconder elementos via JavaScript\n        const hidden = hideAskTextAggressive();\n        \n        // 3. Log do resultado\n        if (hidden) {\n            console.log('✅ Mobile Fix aplicado com sucesso');\n        } else {\n            console.log('ℹ️ Nenhum elemento encontrado para esconder');\n        }\n        \n        return hidden;\n    }\n    \n    // Executar imediatamente\n    executeMobileFix();\n    \n    // Executar quando DOM estiver pronto\n    if (document.readyState === 'loading') {\n        document.addEventListener('DOMContentLoaded', executeMobileFix);\n    }\n    \n    // Executar quando página estiver totalmente carregada\n    if (document.readyState !== 'complete') {\n        window.addEventListener('load', executeMobileFix);\n    }\n    \n    // Executar quando jQuery estiver pronto (se disponível)\n    if (typeof $ !== 'undefined') {\n        $(document).ready(executeMobileFix);\n    }\n    \n    // Executar periodicamente para garantir\n    const intervals = [500, 1000, 2000, 3000, 5000];\n    intervals.forEach(delay => {\n        setTimeout(executeMobileFix, delay);\n    });\n    \n    // Executar quando a janela for redimensionada\n    window.addEventListener('resize', function() {\n        setTimeout(executeMobileFix, 100);\n    });\n    \n    // Observar mudanças no DOM\n    if (typeof MutationObserver !== 'undefined') {\n        const observer = new MutationObserver(function(mutations) {\n            let shouldCheck = false;\n            mutations.forEach(function(mutation) {\n                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {\n                    shouldCheck = true;\n                }\n            });\n            \n            if (shouldCheck) {\n                setTimeout(executeMobileFix, 100);\n            }\n        });\n        \n        observer.observe(document.body, {\n            childList: true,\n            subtree: true\n        });\n        \n        console.log('👁️ Observer de DOM ativado');\n    }\n    \n    // Expor função globalmente para debug\n    window.mobileFix = {\n        execute: executeMobileFix,\n        hide: hideAskTextAggressive,\n        css: applyCSSFix\n    };\n    \n    console.log('🎯 Mobile Fix Ultimate inicializado');\n})();"
+/*
+ * MOBILE FIX ULTIMATE - JAVASCRIPT AGRESSIVO PARA ESCONDER TEXTO NO MOBILE
+ * Este script deve ser carregado e executado múltiplas vezes
+ */
+
+(function() {
+    'use strict';
+    
+    console.log('🔧 Mobile Fix Ultimate carregado');
+    
+    // Função para esconder o elemento de forma agressiva
+    function hideAskTextAggressive() {
+        const isMobile = window.innerWidth < 768;
+        
+        if (!isMobile) {
+            console.log('🖥️ Desktop detectado - não aplicando fix mobile');
+            return false;
+        }
+        
+        console.log('📱 Mobile detectado - aplicando fix agressivo');
+        
+        // Múltiplos seletores para garantir que encontremos o elemento
+        const selectors = [
+            'h5.text-light.text-center',
+            '.text-light.text-center',
+            'h5[class*="text-light"][class*="text-center"]',
+            'h5:contains("Pergunte-me qualquer coisa")',
+            '*:contains("Pergunte-me qualquer coisa")'
+        ];
+        
+        let elementsHidden = 0;
+        
+        selectors.forEach(selector => {
+            try {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(element => {
+                    if (element && element.textContent && element.textContent.includes('Pergunte-me qualquer coisa')) {
+                        // Aplicar múltiplas técnicas de ocultação
+                        element.style.display = 'none';
+                        element.style.visibility = 'hidden';
+                        element.style.opacity = '0';
+                        element.style.height = '0';
+                        element.style.margin = '0';
+                        element.style.padding = '0';
+                        element.style.overflow = 'hidden';
+                        element.style.position = 'absolute';
+                        element.style.left = '-9999px';
+                        element.style.top = '-9999px';
+                        element.style.zIndex = '-1';
+                        
+                        // Adicionar classes de ocultação
+                        element.classList.add('mobile-hide', 'hide-mobile', 'd-none');
+                        
+                        // Remover do DOM como último recurso
+                        element.setAttribute('hidden', 'true');
+                        element.setAttribute('aria-hidden', 'true');
+                        
+                        elementsHidden++;
+                        console.log(`✅ Elemento escondido: ${selector}`);
+                    }
+                });
+            } catch (e) {
+                console.warn(`⚠️ Erro com seletor ${selector}:`, e.message);
+            }
+        });
+        
+        // Busca por texto específico
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(element => {
+            if (element.textContent && element.textContent.trim() === 'Pergunte-me qualquer coisa') {
+                element.style.display = 'none';
+                element.classList.add('mobile-hide');
+                elementsHidden++;
+                console.log('✅ Elemento escondido por texto específico');
+            }
+        });
+        
+        console.log(`📊 Total de elementos escondidos: ${elementsHidden}`);
+        return elementsHidden > 0;
+    }
+    
+    // Função para aplicar CSS dinâmico
+    function applyCSSFix() {
+        const style = document.createElement('style');
+        style.id = 'mobile-fix-ultimate-css';
+        style.innerHTML = `
+            @media screen and (max-width: 768px) {
+                h5.text-light.text-center,
+                .text-light.text-center {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    height: 0 !important;
+                    position: absolute !important;
+                    left: -9999px !important;
+                }
+            }
+        `;
+        
+        // Remover estilo anterior se existir
+        const existingStyle = document.getElementById('mobile-fix-ultimate-css');
+        if (existingStyle) {
+            existingStyle.remove();
+        }
+        
+        document.head.appendChild(style);
+        console.log('🎨 CSS dinâmico aplicado');
+    }
+    
+    // Função principal
+    function executeMobileFix() {
+        console.log('🚀 Executando Mobile Fix Ultimate...');
+        
+        // 1. Aplicar CSS dinâmico
+        applyCSSFix();
+        
+        // 2. Esconder elementos via JavaScript
+        const hidden = hideAskTextAggressive();
+        
+        // 3. Log do resultado
+        if (hidden) {
+            console.log('✅ Mobile Fix aplicado com sucesso');
+        } else {
+            console.log('ℹ️ Nenhum elemento encontrado para esconder');
+        }
+        
+        return hidden;
+    }
+    
+    // Executar imediatamente
+    executeMobileFix();
+    
+    // Executar quando DOM estiver pronto
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', executeMobileFix);
+    }
+    
+    // Executar quando página estiver totalmente carregada
+    if (document.readyState !== 'complete') {
+        window.addEventListener('load', executeMobileFix);
+    }
+    
+    // Executar quando jQuery estiver pronto (se disponível)
+    if (typeof $ !== 'undefined') {
+        $(document).ready(executeMobileFix);
+    }
+    
+    // Executar periodicamente para garantir
+    const intervals = [500, 1000, 2000, 3000, 5000];
+    intervals.forEach(delay => {
+        setTimeout(executeMobileFix, delay);
+    });
+    
+    // Executar quando a janela for redimensionada
+    window.addEventListener('resize', function() {
+        setTimeout(executeMobileFix, 100);
+    });
+    
+    // Observar mudanças no DOM
+    if (typeof MutationObserver !== 'undefined') {
+        const observer = new MutationObserver(function(mutations) {
+            let shouldCheck = false;
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    shouldCheck = true;
+                }
+            });
+            
+            if (shouldCheck) {
+                setTimeout(executeMobileFix, 100);
+            }
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        console.log('👁️ Observer de DOM ativado');
+    }
+    
+    // Expor função globalmente para debug
+    window.mobileFix = {
+        execute: executeMobileFix,
+        hide: hideAskTextAggressive,
+        css: applyCSSFix
+    };
+    
+    console.log('🎯 Mobile Fix Ultimate inicializado');
+})();
