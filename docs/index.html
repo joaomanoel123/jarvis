@@ -427,26 +427,49 @@
         }
 
         // Carregar apenas scripts que existem
-        async function loadJarvisScripts() {
-            const scripts = [
-                { src: 'js/core-js.min.js', name: 'Core JS' },
-                { src: 'main-github-pages-fixed.js', name: 'Main Script' },
-                { src: 'jarvis-speech-recognition.js', name: 'Speech Recognition' },
-                { src: 'jarvis-tts.js', name: 'Text-to-Speech' }
-            ];
-            
-            console.log('📦 Carregando scripts JARVIS...');
-            
-            for (const script of scripts) {
-                const loaded = await loadScriptWithTimeout(script.src, 3000);
-                console.log(`${loaded ? '✅' : '⚠️'} ${script.name}: ${loaded ? 'Carregado' : 'Não encontrado'}`);
+console.log('🚀 Carregando scripts JARVIS...');
+
+// Carregar apenas o script principal unificado
+const mainScript = document.createElement('script');
+mainScript.src = 'main-github-pages-fixed.js';
+
+mainScript.onload = () => {
+    console.log('✅ Main script carregado com sucesso');
+};
+
+mainScript.onerror = () => {
+    console.error('❌ Erro ao carregar main script');
+    
+    // Remover loading mesmo em caso de erro
+    const loadingScreen = document.getElementById("loadingScreen");
+    if (loadingScreen) {
+        loadingScreen.classList.add("fade-out");
+        setTimeout(() => {
+            loadingScreen.remove();
+            document.getElementById("Start").hidden = false;
+        }, 700);
+    }
+};
+
+document.head.appendChild(mainScript);
+
+// Timeout de segurança: remover loading após 3 segundos independente de qualquer coisa
+setTimeout(() => {
+    const loadingScreen = document.getElementById("loadingScreen");
+    if (loadingScreen && loadingScreen.parentElement) {
+        console.log('⏰ Timeout: removendo loading screen');
+        loadingScreen.classList.add("fade-out");
+        setTimeout(() => {
+            if (loadingScreen.parentElement) {
+                loadingScreen.remove();
             }
-            
-            console.log('🎯 Carregamento de scripts concluído');
-        }
-        
-        // Iniciar carregamento
-        loadJarvisScripts();
+            const startSection = document.getElementById("Start");
+            if (startSection) {
+                startSection.hidden = false;
+            }
+        }, 700);
+    }
+}, 3000);
     </script>
 
     <!-- Service Worker Registration -->
@@ -556,27 +579,37 @@
         }
     </script>
 
-    <!-- Script para remover a tela de loading -->
     <script>
-    window.addEventListener("load", function() {
-        const loadingScreen = document.getElementById("loadingScreen");
-        const startSection = document.getElementById("Start");
-
-        if (loadingScreen) {
+    // Script para remover a tela de loading - VERSÃO CORRIGIDA
+document.addEventListener("DOMContentLoaded", function() {
+    console.log('✅ DOM carregado');
+    
+    const loadingScreen = document.getElementById("loadingScreen");
+    const startSection = document.getElementById("Start");
+    
+    // Remove loading após 2 segundos OU quando tudo carregar
+    const removeLoading = () => {
+        if (loadingScreen && !loadingScreen.classList.contains('fade-out')) {
+            console.log('🎬 Removendo tela de loading...');
             loadingScreen.classList.add("fade-out");
-
             setTimeout(() => {
                 loadingScreen.remove();
                 if (startSection) {
                     startSection.hidden = false;
-                    // aplica o fade-in suavemente
                     requestAnimationFrame(() => {
                         startSection.classList.add("visible");
                     });
                 }
             }, 700);
         }
-    });
+    };
+    
+    // Timeout de segurança: remove após 2 segundos independente de qualquer coisa
+    setTimeout(removeLoading, 2000);
+    
+    // Também tenta remover no load completo (se acontecer antes)
+    window.addEventListener("load", removeLoading);
+});
     </script>
 
     <link rel="stylesheet" href="mobile-fix-ultimate.css">
