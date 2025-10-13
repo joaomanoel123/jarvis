@@ -553,27 +553,37 @@
         }
     </script>
 
-    <!-- Script para remover a tela de loading -->
     <script>
-    window.addEventListener("load", function() {
-        const loadingScreen = document.getElementById("loadingScreen");
-        const startSection = document.getElementById("Start");
-
-        if (loadingScreen) {
+    // Script para remover a tela de loading - VERSÃO CORRIGIDA
+document.addEventListener("DOMContentLoaded", function() {
+    console.log('✅ DOM carregado');
+    
+    const loadingScreen = document.getElementById("loadingScreen");
+    const startSection = document.getElementById("Start");
+    
+    // Remove loading após 2 segundos OU quando tudo carregar
+    const removeLoading = () => {
+        if (loadingScreen && !loadingScreen.classList.contains('fade-out')) {
+            console.log('🎬 Removendo tela de loading...');
             loadingScreen.classList.add("fade-out");
-
             setTimeout(() => {
                 loadingScreen.remove();
                 if (startSection) {
                     startSection.hidden = false;
-                    // aplica o fade-in suavemente
                     requestAnimationFrame(() => {
                         startSection.classList.add("visible");
                     });
                 }
             }, 700);
         }
-    });
+    };
+    
+    // Timeout de segurança: remove após 2 segundos independente de qualquer coisa
+    setTimeout(removeLoading, 2000);
+    
+    // Também tenta remover no load completo (se acontecer antes)
+    window.addEventListener("load", removeLoading);
+});
     </script>
 
     <link rel="stylesheet" href="mobile-fix-ultimate.css">
