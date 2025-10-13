@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: jarvis-groq-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    
+    envVars:
+      # Groq API Key (configure no Dashboard)
+      - key: GROQ_API_KEY
+        sync: false
+      
+      # Porta (Render define automaticamente)
+      - key: PORT
+        value: 10000
+      
+      # Modelo
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      
+      # Ambiente
+      - key: NODE_ENV
+        value: production
+    
+    autoDeploy: true
+    branch: main

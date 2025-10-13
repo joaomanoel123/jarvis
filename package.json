@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@composio/rube-mcp": "github:composiohq/rube"
+  }
+}
