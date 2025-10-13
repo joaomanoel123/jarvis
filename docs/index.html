@@ -424,26 +424,49 @@
         }
 
         // Carregar apenas scripts que existem
-        async function loadJarvisScripts() {
-            const scripts = [
-                { src: 'js/core-js.min.js', name: 'Core JS' },
-                { src: 'main-github-pages-fixed.js', name: 'Main Script' },
-                { src: 'jarvis-speech-recognition.js', name: 'Speech Recognition' },
-                { src: 'jarvis-tts.js', name: 'Text-to-Speech' }
-            ];
-            
-            console.log('📦 Carregando scripts JARVIS...');
-            
-            for (const script of scripts) {
-                const loaded = await loadScriptWithTimeout(script.src, 3000);
-                console.log(`${loaded ? '✅' : '⚠️'} ${script.name}: ${loaded ? 'Carregado' : 'Não encontrado'}`);
+console.log('🚀 Carregando scripts JARVIS...');
+
+// Carregar apenas o script principal unificado
+const mainScript = document.createElement('script');
+mainScript.src = 'main-github-pages-fixed.js';
+
+mainScript.onload = () => {
+    console.log('✅ Main script carregado com sucesso');
+};
+
+mainScript.onerror = () => {
+    console.error('❌ Erro ao carregar main script');
+    
+    // Remover loading mesmo em caso de erro
+    const loadingScreen = document.getElementById("loadingScreen");
+    if (loadingScreen) {
+        loadingScreen.classList.add("fade-out");
+        setTimeout(() => {
+            loadingScreen.remove();
+            document.getElementById("Start").hidden = false;
+        }, 700);
+    }
+};
+
+document.head.appendChild(mainScript);
+
+// Timeout de segurança: remover loading após 3 segundos independente de qualquer coisa
+setTimeout(() => {
+    const loadingScreen = document.getElementById("loadingScreen");
+    if (loadingScreen && loadingScreen.parentElement) {
+        console.log('⏰ Timeout: removendo loading screen');
+        loadingScreen.classList.add("fade-out");
+        setTimeout(() => {
+            if (loadingScreen.parentElement) {
+                loadingScreen.remove();
             }
-            
-            console.log('🎯 Carregamento de scripts concluído');
-        }
-        
-        // Iniciar carregamento
-        loadJarvisScripts();
+            const startSection = document.getElementById("Start");
+            if (startSection) {
+                startSection.hidden = false;
+            }
+        }, 700);
+    }
+}, 3000);
     </script>
 
     <!-- Service Worker Registration -->
