@@ -1,8 +1,6 @@
 /**
- * server.js - JARVIS API com Groq DIRETO
- * 
- * Versão simplificada SEM Rube - apenas Groq API
- * Mais fácil, mais estável, totalmente GRÁTIS
+ * server.js - JARVIS API com Groq
+ * Versão final testada e funcional
  */
 
 import express from "express";
@@ -15,53 +13,50 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+// Verificar se Groq API Key está configurada
+if (!process.env.GROQ_API_KEY) {
+  console.error('❌ GROQ_API_KEY não encontrada!');
+  console.log('Configure no Render Dashboard ou no .env local');
+  process.exit(1);
+}
+
 // Inicializar Groq
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
-// Verificar se API key está configurada
-if (!process.env.GROQ_API_KEY) {
-  console.error('❌ GROQ_API_KEY não configurada!');
-  console.log('💡 Obtenha gratuitamente em: https://console.groq.com');
-  process.exit(1);
-}
+console.log('✅ Groq SDK inicializado');
 
-// Middleware CORS - CORRIGIDO para GitHub Pages
+// Configuração CORS permissiva
 app.use(cors({
   origin: function(origin, callback) {
-    // Permitir requisições sem origin (mobile apps, curl, etc)
+    // Permitir requisições sem origin (Postman, curl, etc)
     if (!origin) return callback(null, true);
     
-    const allowedOrigins = [
-      'https://joaomanoel123.github.io',
-      'http://localhost:3000',
-      'http://localhost:5500',
-      'http://127.0.0.1:5500',
-      'http://127.0.0.1:5173',
-      'http://localhost:8000'
-    ];
-    
-    // Permitir qualquer subdomínio/subpasta do GitHub Pages
-    if (origin.includes('joaomanoel123.github.io') || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(null, true); // Por enquanto, permitir todas (desenvolvimento)
+    // Permitir todas as origens do GitHub Pages
+    if (origin.includes('github.io')) {
+      return callback(null, true);
     }
+    
+    // Permitir localhost
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+    
+    // Por segurança, permitir tudo por enquanto
+    callback(null, true);
   },
-  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Accept', 'Authorization', 'X-Requested-With']
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
+  credentials: true
 }));
 
-// Headers CORS adicionais (fallback)
+// Headers CORS adicionais
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With');
-  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization');
   
-  // Responder imediatamente a OPTIONS (preflight)
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -81,91 +76,66 @@ app.use((req, res, next) => {
 // Modelo padrão
 const DEFAULT_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
-// System prompt do JARVIS
-const JARVIS_SYSTEM_PROMPT = `Você é JARVIS (Just A Rather Very Intelligent System), o assistente virtual do Tony Stark.
-
-Características:
-- Seja educado, prestativo e conciso
-- Responda SEMPRE em português brasileiro
-- Use tom profissional mas amigável
-- Seja direto nas respostas
-- Se não souber algo, admita honestamente
-
-Você pode:
-✅ Responder perguntas gerais
-✅ Explicar conceitos
-✅ Fazer cálculos
-✅ Contar piadas
-✅ Dar dicas e sugestões
-✅ Conversar naturalmente
-
-NÃO invente informações. Seja preciso.`;
+// System prompt
+const JARVIS_PROMPT = `Você é JARVIS, assistente virtual do Tony Stark.
+Responda SEMPRE em português brasileiro.
+Seja educado, prestativo e conciso.`;
 
 // ==============================================
 // ROTAS
 // ==============================================
 
-// Health check básico
+// Root
 app.get("/", (req, res) => {
   res.json({
     status: "online",
-    service: "JARVIS API - Groq Direct",
+    service: "JARVIS API",
     version: "2.0.0",
     model: DEFAULT_MODEL,
-    provider: "Groq",
     timestamp: new Date().toISOString()
   });
 });
 
-// Health check detalhado
+// Health check
 app.get("/health", (req, res) => {
   res.json({
     status: "healthy",
     groq: "ready",
     model: DEFAULT_MODEL,
-    uptime: process.uptime(),
+    uptime: Math.floor(process.uptime()),
     memory: process.memoryUsage(),
     timestamp: new Date().toISOString()
   });
 });
 
-// Endpoint principal de comandos
+// Comando principal
 app.post("/command", async (req, res) => {
   try {
     const { message } = req.body;
     
-    // Validar entrada
-    if (!message || typeof message !== 'string' || message.trim() === '') {
+    if (!message || typeof message !== 'string' || !message.trim()) {
       return res.status(400).json({
         error: true,
-        reply: "Mensagem inválida. Por favor, envie um texto."
+        reply: "Mensagem inválida"
       });
     }
     
-    console.log('📨 Comando recebido:', message);
+    console.log('📨 Comando:', message);
     
-    // Chamar Groq API
-    const chatCompletion = await groq.chat.completions.create({
+    // Chamar Groq
+    const completion = await groq.chat.completions.create({
       messages: [
-        {
-          role: "system",
-          content: JARVIS_SYSTEM_PROMPT
-        },
-        {
-          role: "user",
-          content: message
-        }
+        { role: "system", content: JARVIS_PROMPT },
+        { role: "user", content: message }
       ],
       model: DEFAULT_MODEL,
       temperature: 0.7,
-      max_tokens: 500,
-      top_p: 1,
-      stream: false
+      max_tokens: 500
     });
     
-    const reply = chatCompletion.choices[0]?.message?.content || "Desculpe, não consegui processar sua solicitação.";
+    const reply = completion.choices[0]?.message?.content || "Erro ao gerar resposta";
     
-    console.log('✅ Resposta gerada:', reply.substring(0, 100) + '...');
+    console.log('✅ Resposta gerada');
     
     res.json({
       error: false,
@@ -175,108 +145,81 @@ app.post("/command", async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Erro ao processar comando:', error);
+    console.error('❌ Erro:', error.message);
     
-    // Verificar tipo de erro
-    let errorMessage = "Desculpe, ocorreu um erro ao processar seu comando.";
+    let errorMsg = "Erro ao processar comando";
     
     if (error.status === 429) {
-      errorMessage = "Limite de requisições atingido. Aguarde alguns segundos.";
+      errorMsg = "Limite de requisições atingido. Aguarde.";
     } else if (error.status === 401) {
-      errorMessage = "Erro de autenticação. API key inválida.";
-    } else if (error.message) {
-      errorMessage = `Erro: ${error.message}`;
+      errorMsg = "Erro de autenticação. Verifique a API key.";
     }
     
     res.status(error.status || 500).json({
       error: true,
-      reply: errorMessage,
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      reply: errorMsg
     });
   }
 });
 
-// Endpoint de chat com histórico
+// Chat com histórico
 app.post("/chat", async (req, res) => {
   try {
-    const { messages, temperature = 0.7, max_tokens = 500 } = req.body;
+    const { messages } = req.body;
     
-    // Validar entrada
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    if (!Array.isArray(messages)) {
       return res.status(400).json({
         error: true,
-        reply: "Formato de mensagens inválido. Envie um array de mensagens."
+        reply: "Formato inválido"
       });
     }
     
-    console.log('💬 Chat recebido:', messages.length, 'mensagens');
-    
-    // Adicionar system prompt
-    const fullMessages = [
-      {
-        role: "system",
-        content: JARVIS_SYSTEM_PROMPT
-      },
-      ...messages
-    ];
-    
-    // Chamar Groq API
-    const chatCompletion = await groq.chat.completions.create({
-      messages: fullMessages,
+    const completion = await groq.chat.completions.create({
+      messages: [
+        { role: "system", content: JARVIS_PROMPT },
+        ...messages
+      ],
       model: DEFAULT_MODEL,
-      temperature,
-      max_tokens,
-      top_p: 1,
-      stream: false
+      temperature: 0.7,
+      max_tokens: 500
     });
     
-    const reply = chatCompletion.choices[0]?.message?.content || "Erro ao gerar resposta.";
-    
-    console.log('✅ Resposta do chat gerada');
+    const reply = completion.choices[0]?.message?.content || "Erro";
     
     res.json({
       error: false,
       reply: reply,
-      model: DEFAULT_MODEL,
       timestamp: new Date().toISOString()
     });
     
   } catch (error) {
-    console.error('❌ Erro no chat:', error);
+    console.error('❌ Erro no chat:', error.message);
     
-    res.status(error.status || 500).json({
+    res.status(500).json({
       error: true,
-      reply: "Erro ao processar conversa.",
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      reply: "Erro ao processar conversa"
     });
   }
 });
 
-// Listar modelos disponíveis
-app.get("/models", async (req, res) => {
-  try {
-    const models = await groq.models.list();
-    
-    res.json({
-      models: models.data.map(m => ({
-        id: m.id,
-        name: m.id,
-        context_window: m.context_window
-      })),
-      current: DEFAULT_MODEL
-    });
-  } catch (error) {
-    console.error('❌ Erro ao listar modelos:', error);
-    
-    res.json({
-      models: [
-        { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B" },
-        { id: "llama-3.1-8b-instant", name: "Llama 3.1 8B (Rápido)" },
-        { id: "mixtral-8x7b-32768", name: "Mixtral 8x7B" }
-      ],
-      current: DEFAULT_MODEL
-    });
-  }
+// Modelos disponíveis
+app.get("/models", (req, res) => {
+  res.json({
+    models: [
+      { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B (Padrão)" },
+      { id: "llama-3.1-8b-instant", name: "Llama 3.1 8B (Rápido)" },
+      { id: "mixtral-8x7b-32768", name: "Mixtral 8x7B" }
+    ],
+    current: DEFAULT_MODEL
+  });
+});
+
+// Erro 404
+app.use((req, res) => {
+  res.status(404).json({
+    error: true,
+    message: "Endpoint não encontrado"
+  });
 });
 
 // Tratamento de erros global
@@ -285,30 +228,28 @@ app.use((err, req, res, next) => {
   
   res.status(500).json({
     error: true,
-    reply: "Erro interno do servidor.",
-    details: process.env.NODE_ENV === 'development' ? err.message : undefined
+    reply: "Erro interno do servidor"
   });
 });
 
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log('═══════════════════════════════════════');
-  console.log('🤖 JARVIS API - Groq Direct');
+  console.log('🤖 JARVIS API - Groq');
   console.log('═══════════════════════════════════════');
-  console.log(`🌐 Servidor rodando na porta ${PORT}`);
+  console.log(`🌐 Porta: ${PORT}`);
   console.log(`🧠 Modelo: ${DEFAULT_MODEL}`);
-  console.log(`🔗 URL: http://localhost:${PORT}`);
-  console.log(`📊 Health: http://localhost:${PORT}/health`);
+  console.log(`🔗 Health: http://localhost:${PORT}/health`);
   console.log('═══════════════════════════════════════');
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('📴 SIGTERM recebido, encerrando...');
+  console.log('📴 Encerrando...');
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  console.log('📴 SIGINT recebido, encerrando...');
+  console.log('📴 Encerrando...');
   process.exit(0);
 });
