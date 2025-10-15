@@ -1,18 +1,13 @@
 {
   "name": "jarvis-groq-api",
   "version": "2.0.0",
-  "description": "JARVIS API com Groq",
+  "description": "JARVIS API Backend",
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "start": "node server.js"
   },
-  "keywords": [
-    "jarvis",
-    "groq",
-    "ai"
-  ],
+  "keywords": ["jarvis", "groq", "ai"],
   "author": "João Manoel",
   "license": "MIT",
   "dependencies": {
