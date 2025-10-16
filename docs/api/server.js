@@ -8,6 +8,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+console.log('🚀 Iniciando JARVIS API...');
+
 // Verificar Groq API Key
 if (!process.env.GROQ_API_KEY) {
   console.error('❌ GROQ_API_KEY não encontrada!');
@@ -16,61 +18,69 @@ if (!process.env.GROQ_API_KEY) {
 
 // Inicializar Groq
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-console.log('✅ Groq inicializado');
+console.log('✅ Groq SDK inicializado');
 
-// CORS TOTALMENTE ABERTO (aceita qualquer origem)
+// CORS - Aceitar TODAS as origens
 app.use(cors());
 
-// OU CORS CONTROLADO (mais seguro):
-// app.use(cors({
-//   origin: '*', // Permite TODAS as origens
-//   methods: ['GET', 'POST', 'OPTIONS'],
-//   allowedHeaders: ['Content-Type', 'Accept']
-// }));
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Log de requisições
+// Log de todas as requisições
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
+  console.log(`📨 ${req.method} ${req.path} - ${req.ip}`);
   next();
 });
 
-// Rotas
+// ============================================
+// ROTAS
+// ============================================
+
+// Rota raiz
 app.get("/", (req, res) => {
+  console.log('✅ GET / - OK');
   res.json({ 
     status: "online", 
     service: "JARVIS API",
+    version: "2.0.0",
     timestamp: new Date().toISOString()
   });
 });
 
+// Health check
 app.get("/health", (req, res) => {
+  console.log('✅ GET /health - OK');
   res.json({ 
     status: "healthy", 
     groq: "ready",
-    uptime: Math.floor(process.uptime())
+    model: "llama-3.3-70b-versatile",
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString()
   });
 });
 
+// Comando principal
 app.post("/command", async (req, res) => {
   try {
     const { message } = req.body;
     
-    if (!message?.trim()) {
+    console.log('📨 POST /command - Mensagem:', message);
+    
+    if (!message || !message.trim()) {
+      console.log('❌ Mensagem vazia');
       return res.status(400).json({ 
         error: true, 
         reply: "Mensagem vazia" 
       });
     }
     
-    console.log('📨 Comando:', message);
+    console.log('🤖 Chamando Groq API...');
     
     const completion = await groq.chat.completions.create({
       messages: [
         { 
           role: "system", 
-          content: "Você é JARVIS, assistente virtual do Tony Stark. Responda SEMPRE em português brasileiro. Seja educado e conciso." 
+          content: "Você é JARVIS, assistente virtual inteligente. Responda SEMPRE em português brasileiro de forma educada e concisa." 
         },
         { role: "user", content: message }
       ],
@@ -81,7 +91,7 @@ app.post("/command", async (req, res) => {
     
     const reply = completion.choices[0]?.message?.content || "Erro ao gerar resposta";
     
-    console.log('✅ Resposta gerada');
+    console.log('✅ Resposta gerada:', reply.substring(0, 50) + '...');
     
     res.json({ 
       error: false, 
@@ -91,14 +101,14 @@ app.post("/command", async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Erro:', error.message);
+    console.error('❌ Erro no comando:', error.message);
     
     let errorMsg = "Erro ao processar comando";
     
     if (error.status === 429) {
-      errorMsg = "Limite de requisições atingido. Aguarde.";
+      errorMsg = "Limite de requisições atingido. Aguarde alguns segundos.";
     } else if (error.status === 401) {
-      errorMsg = "Erro de autenticação da API.";
+      errorMsg = "Erro de autenticação. Verifique a API key.";
     }
     
     res.status(error.status || 500).json({ 
@@ -108,22 +118,46 @@ app.post("/command", async (req, res) => {
   }
 });
 
+// Rota 404
+app.use((req, res) => {
+  console.log(`❌ 404 - Rota não encontrada: ${req.method} ${req.path}`);
+  res.status(404).json({
+    error: true,
+    message: `Rota não encontrada: ${req.method} ${req.path}`,
+    availableRoutes: ['GET /', 'GET /health', 'POST /command']
+  });
+});
+
+// Tratamento de erros
+app.use((err, req, res, next) => {
+  console.error('❌ Erro não tratado:', err);
+  res.status(500).json({ 
+    error: true, 
+    reply: "Erro interno do servidor" 
+  });
+});
+
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log('═══════════════════════════════════════');
   console.log('🤖 JARVIS API - Groq');
+  console.log('═══════════════════════════════════════');
   console.log(`🌐 Porta: ${PORT}`);
   console.log(`🧠 Modelo: llama-3.3-70b-versatile`);
+  console.log(`🔗 Rotas disponíveis:`);
+  console.log(`   GET  / - Status`);
+  console.log(`   GET  /health - Health check`);
+  console.log(`   POST /command - Processar comando`);
   console.log('═══════════════════════════════════════');
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('📴 Encerrando...');
+  console.log('📴 SIGTERM - Encerrando...');
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  console.log('📴 Encerrando...');
+  console.log('📴 SIGINT - Encerrando...');
   process.exit(0);
 });
